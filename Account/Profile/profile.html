@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1526">
+  <title>ملفي الشخصي — أفق</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
+  
+  
+  <link rel="icon" type="image/png" href="../../assets/branding/ofoq-logo.png?v=ofoq-11">
+    
+  <link rel="stylesheet" href="profile.css">
+  <link rel="stylesheet" href="../../assets/arabic-ui.css">
+  <script src="../../assets/publishers.js"></script>
+  <script defer src="../../assets/arabic-ui.js"></script>
+</head>
+<body data-section="lobby">
+  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+  <header class="site-header">
+  <div class="container-xl header-inner">
+    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
+      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
+      <a data-section-link="academy" href="../../Academy/academy.html">الأكاديمية</a>
+      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
+      <a data-section-link="jobs" href="../../Jobs/jobs.html">الوظائف</a>
+      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
+    </nav></details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../../Auth/Login/login.html">تسجيل الدخول</a><a href="../../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="profile.html">الملف الشخصي</a><a href="../Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Messages/messages.html">الرسائل</a><a href="../Settings/settings.html">الإعدادات</a></div></details></nav>
+  </div>
+</header>
+  <main id="mainContent" tabindex="-1" class="container-xl account-page">
+    <div class="account-heading">
+      <div>
+        <p class="eyebrow mb-3">أفق / مساحتي</p>
+        <h1>قصتك. <em>ملفك الشخصي.</em></h1>
+        <p>عرّف بمهاراتك وما تطمح إلى إنجازه.</p>
+      </div>
+      <a class="btn btn-orange" href="../Dashboard/dashboard.html">افتح لوحة المتابعة ←</a>
+    </div>
+    <p class="preview-note">ملف شخصي توضيحي. التعديلات مؤقتة وتختفي عند تحديث الصفحة.</p>
+
+    <div class="account-grid">
+      <aside class="account-panel profile-identity" aria-label="ملخص الملف الشخصي">
+        <div id="profileAvatar" class="profile-avatar" aria-hidden="true">A</div>
+        <h2 id="profileName" dir="auto">أليكس مورغان</h2>
+        <p id="profileRole" class="profile-role" dir="auto">مصمم واجهات ومطوّر مواقع</p>
+        <p id="profileLocation" class="profile-location" dir="auto">عمّان، الأردن</p>
+        <span class="availability">متاح للعمل الحر</span>
+        <button id="editProfile" class="btn btn-orange" type="button">تعديل الملف</button>
+        <a class="profile-dashboard-link" href="../Dashboard/dashboard.html">لوحة متابعتي ↗</a>
+        <div class="profile-stats">
+          <div><strong>2</strong><small>نماذج الأعمال</small></div>
+          <div><strong id="profileSkillCount">5</strong><small>المهارات</small></div>
+        </div>
+      </aside>
+
+      <div class="account-stack">
+        <section class="account-panel" aria-labelledby="aboutTitle">
+          <h2 id="aboutTitle">نبذة عني.</h2>
+          <p id="profileBio" class="about-text" dir="auto">أحوّل الأفكار إلى تجارب رقمية واضحة وسهلة. أستمتع ببناء المواقع والعمل مع أشخاص يهتمون بجودة التصميم.</p>
+          <div id="profileSkills" class="account-tags" aria-label="المهارات"></div>
+          <p id="profileStatus" class="profile-status" role="status"></p>
+
+          <!-- Edits update the visible preview; no storage or server is used. -->
+          <form autocomplete="off" id="profileForm" class="profile-form" novalidate hidden>
+            <h2>تعديل ملفك الشخصي</h2>
+            <div class="form-row">
+              <div class="field">
+                <label for="editName">الاسم الكامل</label>
+                <input id="editName" class="form-control" dir="auto" autocomplete="name" minlength="2" maxlength="80" required>
+              </div>
+              <div class="field">
+                <label for="editLocation">الموقع</label>
+                <input id="editLocation" class="form-control" dir="auto" maxlength="100" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="editRole">المسمى المهني</label>
+              <input id="editRole" class="form-control" dir="auto" maxlength="120" required>
+            </div>
+            <div class="field">
+              <label for="editBio">نبذة عنك</label>
+              <textarea id="editBio" class="form-control" dir="auto" rows="4" maxlength="1000" required></textarea>
+            </div>
+            <div class="field">
+              <label for="editSkills">المهارات، مفصولة بفواصل</label>
+              <input id="editSkills" class="form-control" dir="auto" maxlength="200" placeholder="HTML, CSS, Figma">
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-orange" type="submit">تحديث المعاينة</button>
+              <button id="cancelEdit" class="text-button" type="button">إلغاء</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="account-panel" aria-labelledby="portfolioTitle">
+          <h2 id="portfolioTitle">أعمال مختارة.</h2>
+          <p class="demo-note">نماذج أعمال توضيحية. افتح أي بطاقة لقراءة نبذة عنها.</p>
+          <div class="portfolio-grid">
+            <article class="portfolio-card">
+              <div class="portfolio-art" aria-hidden="true">
+                <div class="mock-window"><span></span><span></span><span></span></div>
+              </div>
+              <details>
+                <summary>صفحة تعريفية لشركة ناشئة</summary>
+                <p>تصوّر توضيحي لصفحة متجاوبة بمحتوى واضح وزر برتقالي بارز، مبنية باستخدام HTML وCSS.</p>
+              </details>
+            </article>
+            <article class="portfolio-card">
+              <div class="portfolio-art blue" aria-hidden="true">
+                <div class="mock-window"><span></span><span></span><span></span></div>
+              </div>
+              <details>
+                <summary>تصوّر لتطبيق تعليمي</summary>
+                <p>تصوّر توضيحي لتصفح الدروس ومتابعة التقدم، مع تنقّل سهل وبطاقات واضحة.</p>
+              </details>
+            </article>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer container-xl">
+  <span>© OFOQ <span id="year"></span></span>
+  <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
+</footer>
+  
+  
+  <script src="profile.js"></script>
+</body>
+</html>

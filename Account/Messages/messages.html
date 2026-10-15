@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1526">
+  <title>الرسائل — أفق</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
+  
+  
+  
+  <link rel="icon" type="image/png" href="../../assets/branding/ofoq-logo.png?v=ofoq-11">
+    
+  <link rel="stylesheet" href="messages.css">
+  <link rel="stylesheet" href="../../assets/arabic-ui.css">
+  <script src="../../assets/publishers.js"></script>
+  <script defer src="../../assets/arabic-ui.js"></script>
+</head>
+<body data-section="lobby" data-page="messages">
+  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+  <header class="site-header">
+  <div class="container-xl header-inner">
+    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
+      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
+      <a data-section-link="academy" href="../../Academy/academy.html">الأكاديمية</a>
+      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
+      <a data-section-link="jobs" href="../../Jobs/jobs.html">الوظائف</a>
+      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
+    </nav></details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../../Auth/Login/login.html">تسجيل الدخول</a><a href="../../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Profile/profile.html">الملف الشخصي</a><a href="../Dashboard/dashboard.html">لوحة المتابعة</a><a href="messages.html">الرسائل</a><a href="../Settings/settings.html">الإعدادات</a></div></details></nav>
+  </div>
+</header>
+  <main id="mainContent" tabindex="-1" class="container-xl account-page">
+    <div class="account-heading">
+      <div><p class="eyebrow mb-3">أفق / مساحتي</p><h1>العمل المميز يبدأ <em>بحوار.</em></h1></div>
+      <a class="btn btn-orange" href="../Dashboard/dashboard.html">العودة إلى لوحة المتابعة ←</a>
+    </div>
+    <p class="preview-note">صندوق رسائل توضيحي. لا يوجد اتصال بأشخاص حقيقيين ولا تُحفظ أو تُرسل رسائل. يعيد تحديث الصفحة الأمثلة الأصلية.</p>
+    <div class="inbox-grid">
+      <aside class="account-panel" aria-labelledby="inboxTitle">
+        <h2 id="inboxTitle">المحادثات</h2>
+        <label for="conversationSearch" class="visually-hidden">البحث في المحادثات التوضيحية</label>
+        <input id="conversationSearch" class="form-control" type="search" placeholder="ابحث بالاسم…">
+        <div class="conversation-list">
+          <button data-conversation="0" type="button" aria-pressed="true"><strong>لينا حداد</strong><small>مصممة · مثال توضيحي</small></button>
+          <button data-conversation="1" type="button" aria-pressed="false"><strong>عمر خليل</strong><small>مطوّر · مثال توضيحي</small></button>
+        </div>
+        <p id="noConversations" class="demo-note mt-3" role="status" hidden>لا توجد محادثات تطابق بحثك.</p>
+      </aside>
+      <section class="account-panel chat-panel" aria-labelledby="chatName">
+        <div class="chat-heading">
+          <a id="chatProfileLink" class="publisher-account" href="../Profile/profile.html?user=lina">
+            <img id="chatAvatar" class="publisher-avatar" src="../../assets/avatars/orange.svg" alt="صورة حساب لينا حداد" width="48" height="48">
+            <div class="chat-identity"><h2 id="chatName">لينا حداد</h2><p id="chatRole">مصممة</p></div>
+          </a>
+          <div class="chat-heading-actions">
+            <span class="chat-preview-badge">محادثة تجريبية</span>
+            <a id="startMeeting" class="chat-meeting-button" href="../../Meeting/meeting.html?recipient=lina" aria-label="بدء اجتماع فيديو" title="بدء اجتماع فيديو">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="3"/><path d="m15 10 6-4v12l-6-4Z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div id="chatMessages" class="chat-messages" role="log" aria-label="رسائل توضيحية"></div>
+        <form autocomplete="off" id="messageForm" class="message-form" novalidate>
+          <label for="messageInput">رسالتك</label>
+          <textarea id="messageInput" class="form-control" dir="auto" rows="2" maxlength="1000" placeholder="اكتب رسالتك هنا…" required aria-describedby="messageHint"></textarea>
+          <div class="message-actions">
+            <button class="btn btn-orange" type="submit">معاينة الرسالة <span aria-hidden="true">←</span></button>
+            <small id="messageHint">معاينة فقط، لا تُرسل الرسائل.</small>
+          </div>
+          <p id="messageStatus" class="profile-status" role="status"></p>
+        </form>
+      </section>
+    </div>
+  </main>
+  <footer class="page-footer container-xl">
+  <span>© OFOQ <span id="year"></span></span>
+  <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
+</footer>
+  
+  
+  <script src="messages.js"></script>
+</body>
+</html>

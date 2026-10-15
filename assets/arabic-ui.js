@@ -1,0 +1,61 @@
+// Native disclosure menus work with keyboard and touch; desktop sections stay visible.
+(() => {
+  const navigation = document.querySelector('.site-navigation');
+  const desktop = matchMedia('(min-width: 992px)');
+  const syncNavigation = () => { if (navigation) navigation.open = desktop.matches; };
+  syncNavigation();
+  desktop.addEventListener('change', syncNavigation);
+
+  const section = document.body.dataset.section;
+  document.querySelectorAll('.section-nav a[data-section-link]').forEach(link => {
+    if (link.dataset.sectionLink === section) link.setAttribute('aria-current', 'page');
+  });
+
+  document.addEventListener('click', event => {
+    document.querySelectorAll('.account-menu[open], .site-navigation[open]').forEach(menu => {
+      if (menu === navigation && desktop.matches) return;
+      if (!menu.contains(event.target)) menu.open = false;
+    });
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    document.querySelectorAll('.account-menu[open], .site-navigation[open]').forEach(menu => {
+      if (menu === navigation && desktop.matches) return;
+      const containedFocus = menu.contains(document.activeElement);
+      menu.open = false;
+      if (containedFocus) menu.querySelector('summary').focus();
+    });
+  });
+
+  // Keep native form validation readable when the browser itself uses another language.
+  document.addEventListener('invalid', event => {
+    const field = event.target;
+    const state = field.validity;
+    if (!state || state.customError) return;
+    let message = 'يرجى مراجعة القيمة المدخلة.';
+    if (state.valueMissing) message = 'يرجى تعبئة هذا الحقل.';
+    else if (state.typeMismatch) message = field.type === 'email' ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'يرجى إدخال رابط صحيح يبدأ بـhttps://.';
+    else if (state.tooShort) message = `يرجى إدخال ${field.minLength} أحرف على الأقل.`;
+    else if (state.tooLong) message = `الحد الأقصى هو ${field.maxLength} حرفًا.`;
+    else if (state.rangeUnderflow) message = `أدخل قيمة لا تقل عن ${field.min}.`;
+    else if (state.rangeOverflow) message = `أدخل قيمة لا تزيد على ${field.max}.`;
+    else if (state.badInput || state.stepMismatch) message = 'يرجى إدخال رقم صحيح ضمن القيم المتاحة.';
+    field.setCustomValidity(message);
+    field.dataset.arabicValidity = 'true';
+  }, true);
+  const clearValidation = event => {
+    const field = event.target;
+    if (field.dataset.arabicValidity) {
+      field.setCustomValidity('');
+      delete field.dataset.arabicValidity;
+    }
+  };
+  document.addEventListener('input', clearValidation, true);
+  document.addEventListener('change', clearValidation, true);
+  document.addEventListener('reset', event => {
+    event.target.querySelectorAll('[data-arabic-validity]').forEach(field => {
+      field.setCustomValidity('');
+      delete field.dataset.arabicValidity;
+    });
+  });
+})();

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1526">
+  <title>تسجيل الدخول — أفق</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
+  
+  
+  <link rel="icon" type="image/png" href="../../assets/branding/ofoq-logo.png?v=ofoq-11">
+    
+  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="../../assets/arabic-ui.css">
+  <script defer src="../../assets/arabic-ui.js"></script>
+</head>
+<body data-section="lobby">
+  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+  <header class="site-header">
+  <div class="container-xl header-inner">
+    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
+      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
+      <a data-section-link="academy" href="../../Academy/academy.html">الأكاديمية</a>
+      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
+      <a data-section-link="jobs" href="../../Jobs/jobs.html">الوظائف</a>
+      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
+    </nav></details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="login.html">تسجيل الدخول</a><a href="../Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../../Account/Profile/profile.html">الملف الشخصي</a><a href="../../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../../Account/Messages/messages.html">الرسائل</a><a href="../../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
+  </div>
+</header>
+  <main id="mainContent" tabindex="-1" class="container-xl auth-page">
+    <div class="auth-shell">
+      <section class="auth-story" aria-labelledby="storyTitle">
+        <p class="eyebrow">أفق / خطوتك القادمة</p>
+        <h1 id="storyTitle">أفكار كبيرة.<br><span>ننجزها معًا.</span></h1>
+        <p>تواصل مع من يشاركونك الطموح، وشارك أفكارك وخذ خطوتك المهنية القادمة.</p>
+        <div class="auth-illustration" aria-hidden="true">
+          <div class="auth-orbit"></div><div class="auth-monogram ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png" alt="أفق | OFOQ" width="1254" height="1254"></div><span class="auth-dot"></span>
+        </div>
+        <ul class="auth-benefits">
+          <li><span>01</span> اكتشف فرص العمل الحر</li>
+          <li><span>02</span> شارك فكرة مشروع</li>
+          <li><span>03</span> ابدأ حوارًا</li>
+        </ul>
+      </section>
+      <section class="auth-form-panel" aria-labelledby="formTitle">
+        <nav class="auth-tabs" aria-label="صفحات الحساب">
+          <a href="./login.html" aria-current="page">تسجيل الدخول</a>
+          <a href="../Register/register.html" >إنشاء حساب</a>
+        </nav>
+        <h2 id="formTitle">أهلًا بعودتك</h2>
+        <p class="auth-subtitle">خطوتك القادمة بانتظارك.</p>
+        <form autocomplete="off" id="authForm" novalidate>
+          
+          <div class="field">
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" class="form-control" type="email" autocomplete="email" maxlength="200" placeholder="you@example.com" required dir="ltr">
+          </div>
+          <div class="field">
+            <label for="password">كلمة المرور</label>
+            <div class="password-field">
+              <input id="password" class="form-control" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="8 أحرف على الأقل" required>
+              <button type="button" class="password-toggle" data-toggle-password="password" aria-pressed="false" aria-label="إظهار كلمة المرور أو إخفاؤها">إظهار</button>
+            </div>
+            <small class="field-hint">استخدم 8 أحرف على الأقل.</small>
+          </div>
+          
+          <p class="auth-notice">معاينة للواجهة فقط. لا يُنشأ حساب حقيقي ولا تُحفظ أو تُرسل بياناتك أو كلمات المرور.</p>
+          <button class="btn btn-orange w-100" type="submit">تسجيل الدخول <span aria-hidden="true">→</span></button>
+          <p class="auth-switch">جديد في أفق؟ <a href="../Register/register.html">إنشاء حساب</a></p>
+        </form>
+        <div id="authSuccess" class="auth-success" role="status" tabindex="-1" hidden>
+          <span aria-hidden="true">✓</span>
+          <h3>اكتملت معاينة النموذج!</h3>
+          <p>اجتازت البيانات التحقق من الحقول. هذه معاينة فقط؛ لم يُنشأ حساب ولم يحدث تسجيل دخول.</p>
+          <a class="btn btn-orange w-100" href="../../Freelance/freelance.html">استكشف العمل الحر ←</a>
+          <button id="tryAgain" type="button" class="text-button">تجربة النموذج مجددًا</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="page-footer container-xl">
+  <span>© OFOQ <span id="year"></span></span>
+  <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
+</footer>
+  
+  
+  <script src="login.js"></script>
+</body>
+</html>

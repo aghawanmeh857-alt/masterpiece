@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f3f6fb">
+  <title>لوحة الإدارة — أفق | OFOQ</title>
+  <link rel="icon" type="image/png" href="../assets/branding/ofoq-logo.png">
+  
+  
+  
+  
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="../assets/arabic-ui.css">
+</head>
+<body data-section="lobby">
+  <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
+  <aside class="sidebar" id="sidebar" aria-label="قائمة الإدارة">
+    <a class="brand" href="../hero/userHero.html#lobby"><span class="logo-frame"><img src="../assets/branding/ofoq-logo.png" alt="أفق | OFOQ" width="1254" height="1254"></span><span>لوحة الإدارة<small>إدارة أفق</small></span></a>
+    <p class="nav-label">مساحة الإدارة</p>
+    <nav id="navigation" aria-label="أقسام لوحة الإدارة"></nav>
+    <div class="sidebar-bottom"><span class="online-dot"></span> واجهة تجريبية <a href="../hero/userHero.html">زيارة الموقع ↗</a></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <button id="menuButton" class="icon-button" aria-controls="sidebar" aria-expanded="false" aria-label="فتح قائمة الإدارة">☰</button>
+      <div class="breadcrumbs">أفق <span>/</span> لوحة الإدارة <span>/</span> <strong id="breadcrumb">نظرة عامة</strong></div>
+      <div class="top-actions"><button class="theme-toggle" type="button">☾ الوضع الليلي</button><span class="admin-avatar" aria-hidden="true">أ</span><span class="admin-name">الأدمن<small>حساب توضيحي</small></span></div>
+    </header>
+    <main id="main" tabindex="-1">
+      <div class="page-heading"><div><p class="eyebrow">أفق / مركز الإدارة</p><h1 id="pageTitle">نظرة عامة</h1><p id="pageDescription">نظرة على المحتوى والنشاط في مساحة واحدة.</p></div><div class="heading-actions"><span id="today"></span><button id="addButton" class="primary" hidden>+ إضافة</button></div></div>
+      <p class="preview-note"><span aria-hidden="true">◈</span> بيانات توضيحية. الإضافة والتعديل والحذف مؤقتة داخل هذه اللوحة؛ تحديث الصفحة يعيد الأمثلة، ولا يغيّر الموقع المنشور.</p>
+      <section id="overviewView" aria-label="نظرة عامة">
+        <div id="stats" class="stats-grid"></div>
+        <div class="chart-grid"><article class="panel"><div class="panel-heading"><h2>المحتوى حسب القسم</h2><span class="muted">البيانات الحالية</span></div><div id="contentChart" class="bar-chart"></div></article><article class="panel"><div class="panel-heading"><h2>حالة المحتوى</h2><span class="muted">توزيع مباشر</span></div><div id="statusChart"></div></article></div>
+        <div class="lower-grid"><article class="panel"><div class="panel-heading"><h2>بانتظار المراجعة</h2><button class="text-button" data-view="review">عرض الكل ←</button></div><div id="reviewList"></div></article><article class="panel"><div class="panel-heading"><h2>آخر النشاطات</h2><button class="text-button" data-view="logs">السجل ←</button></div><div id="activityList"></div></article></div>
+        <section class="quick-actions" aria-label="إجراءات سريعة"><button data-create="projects">+ مشروع جديد</button><button data-create="jobs">+ فرصة عمل</button><button data-create="courses">+ دورة تعليمية</button><button data-create="events">+ فعالية</button></section>
+      </section>
+      <section id="recordsView" hidden aria-label="إدارة المحتوى"><div class="panel table-panel"><div class="table-toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="ابحث بالعنوان أو المسؤول…" aria-label="البحث في القسم"></label><label class="filter-label">الحالة <select id="statusFilter"><option value="">الكل</option><option value="published">منشور / نشط</option><option value="pending">بانتظار المراجعة</option><option value="archived">مؤرشف / معطّل</option></select></label><span id="resultCount" class="muted"></span></div><div class="table-scroll"><table><caption class="visually-hidden" id="tableCaption">سجلات القسم</caption><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div><div id="emptyState" class="empty-state" hidden><span>⌕</span><h2>لا توجد نتائج</h2><p>جرّب كلمات أخرى أو غيّر فلتر الحالة.</p></div><div class="table-footer"><button id="previousPage" class="secondary">السابق</button><span id="pageNumber"></span><button id="nextPage" class="secondary">التالي</button></div></div></section>
+      <section id="settingsView" hidden><div class="settings-grid"><form autocomplete="off" id="siteSettings" class="panel"><h2>هوية الموقع ومظهره</h2><label>اسم الموقع<input name="name" value="أفق | OFOQ" maxlength="70" required></label><label>العبارة المرافقة<input name="tagline" value="خطوتك للفرصة" maxlength="120" required></label><label>اللون الرئيسي<input name="accent" type="color" value="#ff783d"></label><label>الوضع الافتراضي للمعاينة<select name="theme"><option value="light">نهاري</option><option value="dark">ليلي</option></select></label><button class="primary" type="submit">تحديث المعاينة</button></form><article class="panel site-preview" id="sitePreview"><span class="logo-frame"><img src="../assets/branding/ofoq-logo.png" alt="الشعار المعتمد" width="1254" height="1254"></span><span class="eyebrow">معاينة الهوية</span><h2 id="previewName">أفق | OFOQ</h2><p id="previewTagline">خطوتك للفرصة</p><span class="preview-cta">اكتشف فرصتك ←</span><small>هذه المعاينة داخل لوحة الإدارة فقط.</small></article></div></section>
+      <section id="sceneView" hidden><div class="settings-grid"><form autocomplete="off" class="panel" id="sceneSettings"><h2>إعدادات حركة المشهد</h2><label>مدة الاقتراب من الباب <span id="durationValue">16 ثانية</span><input name="duration" type="range" min="8" max="40" value="16"></label><label>نعومة السكرول <span id="smoothnessValue">0.85 ثانية</span><input name="smoothness" type="range" min="0.2" max="2" step="0.05" value="0.85"></label><label class="switch-row"><span>الاقتراب التلقائي</span><input name="autoplay" type="checkbox" checked></label><label class="switch-row"><span>إظهار المدينة</span><input name="city" type="checkbox" checked></label><label class="switch-row"><span>إظهار الشخصيات</span><input name="people" type="checkbox" checked></label><button class="primary">تحديث النموذج التوضيحي</button></form><article class="panel"><div class="panel-heading"><h2>نموذج حركة مبسّط</h2><button id="replayScene" class="secondary">إعادة الحركة ↻</button></div><div class="scene-demo" id="sceneDemo" aria-hidden="true"><div class="demo-city">▥ ▥ ▥</div><div class="demo-building"><span>OFOQ</span><div class="demo-door"></div></div><span class="demo-person">●</span><span class="demo-camera">◉</span></div><p id="sceneSummary" class="muted"></p><p class="muted">يطبّق على هذا النموذج فقط. <a href="../hero/userHero.html">فتح المشهد الأصلي ↗</a></p></article></div></section>
+      <section id="logsView" hidden><article class="panel"><div class="panel-heading"><h2>سجل التغييرات في الجلسة</h2><span class="muted">تحديث الصفحة يعيد الأمثلة</span></div><div id="fullActivity"></div></article></section>
+      <footer>© <span id="year"></span> أفق · لوحة الإدارة <span>واجهة دون تخزين</span></footer>
+    </main>
+  </div>
+  <dialog id="editor"><form autocomplete="off" id="recordForm"><div class="dialog-heading"><h2 id="editorTitle">إضافة سجل</h2><button class="icon-button" type="button" data-close="editor" aria-label="إغلاق">×</button></div><label id="titleLabel">العنوان<input name="title" maxlength="140" required></label><label id="ownerLabel">المسؤول / الجهة<input name="owner" maxlength="100" required></label><div class="form-row"><label>التصنيف<input name="category" maxlength="60" required></label><label>الحالة<select name="status"><option value="published">منشور / نشط</option><option value="pending">بانتظار المراجعة</option><option value="archived">مؤرشف / معطّل</option></select></label></div><label id="roleLabel" hidden>الصلاحية<select name="role"><option value="member">مستخدم</option><option value="editor">محرر محتوى</option><option value="admin">أدمن</option></select></label><label>التفاصيل / الرد<textarea name="description" rows="4" maxlength="1500"></textarea></label><div class="dialog-actions"><button type="button" class="secondary" data-close="editor">إلغاء</button><button class="primary" type="submit">تأكيد التعديل المؤقت</button></div></form></dialog>
+  <dialog id="deleteDialog"><div class="dialog-heading"><h2>حذف السجل؟</h2><button type="button" class="icon-button" data-close="deleteDialog" aria-label="إغلاق">×</button></div><p id="deleteText"></p><p class="muted">الحذف يخص البيانات التجريبية في هذه الجلسة فقط.</p><div class="dialog-actions"><button class="secondary" data-close="deleteDialog">إلغاء</button><button id="confirmDelete" class="danger">حذف السجل</button></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+    
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta name="theme-color" content="#0b1526">
+
+  <title>OFOQ — مساحة لمستقبلك</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+  >
+
+  
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="icon" type="image/png" href="../assets/branding/ofoq-logo.png?v=ofoq-11">
+  <link rel="stylesheet" href="userHero.css">
+  <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <script defer src="../assets/arabic-ui.js"></script>
+</head>
+
+<body data-section="hero">
+
+  <!-- مشهد الأنيميشن -->
+  <div id="scene" aria-hidden="true"></div>
+  <div class="scene-vignette"></div>
+  <div class="day-night-controls" role="group" aria-label="إضاءة المشهد">
+    <button id="dayMode" type="button" aria-pressed="true" disabled>☀ نهار</button>
+    <button id="nightMode" type="button" aria-pressed="false" disabled>☾ ليل</button>
+  </div>
+
+  <!-- الخروج من hero والدخول إلى shared -->
+
+<header class="topbar container-fluid">
+
+  <a class="brand" href="#lobby" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي" disabled>☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Auth/Login/login.html">تسجيل الدخول</a><a href="../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Account/Profile/profile.html">الملف الشخصي</a><a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Account/Messages/messages.html">الرسائل</a><a href="../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
+
+</header>
+
+
+
+<nav class="room-nav" aria-label="أقسام OFOQ">
+
+  <button
+    type="button"
+    data-room="0"
+    class="active"
+    aria-current="location"
+  >
+    <span>01</span>
+    الرئيسية
+  </button>
+
+  <button type="button" data-room="1">
+    <span>02</span>
+    العمل الحر
+  </button>
+
+  <button type="button" data-room="2">
+    <span>03</span>
+    الأكاديمية
+  </button>
+
+  <button type="button" data-room="3">
+    <span>04</span>
+    فرص التدريب
+  </button>
+
+  <button type="button" data-room="4">
+    <span>05</span>
+    الوظائف
+  </button>
+
+  <button type="button" data-room="5">
+    <span>06</span>
+    الفعاليات
+  </button>
+
+</nav>
+
+
+  <!-- أقسام التمرير لتحريك الكاميرا -->
+  <main id="journey">
+
+    <section
+      id="lobby"
+      class="chapter"
+      aria-label="الرئيسية"
+    ></section>
+
+    <section
+      id="freelance"
+      class="chapter"
+      aria-label="العمل الحر"
+    ></section>
+
+    <section
+      id="academy"
+      class="chapter"
+      aria-label="الأكاديمية"
+    ></section>
+
+    <section
+      id="internships"
+      class="chapter"
+      aria-label="فرص التدريب"
+    ></section>
+
+    <section
+      id="jobs"
+      class="chapter"
+      aria-label="الوظائف"
+    ></section>
+
+    <section
+      id="events"
+      class="chapter"
+      aria-label="الفعاليات"
+    ></section>
+
+  </main>
+
+  <!-- معلومات الغرفة -->
+  <aside class="story" aria-label="الغرفة الحالية">
+
+    <div class="eyebrow">
+      <span class="live-dot"></span>
+      عالم من الفرص. مساحة واحدة.
+    </div>
+
+    <p id="roomLabel" class="room-label" dir="rtl">
+      01 / الرئيسية
+    </p>
+
+    <h1 id="headline">
+      مستقبلك يبدأ<br>
+      <em>من هنا.</em>
+    </h1>
+
+    <p id="description">
+      ادخل مساحة تجمع التعلّم والعمل والأشخاص الذين
+      يشاركونك الطموح. كل غرفة تفتح بابًا جديدًا.
+    </p>
+
+    <button
+      id="roomAction"
+      type="button"
+      class="btn btn-orange story-action"
+    >
+      ابدأ رحلتك
+      <span aria-hidden="true">←</span>
+    </button>
+
+    <div id="tags" class="chapter-tags">
+      <span>تعلّم</span>
+      <span>تواصل</span>
+      <span>انطلق</span>
+    </div>
+
+  </aside>
+
+  <!-- عنوان المشهد -->
+  <div class="scene-caption">
+
+    <span class="live-dot"></span>
+
+    <span id="sceneCaption">
+      الرئيسية / أهلًا بك
+    </span>
+
+    <small>مساحة تفاعلية ثلاثية الأبعاد</small>
+
+  </div>
+
+  <!-- الفوتر المشترك -->
+
+<footer class="tour-footer">
+  <a class="model-credits" href="../Credits/credits.html">مصادر المجسّمات</a>
+
+  <span id="status" role="status">
+    جارٍ تجهيز المكتب…
+  </span>
+
+  <span class="scroll-hint">
+    مرّر لاستكشاف الغرف
+    <b aria-hidden="true">↓</b>
+  </span>
+
+  <span id="counter" dir="ltr">
+    01 / 06
+  </span>
+
+  <div class="progress-track" aria-hidden="true">
+    <div id="progress"></div>
+  </div>
+
+</footer>
+
+
+  <!-- نافذة الفرص -->
+  <div
+    id="exploreModal"
+    class="modal fade"
+    tabindex="-1"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+      <div class="modal-content">
+
+        <div class="modal-header">
+
+          <div>
+            <p class="room-label mb-2">
+              أفق / استكشف
+            </p>
+
+            <h2 id="modalTitle" class="modal-title fs-4">
+              اكتشف الفرص
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            data-bs-dismiss="modal"
+            aria-label="إغلاق"
+          ></button>
+
+        </div>
+
+        <div class="modal-body">
+
+          <p id="modalIntro"></p>
+
+          <div id="opportunities" class="row g-3"></div>
+
+          <p class="demo-note mt-4 mb-0">
+            هذه بيانات توضيحية للنموذج الأولي؛
+            لا يتم إرسال طلبات أو حفظ بيانات.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- رسالة اختيار فرصة -->
+  <div class="toast-container position-fixed bottom-0 start-0 p-3">
+
+    <div
+      id="demoToast"
+      class="toast"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="toast-body">
+        تم اختيار الفرصة للتجربة.
+        التقديم الفعلي يحتاج ربط الموقع بخدمة خلفية.
+      </div>
+    </div>
+
+  </div>
+
+  <noscript>
+    <div class="no-script">
+      يرجى تفعيل JavaScript لتجربة المكتب ثلاثي الأبعاد.
+    </div>
+  </noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+  
+
+  
+
+  
+
+  
+
+  <script type="module" src="userHero.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1526">
+  <title>تفاصيل الوظيفة — أفق</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
+  
+  
+  
+  <link rel="icon" type="image/png" href="../../assets/branding/ofoq-logo.png?v=ofoq-11">
+    
+  <link rel="stylesheet" href="job.css">
+  <link rel="stylesheet" href="../../assets/arabic-ui.css">
+  <script src="../../assets/publishers.js"></script>
+  <script defer src="../../assets/arabic-ui.js"></script>
+</head>
+<body data-section="jobs" data-kind="job">
+  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+  <header class="site-header">
+  <div class="container-xl header-inner">
+    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
+      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
+      <a data-section-link="academy" href="../../Academy/academy.html">الأكاديمية</a>
+      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
+      <a data-section-link="jobs" href="../jobs.html">الوظائف</a>
+      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
+    </nav></details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../../Auth/Login/login.html">تسجيل الدخول</a><a href="../../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../../Account/Profile/profile.html">الملف الشخصي</a><a href="../../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../../Account/Messages/messages.html">الرسائل</a><a href="../../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
+  </div>
+</header>
+  <main id="mainContent" tabindex="-1" class="container-xl account-page">
+    <a class="details-link mb-4" href="../jobs.html">→ العودة إلى الوظائف</a>
+    <p class="preview-note">محتوى توضيحي فقط. لا تُحفظ النماذج أو التعليقات أو تقدّم الدروس، ولا يجري تقديم طلبات أو تسجيل أو دفع فعلي.</p>
+    <section id="notFound" class="account-panel" tabindex="-1" hidden>
+      <h1>لم نعثر على هذا العنصر.</h1><p>استخدم الرابط بالأعلى لاختيار عنصر من القائمة.</p>
+    </section>
+    <div id="detailContent">
+      <div class="account-heading">
+        <div><p class="eyebrow mb-3">أفق / تفاصيل الوظيفة</p><h1 id="detailTitle">جارٍ تحميل التفاصيل…</h1><p id="detailDescription"></p></div>
+      </div>
+      <div class="detail-grid">
+        <div class="account-stack">
+          <section class="account-panel"><h2 id="tasksTitle">المهام التي ستعمل عليها</h2><ul id="detailTasks" class="detail-list"></ul></section>
+          <section class="account-panel"><h2 id="requirementsTitle">ما الذي تحتاجه؟</h2><ul id="detailRequirements" class="detail-list"></ul></section>
+          <div><button id="applyForJob" class="btn btn-orange" type="button">معاينة التقديم للوظيفة ↗</button></div>
+          <section id="courseLessons" class="account-panel" hidden>
+            <h2>معاينات الدروس</h2><p class="demo-note">نبذات توضيحية وليست دروسًا كاملة. يُعاد ضبط تقدّم القراءة عند تحديث الصفحة.</p>
+            <progress id="lessonProgress" class="course-progress" value="0" max="1" aria-labelledby="lessonStatus">0</progress>
+            <p id="lessonStatus" class="demo-note" role="status">لم تُقرأ أي وحدات بعد</p>
+            <div id="lessonList" class="lesson-list"></div>
+          </section>
+          <section id="projectConversation" class="account-panel" hidden>
+            <h2>حوار المشروع</h2><p class="demo-note">اطرح سؤالًا أو اعرض مهاراتك ضمن هذه المعاينة المؤقتة.</p>
+            <div id="detailComments"></div>
+            <form autocomplete="off" id="detailCommentForm" class="detail-comment-form" novalidate>
+              <div class="field"><label for="commentName">اسمك الظاهر</label><input id="commentName" class="form-control" dir="auto" minlength="2" maxlength="80" required></div>
+              <div class="field"><label for="commentText">تعليقك</label><textarea id="commentText" class="form-control" dir="auto" rows="3" maxlength="1000" required></textarea></div>
+              <button class="btn btn-orange" type="submit">إضافة تعليق</button><p id="commentStatus" class="profile-status" role="status"></p>
+            </form>
+          </section>
+        </div>
+        <aside class="account-stack" aria-label="تفاصيل الوظيفة">
+          <section class="account-panel"><h2>نظرة سريعة.</h2><dl id="detailFacts" class="detail-facts"></dl></section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <dialog id="jobApplicationDialog" class="job-application-dialog" aria-labelledby="applicationTitle">
+    <div class="application-dialog-header">
+      <h2 id="applicationTitle">معاينة التقديم للوظيفة</h2>
+      <button id="closeJobApplication" class="application-dialog-close" type="button" aria-label="إغلاق نموذج التقديم">×</button>
+    </div>
+    <p id="applicationJobTitle" class="apply-summary"></p>
+    <form autocomplete="off" id="jobApplicationForm">
+              <div class="preview-fields">
+                <div class="field"><label for="visitorName">الاسم الكامل</label><input id="visitorName" name="fullName" class="form-control" dir="auto" minlength="2" maxlength="100" required></div>
+                <div class="field"><label for="visitorEmail">البريد الإلكتروني</label><input id="visitorEmail" name="email" class="form-control" type="email" maxlength="200" required dir="ltr"></div>
+                <div class="field"><label for="visitorPhone">رقم الهاتف</label><input id="visitorPhone" name="phone" class="form-control" type="tel" dir="ltr" maxlength="30" required></div>
+                <div class="field"><label for="visitorLocation">المدينة / الدولة</label><input id="visitorLocation" name="location" class="form-control" dir="auto" maxlength="100" required></div>
+                <div class="field"><label for="visitorExperience">سنوات الخبرة</label><input id="visitorExperience" name="experience" class="form-control" type="number" min="0" max="60" step="0.5" required></div>
+                <div class="field"><label for="visitorPortfolio">رابط معرض الأعمال أو LinkedIn (اختياري)</label><input id="visitorPortfolio" name="portfolio" class="form-control" type="url" dir="ltr" placeholder="https://" maxlength="500"></div>
+              </div>
+              <div class="field"><label for="visitorResume">السيرة الذاتية (اختياري)</label><input id="visitorResume" name="resume" class="form-control" type="file" accept=".pdf,.doc,.docx" aria-describedby="resumeNote"><small id="resumeNote" class="demo-note">ملف PDF أو Word. لن يُرفع الملف المحدد أو يُحفظ.</small></div>
+              <div class="field"><label for="visitorMessage">أخبرنا عن خبرتك وما يجعلك مناسبًا لهذه الوظيفة</label><textarea id="visitorMessage" name="coverLetter" class="form-control" dir="auto" rows="4" maxlength="2000" required></textarea></div>
+              <p class="demo-note">هذا النموذج للمعاينة فقط. لا تُحفظ أو تُرسل معلوماتك أو سيرتك الذاتية.</p>
+              <button class="btn btn-orange" type="submit">معاينة طلب التوظيف</button>
+            </form>
+    <p id="jobApplicationStatus" role="status" tabindex="-1" hidden></p>
+  </dialog>
+  <footer class="page-footer container-xl">
+  <span>© OFOQ <span id="year"></span></span>
+  <a data-room-link href="../../hero/userHero.html#jobs">العودة إلى قسم <span data-room-name>الوظائف</span>  <span aria-hidden="true">↗</span></a>
+</footer>
+  
+  
+  
+  <script src="job.js"></script>
+</body>
+</html>

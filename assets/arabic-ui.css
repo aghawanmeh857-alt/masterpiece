@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+
+.publisher-card { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-block: 14px; }
+.publisher-account { display: inline-flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; min-width: 0; }
+.publisher-avatar { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; object-fit: cover; border: 1px solid #a0a8b650; }
+.publisher-account span { display: grid; min-width: 0; }
+.publisher-account small { font-size: 11px; opacity: .7; }
+.publisher-account strong { font-size: 14px; overflow-wrap: anywhere; }
+.publisher-message { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 6px 14px; border: 1px solid #ff783d; border-radius: 12px; color: inherit; text-decoration: none; font-size: 13px; font-weight: 700; }
+.publisher-message:hover { background: #ff783d; color: #0b1526; }
+.publisher-account:hover { color: #c95723; }
+:is(.publisher-account, .publisher-message):focus-visible { outline: 3px solid #ff783d; outline-offset: 4px; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.conversation-list button { display: flex; align-items: center; gap: 10px; }
+.conversation-list button > span { min-width: 0; }
+
+/* Shared Arabic typography and navigation. Page-specific scene/layout styles stay local. */
+html[lang="ar"] body {
+  font-family: 'Noto Sans Arabic', Tahoma, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+html[lang="ar"] :is(button, input, select, textarea, summary) { font-family: inherit; }
+html[lang="ar"] :is(h1, h2, h3, .eyebrow, .room-label, .cover-caption) { letter-spacing: normal; }
+html[lang="ar"] :is(input[type="email"], input[type="url"], input[type="tel"]) {
+  direction: ltr;
+  text-align: left;
+}
+html[lang="ar"] :is(.page-heading, .account-heading, .project-details, .listing-details, .course-body, .detail-facts) { text-align: start; }
+html[lang="ar"] :is(.page-heading h1, .account-heading h1) { line-height: 1.6; }
+html[lang="ar"] :is(.intro, .preview-note, .demo-note, .auth-notice, .auth-subtitle, .field-hint) { font-size: 14px; line-height: 1.9; }
+html[lang="ar"] :is(.field label, .form-control, .form-select) { font-size: 15px; }
+html[lang="ar"] :is(.project-card, .listing-card, .course-card) { min-width: 0; }
+html[lang="ar"] .project-card { grid-template-columns: 56px minmax(0, 1fr) 150px; }
+html[lang="ar"] :is(.project-details h2, .listing-details h2, .course-body h2) {
+  font-size: 19px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+html[lang="ar"] :is(.project-details p, .listing-description, .course-description, .candidate-message) { font-size: 15px; line-height: 1.9; }
+html[lang="ar"] :is(.skill-tags span, .listing-tags span, .course-meta span, .candidate-skills span,
+  .project-duration, .listing-date, .listing-company, .listing-category, .course-category, .course-byline,
+  .filter-chip, .results-meta, .details-link, .project-card .btn, .listing-card .btn, .course-card .btn) { font-size: 13px; }
+html[lang="ar"] :is(.project-offer, .listing-offer) { text-align: end; min-width: 140px; }
+html[lang="ar"] :is(.project-price, .listing-offer > strong, .course-price) { font-size: 22px; }
+html[lang="ar"] :is(.project-card .btn, .listing-card .btn, .course-card .btn) { min-height: 44px; white-space: normal; }
+html[lang="ar"] :is(.project-icon, .listing-symbol) { margin-inline-end: 0; }
+html[lang="ar"] .sort-field { margin-left: 0; margin-inline-start: auto; }
+html[lang="ar"] .search-field svg { flex-shrink: 0; }
+html[lang="ar"] .course-cover { text-align: start; }
+html[lang="ar"] .cover-caption { font-family: inherit; font-size: 23px; line-height: 1.7; }
+html[lang="ar"] :is(.candidate-heading, .applicant-heading, .candidate-message) { text-align: start; }
+html[lang="ar"] .chat-bubble { text-align: start; }
+html[lang="ar"] .chat-bubble.mine { margin-left: 0; margin-inline-start: auto; }
+html[lang="ar"] .detail-facts dd { overflow-wrap: anywhere; }
+html[lang="ar"] :is(.activity-card h3, .work-card h3, .applicant-card h3) { font-size: 18px; line-height: 1.7; }
+html[lang="ar"] :is(.activity-card p, .account-panel > p, .featured-copy > p:not(.eyebrow), .section-note p) { font-size: 15px; line-height: 1.9; }
+html[lang="ar"] :is(.stat-card span, .stat-card small, .activity-label, .activity-count, .activity-card a, .featured-meta span) { font-size: 13px; }
+
+.site-header { position: relative; z-index: 50; }
+.site-header .header-inner {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 24px;
+  min-height: 88px;
+  padding-block: 12px;
+}
+.site-header .brand, .topbar .brand { flex: 0 0 auto; margin: 0; }
+.site-header .brand .ofoq-brand { width: 58px; height: 62px; }
+.site-header .brand .ofoq-logo { width: 99px; height: 99px; left: -21px; top: -18px; }
+.site-navigation { flex: 1; min-width: 0; }
+.site-navigation > summary { display: none; }
+.site-header .site-navigation .section-nav {
+  width: auto;
+  order: initial;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(12px, 1.5vw, 24px);
+  overflow: visible;
+}
+.site-header .section-nav a { padding-block: 10px; font-size: 14px; white-space: nowrap; }
+.site-header .section-nav a[aria-current] { color: var(--accent-text); }
+.site-header .account-links, .topbar .account-links {
+  width: auto;
+  direction: rtl;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 14px;
+}
+.header-actions .theme-toggle { margin: 0; min-height: 44px; font-size: 13px; }
+.account-menu > summary, .site-navigation > summary {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--field-border, var(--line));
+  border-radius: 10px;
+  color: var(--text-main);
+  background: var(--surface);
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+.account-menu > summary::-webkit-details-marker, .site-navigation > summary::-webkit-details-marker { display: none; }
+.account-menu > summary::after, .site-navigation > summary::after { content: ' ▾'; color: var(--accent-text, #c24b16); }
+.account-menu-links {
+  right: auto;
+  left: 0;
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+  width: 230px;
+  max-width: calc(100vw - 32px);
+  gap: 4px;
+  padding: 10px;
+  text-align: start;
+}
+.account-links .account-menu-links a { display: block; padding: 8px 12px; min-height: 44px; font-size: 14px; }
+.account-menu-label { padding: 10px 12px 2px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--field-border, var(--line)); }
+.account-links a.register-link { text-align: center; }
+.skip-content {
+  position: fixed;
+  top: -150px;
+  inset-inline-start: 16px;
+  z-index: 200;
+  padding: 12px 18px;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 2px solid #ff783d;
+  border-radius: 8px;
+}
+.skip-content:focus { top: 12px; }
+.tour-shortcut { font-size: 14px; color: var(--accent-text, #c24b16); padding: 8px 0; }
+body[data-section="hero"] .topbar { flex-wrap: nowrap; gap: 16px; }
+body[data-section="hero"] .topbar .brand { margin-inline-end: auto; }
+body[data-section="hero"] .room-nav { direction: rtl; max-width: 70%; }
+body[data-section="hero"] .room-nav button { font-family: inherit; font-size: 13px; min-height: 44px; }
+body[data-section="hero"] .room-nav button.active { color: var(--accent-text); border-color: var(--accent-text); }
+body[data-section="hero"] :is(.room-label, .scene-caption) { direction: rtl; font-family: inherit; font-size: 13px; letter-spacing: normal; }
+body[data-section="hero"] .scene-caption small { font-size: 11px; letter-spacing: normal; }
+body[data-section="hero"] .story > p:not(.room-label) { font-size: 15px; }
+
+@media (max-width: 991px) {
+  .site-header .header-inner { gap: 12px; justify-content: space-between; }
+  .site-navigation { flex: 0 0 auto; position: relative; margin-inline-end: auto; }
+  .site-navigation > summary { display: block; font-size: 14px; }
+  .site-header .site-navigation .section-nav {
+    position: absolute;
+    top: calc(100% + 10px);
+    inset-inline-start: 0;
+    width: 230px;
+    max-width: calc(100vw - 32px);
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    background: var(--surface);
+    border: 1px solid var(--field-border, var(--line));
+    border-radius: 12px;
+    box-shadow: 0 12px 30px #0003;
+    z-index: 60;
+  }
+  .site-navigation:not([open]) .section-nav { display: none; }
+  .site-header .section-nav a { font-size: 15px; min-height: 44px; padding: 8px 12px; }
+  .header-actions .theme-toggle { font-size: 0; padding: 8px 12px; width: 44px; }
+  .header-actions .theme-toggle::before { content: '☾'; font-size: 20px; }
+  html[data-theme="dark"] .header-actions .theme-toggle::before { content: '☀'; }
+  .site-header .account-links, .topbar .account-links { gap: 8px; }
+  html[lang="ar"] :is(.project-card, .listing-card) { gap: 16px; }
+  html[lang="ar"] .project-card { grid-template-columns: 46px minmax(0, 1fr); }
+  html[lang="ar"] .project-offer { grid-column: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; text-align: start; min-width: 0; }
+  html[lang="ar"] .project-offer .details-link { flex-basis: 100%; }
+}
+@media (max-width: 767px) {
+  html[lang="ar"] :is(.project-details h2, .listing-details h2, .course-body h2) { font-size: 18px; }
+  html[lang="ar"] :is(.project-offer, .listing-offer) { text-align: start; }
+  .site-header .header-inner { padding-inline: 16px; gap: 8px; }
+  .site-header .brand .ofoq-brand { width: 44px; height: 48px; }
+  .site-header .brand .ofoq-logo { width: 76px; height: 76px; left: -16px; top: -14px; }
+  .account-menu > summary, .site-navigation > summary { padding-inline: 10px; }
+  .header-actions .theme-toggle { padding: 6px; }
+  body[data-section="hero"] .topbar { padding: 12px 5%; gap: 10px; }
+  body[data-section="hero"] .room-nav { top: 100px; flex-wrap: wrap; gap: 6px; max-width: none; }
+  body[data-section="hero"] .room-nav button { font-size: 12px; padding: 7px 10px; }
+  body[data-section="hero"] .scene-caption { top: 218px; font-size: 12px; }
+  body[data-section="hero"] .chapter-tags { position: static; margin-top: 12px; flex-wrap: wrap; }
+  body[data-section="hero"] .chapter-tags span { font-size: 12px; }
+  body[data-section="hero"] .story { bottom: 78px; }
+  body[data-section="hero"] .story h1 { font-size: 30px; line-height: 1.6; }
+  body[data-section="hero"] .story > p:not(.room-label) { line-height: 1.8; font-size: 14px; }
+  body[data-section="hero"] .story-action { font-size: 14px; min-height: 44px; }
+}
+@media (max-height: 650px) and (max-width: 767px) {
+  body[data-section="hero"] .scene-caption, body[data-section="hero"] .chapter-tags { display: none; }
+  body[data-section="hero"] .story { bottom: 70px; max-height: calc(100svh - 250px); overflow-y: auto; }
+}
+.application-error { color: #bd302b; font-size: 13px; line-height: 1.8; margin: 6px 0 0; }
+[data-theme="dark"] .application-error { color: #ffaaa4; }
+.application-enhanced [aria-invalid="true"] { border-color: #bd302b; }
+.cv-file-info { overflow-wrap: anywhere; font-size: 13px; margin: 8px 0; }
+.cv-remove { font-size: 13px; margin-bottom: 12px; }
+.application-review { padding: 18px; border: 1px solid var(--field-border, #ff783d55); border-radius: 14px; }
+.application-review h3 { font-size: 20px; margin-bottom: 18px; }
+.application-review dt { color: var(--text-muted); font-size: 13px; }
+.application-review dd { margin: 4px 0 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.application-review-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }

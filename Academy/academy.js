@@ -81,293 +81,102 @@ window.componentsReady = Promise.resolve();
 })();
 
 // Fixed examples for this screen.
-const courses = [
-  {
-    "id": "web",
-    "title": "أساسيات تطوير المواقع",
-    "category": "development",
-    "level": "beginner",
-    "format": "path",
-    "price": 0,
-    "hours": 16,
-    "sessions": 8,
-    "instructor": "عمر خليل",
-    "symbol": "</>",
-    "cover": "اكتب كود\nخطوتك الأولى",
-    "description": "تعلّم HTML وCSS وJavaScript من خلال بناء موقع متجاوب من البداية.",
-    "project": "موقع شخصي متجاوب يتضمن قائمة تنقّل تفاعلية ومعرض أعمال.",
-    "syllabus": [
-      "HTML: بنية الصفحة والعناصر الدلالية",
-      "CSS: التخطيط والألوان والتصميم المتجاوب",
-      "JavaScript: الأحداث والتفاعلات",
-      "بناء موقع معرض أعمالك ومراجعته"
-    ]
-  },
-  {
-    "id": "ux",
-    "title": "أساسيات تصميم واجهات وتجربة المستخدم",
-    "category": "design",
-    "level": "beginner",
-    "format": "path",
-    "price": 0,
-    "hours": 12,
-    "sessions": 6,
-    "instructor": "لينا حداد",
-    "symbol": "◈",
-    "cover": "صمّم لأشخاص\nحقيقيين",
-    "description": "حوّل احتياجات المستخدم إلى مسارات واضحة ومخططات ونماذج متقنة باستخدام Figma.",
-    "project": "نموذج تفاعلي لتطبيق جوّال مع خطة مبسّطة لأبحاث المستخدمين.",
-    "syllabus": [
-      "فهم المستخدمين وتحديد المشكلة",
-      "رسم مسارات الاستخدام ومخططات الواجهات",
-      "بناء نظام بصري متناسق باستخدام Figma",
-      "بناء نموذج أولي واختباره وتحسينه"
-    ]
-  },
-  {
-    "id": "portfolio",
-    "title": "ابنِ معرض أعمال يروي قصتك",
-    "category": "career",
-    "level": "beginner",
-    "format": "workshop",
-    "price": 0,
-    "hours": 2,
-    "sessions": 1,
-    "instructor": "سارة ناصر",
-    "symbol": "↗",
-    "cover": "دع أعمالك\nتتحدث عنك",
-    "description": "اختر أفضل أعمالك وحوّلها إلى دراسات حالة توضح طريقة تفكيرك.",
-    "project": "دراسة حالة مكتملة وخطة واضحة لمعرض أعمالك.",
-    "syllabus": [
-      "اختيار مشاريع تروي قصة واضحة",
-      "شرح خطوات عملك وقراراتك",
-      "عرض النتائج والدروس المستفادة"
-    ]
-  },
-  {
-    "id": "react",
-    "title": "React: من المكوّنات إلى المنتجات",
-    "category": "development",
-    "level": "intermediate",
-    "format": "path",
-    "price": 49,
-    "hours": 20,
-    "sessions": 10,
-    "instructor": "عمر خليل",
-    "symbol": "{ }",
-    "cover": "ابدأ صغيرًا\nوفكّر كبيرًا",
-    "description": "تدرّب على المكوّنات والحالة وتدفّق البيانات من خلال لوحة متابعة تفاعلية متكاملة.",
-    "project": "لوحة متابعة بـReact تتضمن مكوّنات قابلة لإعادة الاستخدام وفلاتر ونماذج تراعي سهولة الوصول.",
-    "syllabus": [
-      "بنية المكوّنات وخصائصها",
-      "الحالة والأحداث وخطّافات قابلة لإعادة الاستخدام",
-      "تحميل البيانات وحالات الخطأ",
-      "بناء لوحة متابعة واختبارها وتحسينها"
-    ]
-  },
-  {
-    "id": "brand",
-    "title": "تطبيقات عملية في الهوية البصرية",
-    "category": "design",
-    "level": "intermediate",
-    "format": "workshop",
-    "price": 25,
-    "hours": 4,
-    "sessions": 2,
-    "instructor": "لينا حداد",
-    "symbol": "Aa",
-    "cover": "حوّل الأفكار\nإلى هوية",
-    "description": "أنشئ هوية بصرية بفكرة واضحة ونظام خطوط ولوحة ألوان متناسقة.",
-    "project": "دليل مختصر للهوية البصرية يتضمن تصوّر الشعار والخطوط والتطبيقات العملية.",
-    "syllabus": [
-      "تحديد شخصية العلامة التجارية",
-      "استكشاف الخطوط والألوان",
-      "إنشاء دليل مختصر للهوية البصرية وعرضه"
-    ]
-  },
-  {
-    "id": "marketing",
-    "title": "انطلاقتك في التسويق الرقمي",
-    "category": "marketing",
-    "level": "beginner",
-    "format": "path",
-    "price": 35,
-    "hours": 8,
-    "sessions": 4,
-    "instructor": "رامي صالح",
-    "symbol": "◎",
-    "cover": "تواصل مع\nجمهورك المناسب",
-    "description": "خطّط لحملة واضحة، واكتب محتوى مفيدًا، وافهم مؤشرات الأداء المهمة.",
-    "project": "تصوّر حملة وخطة محتوى لأسبوعين بأهداف قابلة للقياس.",
-    "syllabus": [
-      "الجمهور وموقع العلامة وأهداف الحملة",
-      "تخطيط المحتوى وكتابته",
-      "القنوات التسويقية وتنفيذ الحملة",
-      "قياس الأداء وتحسين الخطة"
-    ]
+const courses = window.OfoqCourses;
+
+(function () {
+  let store = OfoqLearning.create(courses);
+  const get = id => document.getElementById(id);
+  const labels = {development:'التطوير',design:'التصميم',marketing:'التسويق',career:'المهارات المهنية',beginner:'مبتدئ',intermediate:'متوسط',path:'مسار تعلّم',workshop:'ورشة'};
+  const requestedLibrary = new URLSearchParams(location.search).get('library');
+  let library = ['overview', 'enrolled', 'wishlist'].includes(requestedLibrary) ? requestedLibrary : 'all';
+  function node(tag,text,className) { const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element; }
+  function button(text,action,className='learn-primary') { const element=node('button',text,className);element.type='button';element.addEventListener('click',action);return element; }
+  function card(course) {
+    const owned=store.has(course.id), article=node('article',undefined,'course-card'),cover=node('a',undefined,'course-cover');
+    article.dataset.course=course.id;cover.href=OfoqLearning.url(course.id);cover.setAttribute('aria-label','تفاصيل '+course.title);
+    const image=node('img');image.src=OfoqLearning.cover(course.id);image.alt='';image.width=800;image.height=450;image.loading='lazy';cover.append(image);
+    const body=node('div',undefined,'course-body'),title=node('h2'),link=node('a',course.title);link.href=cover.href;title.append(link);
+    const owner=node('a',course.instructor,'course-instructor');owner.href=OfoqPublishers.url('Profile',OfoqPublishers.forRecord('course',course).id);
+    const badge=node('span',course.price?'تعلّم عملي':'دورة مجانية','learning-badge');
+    const meta=node('p',course.hours+' ساعة · '+course.syllabus.length+' دروس تفاعلية · '+labels[course.level],'course-meta');
+    const price=node('strong',course.price?'$'+course.price:'مجاني','course-price');
+    const actions=node('div',undefined,'course-actions');
+    actions.append(button(owned?'متابعة التعلّم ←':course.price?'اشترِ الآن':'التحق مجانًا',()=>{
+      if(owned)location.assign(cover.href);else if(course.price)store.checkout([course.id],()=>location.assign(cover.href));else{store.enroll([course.id]);location.assign(cover.href);}
+    }));
+    const wish=button(store.state.wishlist.includes(course.id)?'♥':'♡',()=>{store.toggle('wishlist',course.id);render();},'learn-wish');wish.setAttribute('aria-label','المفضلة: '+course.title);wish.setAttribute('aria-pressed',String(store.state.wishlist.includes(course.id)));actions.append(wish);
+    if(!owned&&course.price)actions.append(button(store.state.cart.includes(course.id)?'إزالة من السلة':'أضف للسلة',()=>{store.toggle('cart',course.id);render();},'learn-text'));
+    body.append(badge,title,owner,meta,price);
+    if(owned){const progress=node('progress');progress.max=100;progress.value=store.percent(course.id);progress.setAttribute('aria-label','تقدّمك في '+course.title);body.append(progress,node('small',store.percent(course.id)+'% مكتمل'));}
+    body.append(actions);article.append(cover,body);return article;
   }
-];
-
-
-(async function () {
-// 1) انتظر تحميل النافبار والفلاتر والفوتر قبل ربط الأحداث.
-async function startAcademy() {
-  if (!window.componentsReady) {
-    throw new Error('Page initialization is unavailable.');
-  }
-  await window.componentsReady;
-
-  // بيانات تجريبية: عدّل المسارات والأسعار والخطة التعليمية هنا.
-
-
-  const labels = {
-    development: 'التطوير', design: 'التصميم', marketing: 'التسويق',
-    career: 'مهارات مهنية', beginner: 'مبتدئ', intermediate: 'متوسط',
-    path: 'مسار تعلّم', workshop: 'ورشة عمل'
-  };
-
-  function get(id) {
-    return document.getElementById(id);
-  }
-
-  function priceLabel(price) {
-    return price === 0 ? 'مجاني' : '$' + price;
-  }
-
-  // استخدم النص بأمان داخل HTML، حتى لو أضفت أسماء تحتوي على رموز.
-  function safeText(text) {
-    const span = document.createElement('span');
-    span.textContent = text;
-    return span.innerHTML.replace(/"/g, '&quot;');
-  }
-
-  // 2) اقرأ الفلاتر، ثم رتّب المسارات واعرض البطاقات.
-  function renderCourses() {
-    const query = get('searchQuery').value.trim().toLowerCase();
-    const category = get('category').value;
-    const level = get('level').value;
-    const format = get('format').value;
-    const price = get('price').value;
-    const sort = get('sortBy').value;
-
-    const filtered = courses.filter(course => {
-      const searchableText = [course.title, course.description, course.category,
-        course.instructor, ...course.syllabus].join(' ').toLowerCase();
-
-      if (query && !searchableText.includes(query)) return false;
-      if (category && course.category !== category) return false;
-      if (level && course.level !== level) return false;
-      if (format && course.format !== format) return false;
-      if (price === 'free' && course.price !== 0) return false;
-      if (price === 'paid' && course.price === 0) return false;
-      return true;
-    });
-
-    if (sort === 'duration') filtered.sort((a, b) => a.hours - b.hours);
-    if (sort === 'price') filtered.sort((a, b) => a.price - b.price);
-
-    get('courseList').innerHTML = filtered.map(courseCard).join('');
-    get('resultCount').textContent = filtered.length + ' مسارات تعلّم متاحة';
-    get('emptyState').hidden = filtered.length > 0;
-  }
-
-  function courseCard(course) {
-    return `
-      <article class="course-card" data-course="${course.id}">
-        <div class="course-cover ${course.category}">
-          <span class="course-symbol" aria-hidden="true">${safeText(course.symbol)}</span>
-          <span class="cover-caption" aria-hidden="true">${safeText(course.cover)}</span>
-
-        </div>
-        <div class="course-body">
-          <p class="course-category">${labels[course.category]} / ${labels[course.format]}</p>
-          <h2>${safeText(course.title)}</h2>
-          <p class="course-description">${safeText(course.description)}</p>
-          ${window.OfoqPublishers.card(window.OfoqPublishers.forRecord("course", course))}
-          <div class="course-meta">
-            <span>${labels[course.level]}</span>
-            <span>${course.hours} ${course.hours >= 3 && course.hours <= 10 ? 'ساعات' : 'ساعة'}</span>
-            <span>${course.sessions} ${course.sessions === 1 ? 'جلسة' : 'جلسات'}</span>
-          </div>
-          <div class="course-bottom">
-            <span class="course-price">${priceLabel(course.price)}</span>
-            <button class="btn btn-orange" type="button" data-action="${course.price > 0 ? 'pay' : 'view'}"
-              ${course.price > 0 ? `data-payment-title="${safeText(course.title)}" data-payment-amount="${course.price}" data-payment-kind="دورة تدريبية"` : ''}
-              aria-label="${course.price > 0 ? 'دفع رسوم' : 'عرض'} ${safeText(course.title)}">${course.price > 0 ? 'دفع ←' : 'عرض المسار ↗'}</button>
-          </div>
-          <a class="details-link" href="./Course/course.html?id=${encodeURIComponent(course.id)}">تفاصيل المسار ←</a>
-        </div>
-      </article>`;
-  }
-
-  function clearFilters() {
-    get('filterForm').reset();
-    get('searchQuery').value = '';
-    renderCourses();
-  }
-
-  // 3) نافذة تفاصيل المسار ومعاينة التسجيل التجريبي.
-  function resetEnrollment() {
-    get('enrollmentForm').reset();
-    get('enrollArea').hidden = false;
-    get('enrollmentSuccess').hidden = true;
-  }
-
-  function openCourse(course) {
-    resetEnrollment();
-    get('courseTitle').textContent = course.title;
-    get('courseDescription').textContent = course.description;
-    get('courseProject').textContent = course.project;
-    get('courseSummary').textContent = [labels[course.level], labels[course.format],
-      course.hours + (course.hours >= 3 && course.hours <= 10 ? ' ساعات' : ' ساعة'), priceLabel(course.price), 'مع ' + course.instructor].join(' · ');
-    get('courseSyllabus').innerHTML = course.syllabus.map(step => '<li>' + safeText(step) + '</li>').join('');
-    bootstrap.Modal.getOrCreateInstance(get('courseModal')).show();
-  }
-
-  // زر واحد لكل إجراء؛ لا نحتاج إلى ربط الأحداث مجددًا بعد كل فلترة.
-  get('courseList').addEventListener('click', event => {
-    const button = event.target.closest('button[data-action]');
-    if (!button) return;
-
-    const id = button.closest('.course-card').dataset.course;
-    const course = courses.find(item => item.id === id);
-
-    if (button.dataset.action === 'view') {
-      openCourse(course);
-      return;
+  function renderOverview() {
+    const enrolled = courses.filter(course => store.has(course.id));
+    const completed = enrolled.filter(course => store.percent(course.id) === 100);
+    const lessonTotal = enrolled.reduce((sum, course) => sum + course.syllabus.length, 0);
+    const finished = enrolled.reduce((sum, course) => sum + store.state.progress[course.id].length, 0);
+    const percent = lessonTotal ? Math.round(finished / lessonTotal * 100) : 0;
+    const summary = store.cartSummary(store.state.cart);
+    const metrics = [
+      ['دوراتي', enrolled.length, 'دورات التحقت بها'],
+      ['التقدّم العام', percent + '%', finished + ' من ' + lessonTotal + ' دروس'],
+      ['دورات مكتملة', completed.length, 'إنجازاتك حتى الآن'],
+      ['في السلة', summary.items.length, '$' + summary.total.toFixed(2) + ' إجمالي السلة']
+    ];
+    get('overviewMetrics').replaceChildren(...metrics.map(([label, value, hint]) => {
+      const item = node('article', undefined, 'overview-metric');
+      item.append(node('span', label), node('strong', value), node('small', hint));
+      return item;
+    }));
+    const inProgress = [...enrolled].sort((a, b) => Number(store.percent(a.id) === 100) - Number(store.percent(b.id) === 100));
+    get('overviewCourses').replaceChildren(...inProgress.map(card));
+    get('overviewEmpty').hidden = enrolled.length > 0;
+    function miniCard(course) {
+      const link = node('a', undefined, 'overview-mini-course');
+      link.href = OfoqLearning.url(course.id);
+      const image = node('img'); image.src = OfoqLearning.cover(course.id); image.alt = ''; image.width = 80; image.height = 45;
+      const info = node('span'); info.append(node('strong', course.title), node('small', course.price ? '$' + course.price : 'مجاني'));
+      link.append(image, info); return link;
     }
-
-
+    get('overviewCartItems').replaceChildren(...summary.items.map(miniCard));
+    if (!summary.items.length) get('overviewCartItems').append(node('p', 'ما في دورات بالسلة حاليًا.', 'overview-hint'));
+    get('overviewCartTotal').textContent = '$' + summary.total.toFixed(2);
+    const wishlist = courses.filter(course => store.state.wishlist.includes(course.id));
+    get('overviewWishlist').replaceChildren(...wishlist.slice(0, 3).map(miniCard));
+    if (!wishlist.length) get('overviewWishlist').append(node('p', 'احفظ الدورات اللي تهمّك لتعود لها لاحقًا.', 'overview-hint'));
+  }
+  function render(){
+    get('academyOverview').hidden = library !== 'overview';
+    get('catalogWorkspace').hidden = library === 'overview';
+    if (library === 'overview') renderOverview();
+    const query=get('searchQuery').value.trim().toLowerCase(),category=get('category').value,level=get('level').value,format=get('format').value,price=get('price').value;
+    const items=courses.filter(course=>{
+      if(library==='enrolled'&&!store.has(course.id))return false;if(library==='wishlist'&&!store.state.wishlist.includes(course.id))return false;
+      return (!query||[course.title,course.description,course.instructor,...course.syllabus].join(' ').toLowerCase().includes(query))&&(!category||course.category===category)&&(!level||course.level===level)&&(!format||course.format===format)&&(price!=='free'||course.price===0)&&(price!=='paid'||course.price>0);
+    });
+    if(get('sortBy').value==='duration')items.sort((a,b)=>a.hours-b.hours);if(get('sortBy').value==='price')items.sort((a,b)=>a.price-b.price);
+    get('courseList').replaceChildren(...items.map(card));get('emptyState').hidden=items.length>0;get('resultCount').textContent=items.length+' دورات';
+    get('learningCount').textContent=store.state.enrolled.length;get('wishCount').textContent=store.state.wishlist.length;get('cartCount').textContent=store.state.cart.length;
+    get('academyCartCount').textContent = store.state.cart.length;
+    get('featuredWishCount').textContent = store.state.wishlist.length;
+    get('academyCartButton').setAttribute('aria-label', 'فتح سلة مشتريات الأكاديمية، ' + store.state.cart.length + ' دورات');
+    get('featuredWishlist').setAttribute('aria-label', 'عرض المفضلة، ' + store.state.wishlist.length + ' دورات');
+    document.querySelectorAll('[data-library]').forEach(element=>element.setAttribute('aria-pressed',String(element.dataset.library===library)));
+  }
+  function clear(){get('filterForm').reset();get('searchForm').reset();render();}
+  for(const id of ['filterForm','searchForm'])get(id).addEventListener('submit',event=>{event.preventDefault();render();});
+  for(const id of ['category','level','format','price','sortBy'])get(id).addEventListener('change',render);
+  get('searchQuery').addEventListener('input',render);get('clearFilters').addEventListener('click',clear);get('resetEmpty').addEventListener('click',clear);
+  document.querySelectorAll('[data-library]').forEach(element=>element.addEventListener('click',()=>{library=element.dataset.library;render();}));
+  get('overviewDiscover').addEventListener('click', () => { library = 'all'; clear(); });
+  get('overviewViewWishlist').addEventListener('click', () => { library = 'wishlist'; clear(); });
+  get('featuredWishlist').addEventListener('click', () => {
+    library = 'wishlist'; clear();
+    get('trainingCourses').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   });
-
-  get('filterForm').addEventListener('submit', event => {
-    event.preventDefault();
-    renderCourses();
-  });
-  get('searchForm').addEventListener('submit', event => {
-    event.preventDefault();
-    renderCourses();
-  });
-  get('searchQuery').addEventListener('search', renderCourses);
-  get('sortBy').addEventListener('change', renderCourses);
-  get('clearFilters').addEventListener('click', clearFilters);
-  get('resetEmpty').addEventListener('click', clearFilters);
-
-  get('enrollmentForm').addEventListener('submit', event => {
-    event.preventDefault();
-    if (!get('enrollmentForm').reportValidity()) return;
-    get('enrollArea').hidden = true;
-    get('enrollmentSuccess').hidden = false;
-    get('enrollmentSuccess').setAttribute('tabindex', '-1');
-    get('enrollmentSuccess').focus();
-  });
-  get('courseModal').addEventListener('hidden.bs.modal', resetEnrollment);
-
-  get('year').textContent = new Date().getFullYear();
-  renderCourses();
-}
-
-startAcademy().catch(error => console.error('Academy page:', error));
-
-
+  get('year').textContent=new Date().getFullYear();
+  const refresh=()=>{store=OfoqLearning.create(courses);render();};
+  addEventListener('pageshow',refresh);
+  addEventListener('storage',event=>{if(event.key==='ofoq-learning-v1')refresh();});
+  render();
 })();

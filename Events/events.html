@@ -13,12 +13,13 @@
     
   <link rel="stylesheet" href="events.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <link rel="stylesheet" href="../assets/opportunity-cards.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
   <link rel="stylesheet" href="../assets/payment.css">
   <script defer src="../assets/payment.js"></script>
 </head>
-<body data-section="events">
+<body data-section="events" class="opportunity-page">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
   <!-- المكونات المشتركة -->
   <header class="site-header">
@@ -50,13 +51,10 @@
         </ol>
       </nav>
     </div>
-    <div class="section-note panel">
-      <span class="note-symbol" aria-hidden="true">✦</span>
-      <div><strong>افتح بابًا لعلاقات جديدة.</strong>
-        <p>تعرّف على أشخاص وتبادل الأفكار واكتسب معرفة تستفيد منها في عملك.</p></div>
-    </div>
+    <section class="opportunity-intro" aria-labelledby="opportunityIntroTitle"><div class="opportunity-intro-copy"><p class="eyebrow">أفق / الفعاليات</p><h2 id="opportunityIntroTitle">لقاء واحد.<br>أفكار وفرص جديدة.</h2><p>ورش عمل ولقاءات تجمعك بأشخاص يشاركونك الشغف والتعلّم والتجربة.</p><div class="opportunity-shortcuts"><a class="btn btn-orange" href="#opportunityResults">استكشف الفعاليات ↓</a></div></div><img class="opportunity-intro-image" src="../assets/project-covers/mobile.svg" width="800" height="450" alt="" aria-hidden="true"></section>
     <div class="workspace">
       <aside class="filter-panel panel" aria-labelledby="filterTitle">
+        <form autocomplete="off" id="searchForm" class="opportunity-search"><label for="searchQuery">بحث</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…"></div></form>
   <div class="filter-heading">
     <h2 id="filterTitle">تواصل مع مجتمعك</h2>
     <button id="clearFilters" class="text-button" type="button">مسح الكل</button>
@@ -98,27 +96,18 @@
           <option value="paid">مدفوع</option>
       </select>
     </div>
-    <button class="btn btn-orange w-100" type="submit">تطبيق الفلاتر <span aria-hidden="true">→</span></button>
   </form>
   <p class="filter-footnote"><span class="live-dot"></span> خطوتك القادمة تبدأ هنا.</p>
 </aside>
-      <section class="results" aria-label="الفعاليات المتاحة">
-        <form autocomplete="off" id="searchForm" class="search-toolbar panel">
-          <div class="search-field main-search">
-            <label class="visually-hidden" for="searchQuery">البحث عن فعالية</label>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
-            <input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…">
-          </div>
-          <button class="btn btn-orange search-button" type="submit">بحث</button>
-          <div class="sort-field">
+      <section class="results opportunity-results" id="opportunityResults" aria-label="الفعاليات المتاحة">
+        <div class="opportunity-toolbar"><h2>الفعاليات المتاحة</h2>          <div class="sort-field">
             <label for="sortBy">الترتيب حسب</label>
             <select id="sortBy" class="form-select">
               <option value="recent">الأحدث</option>
               <option value="soon">الأقرب موعدًا</option>
               <option value="reward">الأقل سعرًا</option>
             </select>
-          </div>
-        </form>
+          </div></div>
         <div class="results-meta">
           <p id="resultCount" role="status" aria-live="polite"></p>
           <span>فعاليات توضيحية</span>

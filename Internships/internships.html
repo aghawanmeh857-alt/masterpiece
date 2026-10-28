@@ -13,10 +13,11 @@
     
   <link rel="stylesheet" href="internships.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <link rel="stylesheet" href="opportunities.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
 </head>
-<body data-section="internships">
+<body data-section="internships" class="opportunity-page">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
   <!-- المكونات المشتركة -->
   <header class="site-header">
@@ -48,13 +49,11 @@
         </ol>
       </nav>
     </div>
-    <div class="section-note panel">
-      <span class="note-symbol" aria-hidden="true">↗</span>
-      <div><strong>ابدأ بخطوة واكتسب خبرة حقيقية.</strong>
-        <p>استكشف فرص تدريب بإشراف مختصين حسب المجال والمدة ونمط العمل.</p></div>
-    </div>
+    <section class="opportunity-intro" aria-labelledby="internshipIntroTitle"><div class="opportunity-intro-copy"><p class="eyebrow">فرص التدريب / من التعلّم إلى التجربة</p><h2 id="internshipIntroTitle">خبرتك الأولى.<br>بدايتك لفرصة أكبر.</h2><p>استكشف تدريبات تناسب مهاراتك، واحفظ الفرص اللي تهمّك لتعود لها لاحقًا.</p><div class="opportunity-shortcuts"><a class="btn btn-orange" href="#internshipResults">استكشف فرص التدريب ↓</a><button id="savedShortcut" class="internship-saved-shortcut" type="button">♡ المفضلة <span id="savedShortcutCount">0</span></button></div></div><img class="opportunity-intro-image" src="../assets/project-covers/dashboard.svg" width="800" height="450" alt="" aria-hidden="true"></section>
+    <p id="savedNotice" class="saved-notice" role="status" hidden></p>
     <div class="workspace">
       <aside class="filter-panel panel" aria-labelledby="filterTitle">
+        <form autocomplete="off" id="searchForm" class="opportunity-search"><label for="searchQuery">بحث</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchQuery" class="form-control" type="search" placeholder="ابحث عن تدريب أو مهارة…"></div></form>
   <div class="filter-heading">
     <h2 id="filterTitle">ابدأ رحلتك</h2>
     <button id="clearFilters" class="text-button" type="button">مسح الكل</button>
@@ -96,34 +95,25 @@
           <option value="unpaid">دون مقابل مالي</option>
       </select>
     </div>
-    <button class="btn btn-orange w-100" type="submit">تطبيق الفلاتر <span aria-hidden="true">→</span></button>
   </form>
   <p class="filter-footnote"><span class="live-dot"></span> خطوتك القادمة تبدأ هنا.</p>
 </aside>
-      <section class="results" aria-label="فرص التدريب المتاحة">
-        <form autocomplete="off" id="searchForm" class="search-toolbar panel">
-          <div class="search-field main-search">
-            <label class="visually-hidden" for="searchQuery">البحث عن فرصة تدريب</label>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
-            <input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…">
-          </div>
-          <button class="btn btn-orange search-button" type="submit">بحث</button>
-          <div class="sort-field">
+      <section class="results opportunity-results" id="internshipResults" tabindex="-1" aria-label="فرص التدريب المتاحة">
+        <div class="opportunity-toolbar"><div class="internship-tabs" role="group" aria-label="عرض فرص التدريب"><button id="allOpportunities" type="button" aria-pressed="true">كل الفرص</button><button id="savedOpportunities" type="button" aria-pressed="false">المفضلة <span id="savedCount">0</span></button></div>          <div class="sort-field">
             <label for="sortBy">الترتيب حسب</label>
             <select id="sortBy" class="form-select">
               <option value="recent">الأحدث</option>
               <option value="soon">الأقرب انتهاءً</option>
               <option value="reward">الأعلى أجرًا</option>
             </select>
-          </div>
-        </form>
+          </div></div>
         <div class="results-meta">
           <p id="resultCount" role="status" aria-live="polite"></p>
           <span>فرص تدريب توضيحية</span>
         </div>
         <div id="itemList" class="listing-list "></div>
         <div id="emptyState" class="empty-state panel" hidden>
-          <h2>لا توجد فرص تدريب مطابقة</h2>
+          <h2 id="emptyTitle">لا توجد فرص تدريب مطابقة</h2>
           <p>جرّب بحثًا آخر أو امسح الفلاتر.</p>
           <button id="resetEmpty" class="btn btn-orange" type="button">مسح البحث والفلاتر</button>
         </div>

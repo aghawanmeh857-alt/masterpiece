@@ -81,270 +81,47 @@ window.componentsReady = Promise.resolve();
 })();
 
 // Fixed examples for this screen.
-const courses = [
-  {
-    "id": "web",
-    "title": "أساسيات تطوير المواقع",
-    "category": "development",
-    "level": "beginner",
-    "format": "path",
-    "price": 0,
-    "hours": 16,
-    "sessions": 8,
-    "instructor": "عمر خليل",
-    "symbol": "</>",
-    "cover": "اكتب كود\nخطوتك الأولى",
-    "description": "تعلّم HTML وCSS وJavaScript من خلال بناء موقع متجاوب من البداية.",
-    "project": "موقع شخصي متجاوب يتضمن قائمة تنقّل تفاعلية ومعرض أعمال.",
-    "syllabus": [
-      "HTML: بنية الصفحة والعناصر الدلالية",
-      "CSS: التخطيط والألوان والتصميم المتجاوب",
-      "JavaScript: الأحداث والتفاعلات",
-      "بناء موقع معرض أعمالك ومراجعته"
-    ]
-  },
-  {
-    "id": "ux",
-    "title": "أساسيات تصميم واجهات وتجربة المستخدم",
-    "category": "design",
-    "level": "beginner",
-    "format": "path",
-    "price": 0,
-    "hours": 12,
-    "sessions": 6,
-    "instructor": "لينا حداد",
-    "symbol": "◈",
-    "cover": "صمّم لأشخاص\nحقيقيين",
-    "description": "حوّل احتياجات المستخدم إلى مسارات واضحة ومخططات ونماذج متقنة باستخدام Figma.",
-    "project": "نموذج تفاعلي لتطبيق جوّال مع خطة مبسّطة لأبحاث المستخدمين.",
-    "syllabus": [
-      "فهم المستخدمين وتحديد المشكلة",
-      "رسم مسارات الاستخدام ومخططات الواجهات",
-      "بناء نظام بصري متناسق باستخدام Figma",
-      "بناء نموذج أولي واختباره وتحسينه"
-    ]
-  },
-  {
-    "id": "portfolio",
-    "title": "ابنِ معرض أعمال يروي قصتك",
-    "category": "career",
-    "level": "beginner",
-    "format": "workshop",
-    "price": 0,
-    "hours": 2,
-    "sessions": 1,
-    "instructor": "سارة ناصر",
-    "symbol": "↗",
-    "cover": "دع أعمالك\nتتحدث عنك",
-    "description": "اختر أفضل أعمالك وحوّلها إلى دراسات حالة توضح طريقة تفكيرك.",
-    "project": "دراسة حالة مكتملة وخطة واضحة لمعرض أعمالك.",
-    "syllabus": [
-      "اختيار مشاريع تروي قصة واضحة",
-      "شرح خطوات عملك وقراراتك",
-      "عرض النتائج والدروس المستفادة"
-    ]
-  },
-  {
-    "id": "react",
-    "title": "React: من المكوّنات إلى المنتجات",
-    "category": "development",
-    "level": "intermediate",
-    "format": "path",
-    "price": 49,
-    "hours": 20,
-    "sessions": 10,
-    "instructor": "عمر خليل",
-    "symbol": "{ }",
-    "cover": "ابدأ صغيرًا\nوفكّر كبيرًا",
-    "description": "تدرّب على المكوّنات والحالة وتدفّق البيانات من خلال لوحة متابعة تفاعلية متكاملة.",
-    "project": "لوحة متابعة بـReact تتضمن مكوّنات قابلة لإعادة الاستخدام وفلاتر ونماذج تراعي سهولة الوصول.",
-    "syllabus": [
-      "بنية المكوّنات وخصائصها",
-      "الحالة والأحداث وخطّافات قابلة لإعادة الاستخدام",
-      "تحميل البيانات وحالات الخطأ",
-      "بناء لوحة متابعة واختبارها وتحسينها"
-    ]
-  },
-  {
-    "id": "brand",
-    "title": "تطبيقات عملية في الهوية البصرية",
-    "category": "design",
-    "level": "intermediate",
-    "format": "workshop",
-    "price": 25,
-    "hours": 4,
-    "sessions": 2,
-    "instructor": "لينا حداد",
-    "symbol": "Aa",
-    "cover": "حوّل الأفكار\nإلى هوية",
-    "description": "أنشئ هوية بصرية بفكرة واضحة ونظام خطوط ولوحة ألوان متناسقة.",
-    "project": "دليل مختصر للهوية البصرية يتضمن تصوّر الشعار والخطوط والتطبيقات العملية.",
-    "syllabus": [
-      "تحديد شخصية العلامة التجارية",
-      "استكشاف الخطوط والألوان",
-      "إنشاء دليل مختصر للهوية البصرية وعرضه"
-    ]
-  },
-  {
-    "id": "marketing",
-    "title": "انطلاقتك في التسويق الرقمي",
-    "category": "marketing",
-    "level": "beginner",
-    "format": "path",
-    "price": 35,
-    "hours": 8,
-    "sessions": 4,
-    "instructor": "رامي صالح",
-    "symbol": "◎",
-    "cover": "تواصل مع\nجمهورك المناسب",
-    "description": "خطّط لحملة واضحة، واكتب محتوى مفيدًا، وافهم مؤشرات الأداء المهمة.",
-    "project": "تصوّر حملة وخطة محتوى لأسبوعين بأهداف قابلة للقياس.",
-    "syllabus": [
-      "الجمهور وموقع العلامة وأهداف الحملة",
-      "تخطيط المحتوى وكتابته",
-      "القنوات التسويقية وتنفيذ الحملة",
-      "قياس الأداء وتحسين الخطة"
-    ]
-  }
-];
-
+const courses = window.OfoqCourses;
 
 (function () {
-// The list and detail pages read the same example data.
-const kind = document.body.dataset.kind;
-const records = kind === 'course' ? courses : kind === 'project' ? projects : pageData.items;
-const requestedId = new URLSearchParams(location.search).get('id');
-const record = requestedId === null ? records[0] : records.find(item => String(item.id) === requestedId);
-const get = id => document.getElementById(id);
-
-window.componentsReady.then(() => {
-  get('year').textContent = new Date().getFullYear();
-}).catch(() => {});
-
-const detailLabels = { '2-months': 'شهران', '3-months': '3 أشهر', '6-months': '6 أشهر', development: 'التطوير', design: 'التصميم', marketing: 'التسويق', career: 'المسار المهني والمجتمع', beginner: 'مبتدئ', intermediate: 'متوسط', remote: 'عن بُعد', onsite: 'من مقر العمل', hybrid: 'هجين', 'full-time': 'دوام كامل', 'part-time': 'دوام جزئي', contract: 'عقد مؤقت', workshop: 'ورشة عمل', path: 'مسار تعلّم', talk: 'جلسة حوارية', meetup: 'لقاء' };
-
-function addFact(label, value) {
-  const row = document.createElement('div');
-  const term = document.createElement('dt');
-  const description = document.createElement('dd');
-  term.textContent = label;
-  description.textContent = kind === 'event' && value === 'remote' ? 'عبر الإنترنت' : detailLabels[value] || value;
-  row.append(term, description);
-  get('detailFacts').append(row);
-}
-
-function showList(id, values) {
-  values.forEach(value => {
-    const item = document.createElement('li');
-    item.textContent = value;
-    get(id).append(item);
-  });
-}
-
-if (!record) {
-  get('detailContent').hidden = true;
-  get('notFound').hidden = false;
-  get('notFound').focus();
-} else {
-  document.title = record.title + ' — OFOQ';
-  get('detailTitle').textContent = record.title;
-  get('detailDescription').textContent = record.description;
-  get('detailDescription').insertAdjacentHTML('afterend', window.OfoqPublishers.card(window.OfoqPublishers.forRecord(kind, record)));
-  addFact('المجال', record.category);
-
-  if (kind === 'project') {
-    addFact('الميزانية', '$' + record.budget);
-    addFact('المدة', record.weeks === 1 ? 'أسبوع واحد' : record.weeks === 2 ? 'أسبوعان' : record.weeks + ' أسابيع');
-    addFact('نوع المشروع', record.type === 'fixed' ? 'بسعر ثابت' : 'مشروع مستمر');
-    showList('detailTasks', [record.description, 'الاتفاق على نطاق العمل والمراحل قبل البدء.', 'عرض العمل وتطبيق الملاحظات.']);
-    showList('detailRequirements', record.skills.map(skill => 'خبرة في ' + skill));
-    get('projectConversation').hidden = false;
-  } else if (kind === 'course') {
-    addFact('المدرّب', record.instructor);
-    addFact('المستوى', record.level);
-    addFact('المدة', record.hours + (record.hours >= 3 && record.hours <= 10 ? ' ساعات · ' : ' ساعة · ') + record.sessions + ' جلسات');
-    addFact('السعر', record.price ? '$' + record.price + ' (مثال)' : 'مجاني');
-    get('tasksTitle').textContent = 'ما الذي ستتعلّمه؟';
-    showList('detailTasks', record.syllabus);
-    get('requirementsTitle').textContent = 'مشروعك التطبيقي';
-    showList('detailRequirements', [record.project]);
-    get('courseLessons').hidden = false;
-    record.syllabus.forEach(title => {
-      const lesson = document.createElement('details');
-      const summary = document.createElement('summary');
-      summary.textContent = title;
-      const text = document.createElement('p');
-      text.textContent = 'نبذة توضيحية للدرس: ' + title + '. تدرّب على هذا الموضوع أثناء تنفيذ: ' + record.project;
-      const label = document.createElement('label');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      label.append(checkbox, ' تحديد هذه الوحدة التوضيحية كمقروءة');
-      lesson.append(summary, text, label);
-      get('lessonList').append(lesson);
-    });
-    get('lessonList').addEventListener('change', () => {
-      const read = get('lessonList').querySelectorAll('input:checked').length;
-      get('lessonProgress').max = record.syllabus.length;
-      get('lessonProgress').value = read;
-      get('lessonStatus').textContent = read + ' من أصل ' + record.syllabus.length + ' وحدات مقروءة';
-    });
-    get('previewFormTitle').textContent = 'معاينة التسجيل بالمسار';
-    get('messageField').hidden = true;
-    get('previewMessage').required = false;
-  } else {
-    addFact('الجهة', record.company);
-    addFact('الموقع', record.location);
-    addFact('النوع', record.itemType);
-    addFact('المقابل', record.offer);
-    addFact(kind === 'event' ? 'تاريخ الفعالية' : 'آخر موعد للتقديم', new Intl.DateTimeFormat('ar-JO', {dateStyle:'medium', timeZone:'UTC'}).format(new Date(record.deadline+'T12:00:00Z')));
-    showList('detailTasks', record.details);
-    showList('detailRequirements', record.requirements);
-    if (kind === 'event') {
-      addFact('الوقت', record.eventTime);
-      addFact('المكان', record.venue);
-      get('tasksTitle').textContent = 'برنامج الفعالية';
-      get('previewFormTitle').textContent = 'معاينة التسجيل بالفعالية';
-      get('messageField').hidden = true;
-      get('previewMessage').required = false;
-    }
+  const get=id=>document.getElementById(id),store=OfoqLearning.create(courses),id=new URLSearchParams(location.search).get('id')||'web',course=courses.find(item=>item.id===id);
+  get('year').textContent=new Date().getFullYear();
+  if(!course){get('detailContent').hidden=true;get('notFound').hidden=false;get('notFound').focus();return;}
+  document.title=course.title+' — أفق';get('detailTitle').textContent=course.title;get('detailDescription').textContent=course.description;
+  get('courseInstructor').insertAdjacentHTML('beforeend',OfoqPublishers.card(OfoqPublishers.forRecord('course',course)));
+  get('courseCover').src=OfoqLearning.cover(id);get('coursePrice').textContent=course.price?'$'+course.price:'مجاني';get('courseFacts').textContent=course.hours+' ساعة في المسار · '+course.syllabus.length+' دروس تفاعلية · '+(course.level==='beginner'?'مبتدئ':'متوسط');
+  course.syllabus.forEach(title=>{const item=document.createElement('li');item.textContent='✓ '+title;get('learningOutcomes').append(item);});get('courseProject').textContent='مشروعك التطبيقي: '+course.project;
+  let lesson=store.has(id)?store.state.current[id]:0,slide=0,playing=false,elapsed=0,last=0,frame=0,noteTimer;
+  const content=OfoqLessons[id],slides=()=>{
+    const data=content[lesson];return [
+      {title:course.syllabus[lesson],body:data[0],example:'تعلّم، جرّب، ثم طبّق على مشروعك.'},
+      {title:data[0],body:data[1],example:data[2]},
+      {title:'جرّب بنفسك',body:data[3],example:'المشروع التطبيقي: '+course.project}
+    ];
+  };
+  function stop(){playing=false;cancelAnimationFrame(frame);get('playLesson').textContent='▶ تشغيل';get('playLesson').setAttribute('aria-label','تشغيل الدرس');}
+  function saveNote(){clearTimeout(noteTimer);if(store.has(id))get('notesStatus').textContent=store.note(id,lesson,get('lessonNotes').value)?'تم حفظ الملاحظة على هذا المتصفح.':'الملاحظة متاحة خلال هذه الزيارة فقط.';}
+  function showSlide(){const data=slides()[slide];get('slideEyebrow').textContent='الدرس '+(lesson+1)+' / '+course.syllabus.length;get('slideTitle').textContent=data.title;get('slideBody').textContent=data.body;get('slideExample').textContent=data.example;get('slideNumber').textContent=(slide+1)+' / '+slides().length;get('slideProgress').value=((slide+elapsed/10)/slides().length)*100;get('previousSlide').disabled=slide===0;get('nextSlide').disabled=slide===slides().length-1;}
+  function render(){
+    const owned=store.has(id),done=store.state.progress[id].includes(lesson),percent=store.percent(id);
+    get('buyCourse').textContent=owned?'متابعة التعلّم ←':course.price?'اشترِ الآن — $'+course.price:'التحق مجانًا';get('addCart').hidden=owned||!course.price;get('addCart').textContent=store.state.cart.includes(id)?'إزالة من السلة':'أضف إلى السلة';get('wishCourse').textContent=store.state.wishlist.includes(id)?'♥ في المفضلة':'♡ أضف للمفضلة';get('wishCourse').setAttribute('aria-pressed',String(store.state.wishlist.includes(id)));
+    get('previewAccess').textContent=owned?'أنت ملتحق بهذه الدورة. تقدّمك وملاحظاتك محفوظة محليًا.':'معاينة مجانية للدرس الأول. التحق بالدورة للوصول لباقي الدروس وحفظ التقدّم.';
+    get('lessonTitle').textContent=course.syllabus[lesson];get('completeLesson').disabled=!owned;get('completeLesson').textContent=done?'✓ مكتمل — إلغاء الإكمال':'تحديد الدرس كمكتمل';get('nextLesson').disabled=lesson===course.syllabus.length-1;get('lessonNotes').disabled=!owned;
+    get('progressPercent').textContent=percent+'%';get('courseProgress').value=percent;get('progressSummary').textContent=(owned?store.state.progress[id].length:0)+' من '+course.syllabus.length+' دروس';get('completionBanner').hidden=percent!==100;
+    get('curriculumList').replaceChildren(...course.syllabus.map((title,index)=>{const button=document.createElement('button');button.type='button';button.className='curriculum-lesson';button.textContent=(owned&&store.state.progress[id].includes(index)?'✓ ':(!owned&&index>0?'🔒 ':'▷ '))+(index+1)+'. '+title;button.setAttribute('aria-current',index===lesson?'step':'false');button.addEventListener('click',()=>selectLesson(index));return button;}));
+    get('checkQuiz').disabled=!owned;showSlide();
   }
-}
-
-// Paid items open the shared payment-method popup; free registration stays available.
-if (record && kind === 'course' && record.price > 0) {
-  const form = get('previewForm');
-  form.hidden = true;
-  get('previewFormTitle').textContent = 'دفع رسوم الدورة التدريبية';
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'btn btn-orange detail-payment-button';
-  button.textContent = 'دفع ←';
-  button.setAttribute('aria-label', 'دفع رسوم الدورة التدريبية ' + record.title);
-  button.dataset.paymentTitle = record.title;
-  button.dataset.paymentAmount = record.price;
-  button.dataset.paymentKind = 'رسوم الدورة التدريبية';
-  form.after(button);
-}
-
-get('previewForm').addEventListener('input', event => event.target.setCustomValidity(''));
-get('previewForm').addEventListener('submit', event => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  form.querySelectorAll('[required]').forEach(input => {
-    input.setCustomValidity(input.value.trim() ? '' : 'يرجى إدخال نص.');
-  });
-  if (!form.reportValidity()) return;
-  form.reset();
-  form.hidden = true;
-  get('previewSuccess').hidden = false;
-  get('previewSuccess').focus();
-});
-
-get('previewAgain').addEventListener('click', () => {
-  get('previewSuccess').hidden = true;
-  get('previewForm').hidden = false;
-  get('previewName').focus();
-});
-
-
+  function selectLesson(index){if(!store.has(id)&&index>0){purchase();return;}saveNote();stop();lesson=index;slide=0;elapsed=0;store.remember(id,index);get('lessonNotes').value=store.state.notes[id+':'+index]||'';get('notesStatus').textContent='';get('lessonFeedback').textContent='';render();}
+  function purchase(){if(store.has(id)){get('classroom').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});return;}const done=()=>{render();get('classroom').scrollIntoView({behavior:'smooth'});};if(course.price)store.checkout([id],done);else{store.enroll([id]);done();}}
+  function tick(now){if(!playing)return;const dt=Math.min((now-last)/1000,.25);last=now;elapsed+=dt*Number(get('playbackSpeed').value);if(elapsed>=10){elapsed=0;if(slide<slides().length-1)slide++;else{stop();if(store.has(id)){store.complete(id,lesson);get('lessonFeedback').textContent='أنهيت مشاهدة الدرس التفاعلي. تم تحديث تقدّمك.';}else get('lessonFeedback').textContent='انتهت المعاينة. التحق بالدورة لحفظ تقدّمك.';elapsed=10;render();return;}}showSlide();frame=requestAnimationFrame(tick);}
+  get('playLesson').addEventListener('click',()=>{if(playing){stop();return;}if(slide===slides().length-1&&elapsed>=10){slide=0;elapsed=0;}playing=true;last=performance.now();get('playLesson').textContent='Ⅱ إيقاف مؤقت';get('playLesson').setAttribute('aria-label','إيقاف الدرس مؤقتًا');frame=requestAnimationFrame(tick);});
+  get('previousSlide').addEventListener('click',()=>{stop();slide=Math.max(0,slide-1);elapsed=0;showSlide();});get('nextSlide').addEventListener('click',()=>{stop();slide=Math.min(slides().length-1,slide+1);elapsed=0;showSlide();});
+  get('fullscreenLesson').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await get('lectureScreen').requestFullscreen();}catch{get('lessonFeedback').textContent='ملء الشاشة غير متاح في هذا المتصفح.';}});
+  get('completeLesson').addEventListener('click',()=>{if(!store.has(id))return;store.complete(id,lesson,!store.state.progress[id].includes(lesson));render();});get('nextLesson').addEventListener('click',()=>selectLesson(Math.min(course.syllabus.length-1,lesson+1)));
+  get('buyCourse').addEventListener('click',purchase);get('addCart').addEventListener('click',()=>{store.toggle('cart',id);render();});get('wishCourse').addEventListener('click',()=>{store.toggle('wishlist',id);render();});
+  get('lessonNotes').value=store.state.notes[id+':'+lesson]||'';get('lessonNotes').addEventListener('input',()=>{clearTimeout(noteTimer);noteTimer=setTimeout(saveNote,400);});
+  addEventListener('pagehide',()=>{saveNote();stop();});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+  const questions={web:['ما الطريقة الآمنة لعرض نص المستخدم؟',['textContent','innerHTML مباشرة','eval'],0],ux:['كيف تبدأ اختبار قابلية الاستخدام؟',['تشرح كل الأزرار','تعطي مهمة محددة وتراقب','تطلب اختيار اللون المفضل'],1],portfolio:['ماذا تفعل عند غياب أرقام النتائج؟',['تختلق نسبة نجاح','تحذف المشروع','تصف ما اختبرته وتعلمته بوضوح'],2],react:['ما الذي تعرضه عند فشل تحميل البيانات؟',['صفحة فارغة','رسالة خطأ وطريقة لإعادة المحاولة','نتائج قديمة دون توضيح'],1],brand:['ماذا يتضمن دليل الهوية؟',['الشعار فقط','الألوان فقط','قواعد الخطوط والألوان والاستخدام'],2],marketing:['ما معدل التحويل لـ20 تسجيلًا من 500 زيارة؟',['4%','25%','40%'],0]};
+  const quiz=questions[id];get('quizQuestion').textContent=quiz[0];quiz[1].forEach((text,index)=>{const label=document.createElement('label'),input=document.createElement('input');input.type='radio';input.name='courseQuizAnswer';input.value=index;label.append(input,document.createTextNode(text));get('quizOptions').append(label);});
+  get('checkQuiz').addEventListener('click',()=>{if(!store.has(id))return;const answer=document.querySelector('input[name="courseQuizAnswer"]:checked');get('quizResult').textContent=!answer?'اختر إجابة أولًا.':Number(answer.value)===quiz[2]?'✓ إجابة صحيحة! طبّق الفكرة على مشروعك.':'راجع الدروس وجرّب مرة أخرى.';});render();
 })();

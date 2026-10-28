@@ -159,23 +159,6 @@ Promise.resolve().then(() => {
     sort: "recent"
   };
 
-  const icons = {
-    dashboard: `
-      <rect x="4" y="4" width="16" height="16" rx="2"/>
-      <path d="M9 4v16M9 10h11M14 10v10"/>
-    `,
-    mobile: `
-      <rect x="7" y="2" width="10" height="20" rx="2"/>
-      <path d="M11 18h2"/>
-    `,
-    code: `
-      <path d="m7 6-5 6 5 6m10-12 5 6-5 6m-3-15-4 18"/>
-    `,
-    marketing: `
-      <path d="m3 10 16-6v16L3 14zM6 15l2 6h4l-2-5M22 8v8"/>
-    `
-  };
-
   const normalize = value => value.trim().toLowerCase();
 
   const money = value =>
@@ -253,43 +236,43 @@ Promise.resolve().then(() => {
     article.className = "project-card";
     article.dataset.project = project.id;
 
-    const icon = document.createElement("div");
-    icon.className = `project-icon ${project.color}`;
-    icon.setAttribute("aria-hidden", "true");
-
-    icon.innerHTML = `
-      <svg viewBox="0 0 24 24">
-        ${icons[project.icon]}
-      </svg>
-    `;
+    const cover = document.createElement('a');
+    cover.className = 'project-cover';
+    cover.href = './Project/project.html?id=' + project.id;
+    cover.setAttribute('aria-label', 'تفاصيل ' + project.title);
+    const image = document.createElement('img');
+    image.src = '../assets/project-covers/' + project.icon + '.svg';
+    image.alt = ''; image.width = 800; image.height = 450; image.loading = 'lazy';
+    cover.append(image);
+    const publisher = window.OfoqPublishers.forRecord('project', project);
+    const avatar = document.createElement('img');
+    avatar.className = 'cover-avatar'; avatar.src = publisher.avatar;
+    avatar.alt = publisher.name; avatar.width = 42; avatar.height = 42;
+    cover.append(avatar);
 
     const details = document.createElement("div");
     details.className = "project-details";
 
     const title = document.createElement("h2");
-    title.textContent = project.title;
+    const titleLink = document.createElement('a');
+    titleLink.href = cover.href; titleLink.textContent = project.title;
+    title.append(titleLink);
 
-    const description = document.createElement("p");
-    description.textContent = project.description;
-
-    const tags = document.createElement("div");
-    tags.className = "skill-tags";
-
-    project.skills.forEach(skill => {
-      const tag = document.createElement("span");
-      tag.textContent = skill;
-      tags.append(tag);
-    });
-
-    details.append(title, description, tags);
-    details.insertAdjacentHTML("afterbegin", window.OfoqPublishers.card(window.OfoqPublishers.forRecord("project", project)));
+    const category = document.createElement('p');
+    category.className = 'project-category';
+    category.textContent = {development: 'برمجة وتطوير', design: 'تصميم', marketing: 'تسويق رقمي'}[project.category] + ' / ' + project.skills.join('، ');
+    details.append(title, category);
+    const owner = document.createElement('a');
+    owner.className = 'project-owner'; owner.href = window.OfoqPublishers.url('Profile', publisher.id);
+    owner.textContent = publisher.name;
+    details.append(owner);
 
     const offer = document.createElement("div");
     offer.className = "project-offer";
 
     const price = document.createElement("p");
     price.className = "project-price";
-    price.textContent = money(project.budget);
+    price.textContent = 'الميزانية ' + money(project.budget);
 
     const duration = document.createElement("p");
     duration.className = "project-duration";
@@ -315,7 +298,7 @@ Promise.resolve().then(() => {
     detailsLink.href = './Project/project.html?id=' + project.id;
     detailsLink.textContent = 'تفاصيل المشروع ←';
     offer.append(price, duration, apply, detailsLink);
-    article.append(icon, details, offer);
+    article.append(cover, details, offer);
 
     return article;
   }
@@ -333,6 +316,21 @@ Promise.resolve().then(() => {
       `${list.length} من المشاريع المتاحة`;
 
     renderChips();
+    renderCategories();
+  }
+
+  function renderCategories() {
+    const labels = {'': 'كل المشاريع', development: 'برمجة وتطوير', design: 'تصميم', marketing: 'تسويق رقمي'};
+    $('categoryList').replaceChildren(...Object.entries(labels).map(([value, label]) => {
+      const button = document.createElement('button'); button.type = 'button';
+      button.setAttribute('aria-pressed', String(state.category === value));
+      const name = document.createElement('span'); name.textContent = label;
+      const count = document.createElement('span'); count.className = 'category-count';
+      count.textContent = projects.filter(project => !value || project.category === value).length;
+      button.append(name, count);
+      button.addEventListener('click', () => { state.category = value; $('category').value = value; render(); });
+      return button;
+    }));
   }
 
   function renderChips() {
@@ -418,9 +416,7 @@ Promise.resolve().then(() => {
     render();
   }
 
-  $("filterForm").addEventListener("submit", event => {
-    event.preventDefault();
-
+  function applyFilters() {
     const keys = [
       "category",
       "budget",
@@ -432,17 +428,24 @@ Promise.resolve().then(() => {
     keys.forEach(key => {
       state[key] = $(key).value.trim();
     });
-
+    state.query = $("searchQuery").value.trim();
     render();
+  }
+
+  $("filterForm").addEventListener("change", applyFilters);
+  $("skills").addEventListener("input", applyFilters);
+  $("filterForm").addEventListener("submit", event => {
+    event.preventDefault();
+    applyFilters();
   });
 
   $("searchForm").addEventListener("submit", event => {
     event.preventDefault();
 
-    state.query = $("searchQuery").value.trim();
-
-    render();
+    applyFilters();
   });
+
+  $("searchQuery").addEventListener("input", applyFilters);
 
   $("searchQuery").addEventListener("search", () => {
     if (!$("searchQuery").value) {

@@ -6,6 +6,7 @@ const path = require('path');
 const window = {};
 const context = vm.createContext({window, URL, URLSearchParams, location:{search:'?theme=dark'}, document:{currentScript:{src:pathToFileURL(path.resolve('assets/publishers.js')).href},documentElement:{dataset:{theme:'dark'}}}});
 vm.runInContext(fs.readFileSync('assets/publishers.js','utf8'),context);
+vm.runInContext(fs.readFileSync('Academy/catalog.js','utf8'),context);
 let checked = 0;
 for (const [file,kind,variable] of [
  ['Freelance/freelance','project','projects'],['Academy/academy','course','courses'],
@@ -17,7 +18,7 @@ for (const [file,kind,variable] of [
  new vm.Script(source,{filename:file+'.js'});
  const start = source.indexOf('const '+variable+' =');
  const end = source.indexOf('\n(function () {',start);
- const data = vm.runInNewContext(source.slice(start,end)+'\n'+variable);
+ const data = vm.runInNewContext(source.slice(start,end)+'\n'+variable, {window});
  const records = Array.isArray(data)?data:data.items;
  const html = fs.readFileSync(file+'.html','utf8');
  assert(html.indexOf('assets/publishers.js') < html.indexOf('src="'+path.basename(file)+'.js"'));

@@ -2,6 +2,12 @@
 
 See PROJECT-STRUCTURE.md for the current structure. Most screens are display-only HTML/CSS/JavaScript examples. Their form submissions clear inputs and show a notice without saving or sending data.
 
+Academy/ includes a local learning prototype: discovery, wishlist, cart, simulated checkout, enrolled courses, a lesson player, notes and completion progress. `learning.js` stores only demo learning state in localStorage; no actual payment or account authorization takes place. `lesson-content.js` contains original short interactive slide lessons, not full course videos. Playback offers pause, speed controls and fullscreen; finishing a lesson or marking it complete updates the course percentage. The first lesson is available as a preview; enrollment unlocks the rest. A final practice question is provided per course. When storage is blocked, a visible notice explains that state lasts only for the current visit.
+
+`Academy/catalog.js` is the shared course catalog used by discovery, course details and `Academy/Cart/cart.html`. The cart displays full prices and lets visitors select courses independently, remove items or move them to the wishlist. Its summary shows the full cart value, the unselected value and the selected checkout total. Simulated checkout enrolls only selected courses and keeps the others in the cart.
+
+Internships/ uses image cards with instant search and filters, and a local favorites list saved as opportunity IDs in localStorage. The intro shortcut and Favorites tab show only saved opportunities; the full list and application preview remain available. `node scripts/check-internships.cjs` checks filtering, saved opportunity persistence, empty states and blocked-storage behavior.
+
 Meeting/ is a live Jitsi integration adapted from the supplied meetingZoom/script.js. Clicking Join loads the Jitsi iframe with the entered display name, a unique room name and responsive dimensions. Audio and video start muted; participants control their devices inside Jitsi. Each room remains in the page URL for reload/rejoin. Copy Invite shares a direct Jitsi link so it also works when this website is running only on localhost. The public Jitsi service requires the host to sign in. The website must run on HTTPS or localhost for media access. Calls use Jitsi; there is no local meeting or invitation backend.
 
 Run `node scripts/check-meeting.mjs` for room, lifecycle, retry and validation checks using a fake Jitsi API. This does not exercise a real two-person call.

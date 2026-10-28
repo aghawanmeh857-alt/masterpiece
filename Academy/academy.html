@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="../assets/arabic-ui.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
-  <link rel="stylesheet" href="../assets/payment.css">
-  <script defer src="../assets/payment.js"></script>
+
+  <link rel="stylesheet" href="learning.css">
 </head>
   <body data-section="academy">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
@@ -56,7 +56,7 @@
             مسارات تعلّم عملية تساعدك على تحويل مهاراتك إلى إنجازات.
           </p>
         </div>
-        <nav aria-label="مسار التصفح">
+        <div class="academy-heading-actions"><nav aria-label="مسار التصفح">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
               <a href="../hero/userHero.html">
@@ -68,6 +68,7 @@
             </li>
           </ol>
         </nav>
+        </div>
       </div>
       <section class="featured-path panel" aria-labelledby="featuredTitle">
         <div class="featured-copy">
@@ -99,6 +100,10 @@
               ↓
             </span>
           </a>
+          <div class="featured-shortcuts" role="group" aria-label="السلة والمفضلة">
+            <a id="academyCartButton" class="academy-cart-button" href="Cart/cart.html" aria-label="فتح سلة مشتريات الأكاديمية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg><span>سلة المشتريات</span><span id="academyCartCount" class="academy-cart-count">0</span></a>
+            <button id="featuredWishlist" class="academy-favorite-button" type="button" aria-label="عرض الدورات المفضلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>المفضلة</span><span id="featuredWishCount" class="academy-cart-count">0</span></button>
+          </div>
         </div>
         <div class="learning-art" aria-hidden="true">
           <span class="art-label">
@@ -169,7 +174,9 @@
           </span>
         </div>
       </div>
-      <div class="workspace">
+      <nav class="learning-tabs" aria-label="مكتبة التعلم"><button type="button" data-library="overview" aria-pressed="false">مساحتي</button><button type="button" data-library="all" aria-pressed="true">اكتشف الدورات</button><button type="button" data-library="enrolled" aria-pressed="false">تعلّمي <span id="learningCount">0</span></button><button type="button" data-library="wishlist" aria-pressed="false">المفضلة <span id="wishCount">0</span></button><a id="openCart" href="Cart/cart.html">السلة <span id="cartCount">0</span></a></nav><p class="learning-demo">تجربة تعليمية محلية: شراء تجريبي بدون خصم، ودروس تفاعلية قصيرة مع حفظ تقدّمك على هذا المتصفح.</p><p id="storageNotice" class="learning-demo" role="status" hidden></p>
+      <section id="academyOverview" class="academy-overview" aria-labelledby="overviewTitle" hidden><div class="overview-heading"><div><p class="eyebrow">أفق / مساحتك التعليمية</p><h2 id="overviewTitle">كل تعلّمك في مكان واحد.</h2><p>تابع من حيث توقّفت، وراجع مفضّلتك وسلة دوراتك.</p></div></div><div id="overviewMetrics" class="overview-metrics"></div><div class="overview-layout"><section class="overview-learning"><h3>واصل رحلتك</h3><div id="overviewCourses" class="course-grid"></div><div id="overviewEmpty" class="overview-empty" hidden><h3>مهارتك القادمة تبدأ بخطوة</h3><p>التحق بدورة لتظهر هنا نسبة إنجازك وآخر درس وصلت له.</p><button id="overviewDiscover" type="button" class="learn-primary">اكتشف الدورات ←</button></div></section><aside class="overview-sidebar"><section class="overview-box"><h3>سلتك</h3><div id="overviewCartItems"></div><div class="overview-cart-total"><span>الإجمالي</span><strong id="overviewCartTotal"></strong></div><a class="learn-primary" href="Cart/cart.html">عرض السلة وإتمام الشراء ←</a></section><section class="overview-box"><h3>المفضلة</h3><div id="overviewWishlist"></div><button id="overviewViewWishlist" type="button" class="learn-secondary">عرض المفضلة كاملة ←</button></section></aside></div></section>
+      <div class="workspace" id="catalogWorkspace">
         <aside class="filter-panel panel" aria-labelledby="filterTitle">
   <div class="filter-heading">
     <h2 id="filterTitle">
@@ -250,13 +257,6 @@
         </option>
       </select>
     </div>
-    
-    <button class="btn btn-orange w-100" type="submit">
-      تطبيق الفلاتر
-      <span aria-hidden="true">
-        →
-      </span>
-    </button>
   </form>
   <p class="filter-footnote">
     <span class="live-dot">
@@ -277,9 +277,6 @@
               </svg>
               <input id="searchQuery" class="form-control" type="search" placeholder="ابحث عن مسار أو مهارة…">
             </div>
-            <button class="btn btn-orange search-button" type="submit">
-              بحث
-            </button>
             <div class="sort-field">
               <label for="sortBy">
                 الترتيب حسب
@@ -327,85 +324,13 @@
   <span>© OFOQ <span id="year"></span></span>
   <a data-room-link href="../hero/userHero.html#academy">العودة إلى قسم <span data-room-name>الأكاديمية</span>  <span aria-hidden="true">↗</span></a>
 </footer>
-    <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content panel">
-          <div class="modal-header">
-            <div>
-              <p class="eyebrow mb-2">
-                الأكاديمية / مسار تعلّم
-              </p>
-              <h2 class="modal-title fs-4" id="courseTitle">
-              </h2>
-            </div>
-            <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="إغلاق">
-            </button>
-          </div>
-          <div class="modal-body">
-            <p id="courseSummary" class="apply-summary">
-            </p>
-            <p id="courseDescription" class="intro">
-            </p>
-            <h3 class="syllabus-title">
-              ما الذي ستبنيه؟
-            </h3>
-            <p id="courseProject">
-            </p>
-            <h3 class="syllabus-title">
-              خطة تعلّمك
-            </h3>
-            <ol id="courseSyllabus" class="syllabus">
-            </ol>
-            <div id="enrollArea">
-              <h3 class="syllabus-title">
-                معاينة تسجيلك بالمسار
-              </h3>
-              <form autocomplete="off" id="enrollmentForm">
-                <div class="enroll-fields">
-                  <div class="field">
-                    <label for="learnerName">
-                      اسمك
-                    </label>
-                    <input id="learnerName" class="form-control" autocomplete="name" maxlength="100" required>
-                  </div>
-                  <div class="field">
-                    <label for="learnerEmail">
-                      البريد الإلكتروني
-                    </label>
-                    <input id="learnerEmail" class="form-control" type="email" autocomplete="email" maxlength="200" required dir="ltr">
-                  </div>
-                </div>
-                <p class="demo-note">
-                  هذه المعاينة لا تسجّلك ولا تتطلب دفعًا. تُمسح بياناتك عند إغلاق النافذة.
-                </p>
-                <button type="submit" class="btn btn-orange">
-                  معاينة التسجيل بالمسار
-                </button>
-              </form>
-            </div>
-            <div id="enrollmentSuccess" class="application-success" role="status" hidden>
-              <span aria-hidden="true">
-                ✓
-              </span>
-              <h3>
-                أنت جاهز لخطوتك القادمة.
-              </h3>
-              <p>
-                اكتملت المعاينة. لم يحدث تسجيل أو دفع أو إرسال بريد إلكتروني.
-              </p>
-              <button class="btn btn-orange" type="button" data-bs-dismiss="modal">
-                متابعة الاستكشاف
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
-    </script>
+
     
     
     
-    <script src="academy.js"></script>
+    <script src="catalog.js"></script>
+  <script src="learning.js"></script>
+  <script src="lesson-content.js"></script>
+  <script src="academy.js"></script>
 </body>
 </html>

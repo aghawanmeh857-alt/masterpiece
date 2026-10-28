@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f3f6fb"><title>سلة المشتريات — أفق</title><link rel="icon" href="../../assets/branding/ofoq-logo.png"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"><link rel="stylesheet" href="../academy.css"><link rel="stylesheet" href="../../assets/arabic-ui.css"><link rel="stylesheet" href="../learning.css"><link rel="stylesheet" href="cart.css"><script defer src="../../assets/arabic-ui.js"></script></head>
+<body data-section="academy" data-page="cart">
+<a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+<header class="site-header">
+  <div class="container-xl header-inner">
+    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
+      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+    </a>
+    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
+      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
+      <a data-section-link="academy" href="../academy.html">الأكاديمية</a>
+      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
+      <a data-section-link="jobs" href="../../Jobs/jobs.html">الوظائف</a>
+      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
+    </nav></details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../../Auth/Login/login.html">تسجيل الدخول</a><a href="../../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../../Account/Profile/profile.html">الملف الشخصي</a><a href="../../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../../Account/Messages/messages.html">الرسائل</a><a href="../../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
+  </div>
+</header>
+<main id="mainContent" tabindex="-1" class="cart-page page-content">
+  <nav class="cart-breadcrumb" aria-label="مسار التصفح"><a href="../academy.html">الأكاديمية</a><span aria-hidden="true">/</span><span>سلة المشتريات</span></nav>
+  <div class="cart-heading"><div><p class="eyebrow">أفق / استثمر في خطوتك القادمة</p><h1>سلة <em>المشتريات.</em></h1><p id="cartDescription"></p></div><a href="../academy.html" class="learn-secondary">متابعة التصفّح ←</a></div>
+  <section class="cart-intro" aria-labelledby="cartIntroTitle"><div><p class="eyebrow">الأكاديمية / خطوتك القادمة</p><h2 id="cartIntroTitle">كل مهارة جديدة، بداية لفرصة أكبر.</h2><p>راجع دوراتك، حدّد اللي بدك تبدأ فيها، وشوف الإجمالي قبل المتابعة.</p></div><ol class="cart-steps" aria-label="خطوات الشراء"><li><span>01</span>اختر دوراتك</li><li><span>02</span>راجع الإجمالي</li><li><span>03</span>ابدأ التعلّم</li></ol></section>
+  <p id="storageNotice" class="learning-demo" role="status" hidden></p><p id="cartStatus" class="cart-status" role="status" aria-live="polite"></p>
+  <div class="shopping-layout" id="shoppingLayout">
+    <section class="cart-items" aria-label="الدورات الموجودة في السلة"><div class="cart-section-heading"><h2>دوراتك المختارة</h2><span>اختيار مرن قبل الشراء</span></div><div class="cart-list-heading"><label><input id="selectAll" type="checkbox"> تحديد الكل</label><span id="selectionCount"></span></div><div id="cartItems"></div></section>
+    <aside class="order-summary" aria-labelledby="summaryTitle"><p class="eyebrow">خطوتك نحو مهارة جديدة</p><h2 id="summaryTitle">ملخّص الطلب</h2><dl><div><dt>قيمة السلة كاملة</dt><dd id="fullCartTotal"></dd></div><div><dt>العناصر غير المختارة</dt><dd id="unselectedTotal"></dd></div></dl><div class="selected-heading"><h3>المختار للشراء</h3><span id="selectedCount"></span></div><ul id="selectedItems"></ul><div class="order-total"><span>الإجمالي للدفع</span><strong id="selectedTotal" aria-live="polite"></strong><small>بالدولار الأمريكي</small></div><button id="checkoutSelected" class="learn-primary" type="button">إتمام الشراء</button><p class="checkout-demo">شراء تجريبي فقط، لا يُخصم أي مبلغ. يُحسب السعر من الكورسات المختارة بالكامل.</p></aside>
+  </div>
+  <section id="emptyCart" class="cart-empty" hidden><span aria-hidden="true">▱</span><h2>سلتك بانتظار خطوتك القادمة</h2><p>اكتشف دورة تناسبك وأضفها هنا لتبدأ التعلّم.</p><a class="learn-primary" href="../academy.html">اكتشف الدورات</a></section>
+  <section id="purchaseSuccess" class="cart-success" tabindex="-1" hidden><span aria-hidden="true">✓</span><h2>أُضيفت الدورات المختارة إلى تعلّمك</h2><p>تم الشراء التجريبي بدون خصم. الكورسات غير المختارة بتظل في سلتك.</p><div id="purchasedCourses"></div><a class="learn-secondary" href="../academy.html?library=enrolled">انتقل إلى تعلّمي ←</a></section>
+</main>
+<footer class="page-footer cart-page"><span>© أفق <span id="year"></span></span><a href="../academy.html">العودة إلى الأكاديمية</a></footer>
+<script src="../catalog.js"></script><script src="../learning.js"></script><script src="cart.js"></script>
+</body></html>

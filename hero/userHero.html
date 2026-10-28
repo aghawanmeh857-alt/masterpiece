@@ -33,6 +33,8 @@
   <link rel="stylesheet" href="userHero.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
   <script defer src="../assets/arabic-ui.js"></script>
+  <script defer src="../assets/demo-auth.js"></script>
+  <link rel="stylesheet" href="navbar.css">
 </head>
 
 <body data-section="hero">
@@ -40,64 +42,39 @@
   <!-- مشهد الأنيميشن -->
   <div id="scene" aria-hidden="true"></div>
   <div class="scene-vignette"></div>
-  <div class="day-night-controls" role="group" aria-label="إضاءة المشهد">
-    <button id="dayMode" type="button" aria-pressed="true" disabled>☀ نهار</button>
-    <button id="nightMode" type="button" aria-pressed="false" disabled>☾ ليل</button>
-  </div>
-
-  <!-- الخروج من hero والدخول إلى shared -->
-
-<header class="topbar container-fluid">
-
-  <a class="brand" href="#lobby" aria-label="أفق | OFOQ الرئيسية">
+  <header class="topbar container-fluid hero-navbar">
+    <a class="brand" href="#lobby" aria-label="أفق | OFOQ الرئيسية">
       <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
     </a>
-
-    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي" disabled>☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Auth/Login/login.html">تسجيل الدخول</a><a href="../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Account/Profile/profile.html">الملف الشخصي</a><a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Account/Messages/messages.html">الرسائل</a><a href="../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
-
-</header>
-
-
-
-<nav class="room-nav" aria-label="أقسام OFOQ">
-
-  <button
-    type="button"
-    data-room="0"
-    class="active"
-    aria-current="location"
-  >
-    <span>01</span>
-    الرئيسية
-  </button>
-
-  <button type="button" data-room="1">
-    <span>02</span>
-    العمل الحر
-  </button>
-
-  <button type="button" data-room="2">
-    <span>03</span>
-    الأكاديمية
-  </button>
-
-  <button type="button" data-room="3">
-    <span>04</span>
-    فرص التدريب
-  </button>
-
-  <button type="button" data-room="4">
-    <span>05</span>
-    الوظائف
-  </button>
-
-  <button type="button" data-room="5">
-    <span>06</span>
-    الفعاليات
-  </button>
-
-</nav>
-
+    <details class="site-navigation hero-navigation" open>
+      <summary>الأقسام <span aria-hidden="true">☰</span></summary>
+      <nav class="room-nav" aria-label="أقسام أفق">
+        <a href="#lobby" data-room="0" class="active" aria-current="location">الرئيسية</a>
+        <a href="../Freelance/freelance.html" data-room="1">العمل الحر</a>
+        <a href="../Academy/academy.html" data-room="2">الأكاديمية</a>
+        <a href="../Internships/internships.html" data-room="3">فرص التدريب</a>
+        <a href="../Jobs/jobs.html" data-room="4">الوظائف</a>
+        <a href="../Events/events.html" data-room="5">الفعاليات</a>
+      </nav>
+    </details>
+    <nav class="account-links header-actions" aria-label="الحساب والمظهر">
+      <button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي" disabled>☾ الوضع الليلي</button>
+      <a class="navbar-login" data-auth="guest" href="../Auth/Login/login.html?next=../../hero/userHero.html">تسجيل الدخول</a>
+      <button class="navbar-logout" data-auth="member" data-logout type="button" hidden>تسجيل الخروج</button>
+      <details class="account-menu"><summary>الحساب</summary><div class="account-menu-links">
+        <a href="../Auth/Register/register.html" data-auth="guest">إنشاء حساب</a>
+        <a href="../Account/Profile/profile.html">الملف الشخصي</a>
+        <a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a>
+        <a href="../Account/Messages/messages.html">الرسائل</a>
+        <a href="../Account/Settings/settings.html">الإعدادات</a>
+        <a href="../Admin/dashboard.html">لوحة الإدارة</a>
+      </div></details>
+    </nav>
+    <div class="day-night-controls" hidden aria-hidden="true">
+      <button id="dayMode" type="button" aria-pressed="true" disabled>نهار</button>
+      <button id="nightMode" type="button" aria-pressed="false" disabled>ليل</button>
+    </div>
+  </header>
 
   <!-- أقسام التمرير لتحريك الكاميرا -->
   <main id="journey">

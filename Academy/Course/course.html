@@ -16,8 +16,8 @@
   <link rel="stylesheet" href="../../assets/arabic-ui.css">
   <script src="../../assets/publishers.js"></script>
   <script defer src="../../assets/arabic-ui.js"></script>
-  <link rel="stylesheet" href="../../assets/payment.css">
-  <script defer src="../../assets/payment.js"></script>
+
+  <link rel="stylesheet" href="../learning.css">
 </head>
 <body data-section="academy" data-kind="course">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
@@ -38,50 +38,18 @@
 </header>
   <main id="mainContent" tabindex="-1" class="container-xl account-page">
     <a class="details-link mb-4" href="../academy.html">→ العودة إلى الأكاديمية</a>
-    <p class="preview-note">محتوى توضيحي فقط. لا تُحفظ النماذج أو التعليقات أو تقدّم الدروس، ولا يجري تقديم طلبات أو تسجيل أو دفع فعلي.</p>
-    <section id="notFound" class="account-panel" tabindex="-1" hidden>
-      <h1>لم نعثر على هذا العنصر.</h1><p>استخدم الرابط بالأعلى لاختيار عنصر من القائمة.</p>
-    </section>
+    <a class="details-link cart-shortcut" href="../Cart/cart.html">سلة المشتريات ←</a>
+    <p class="learning-demo">شراء تجريبي بدون خصم. المحتوى دروس تفاعلية قصيرة، ويُحفظ تقدّمك محليًا على هذا المتصفح.</p>
+    <p id="storageNotice" class="learning-demo" role="status" hidden></p>
+    <section id="notFound" class="account-panel" tabindex="-1" hidden><h1>لم نعثر على هذه الدورة</h1><a href="../academy.html">تصفّح الدورات المتاحة ←</a></section>
     <div id="detailContent">
-      <div class="account-heading">
-        <div><p class="eyebrow mb-3">أفق / تفاصيل المسار</p><h1 id="detailTitle">جارٍ تحميل التفاصيل…</h1><p id="detailDescription"></p></div>
-      </div>
-      <div class="detail-grid">
-        <div class="account-stack">
-          <section class="account-panel"><h2 id="tasksTitle">المهام التي ستعمل عليها</h2><ul id="detailTasks" class="detail-list"></ul></section>
-          <section class="account-panel"><h2 id="requirementsTitle">ما الذي تحتاجه؟</h2><ul id="detailRequirements" class="detail-list"></ul></section>
-          <section id="courseLessons" class="account-panel" hidden>
-            <h2>معاينات الدروس</h2><p class="demo-note">نبذات توضيحية وليست دروسًا كاملة. يُعاد ضبط تقدّم القراءة عند تحديث الصفحة.</p>
-            <progress id="lessonProgress" class="course-progress" value="0" max="1" aria-labelledby="lessonStatus">0</progress>
-            <p id="lessonStatus" class="demo-note" role="status">لم تُقرأ أي وحدات بعد</p>
-            <div id="lessonList" class="lesson-list"></div>
-          </section>
-          <section id="projectConversation" class="account-panel" hidden>
-            <h2>حوار المشروع</h2><p class="demo-note">اطرح سؤالًا أو اعرض مهاراتك ضمن هذه المعاينة المؤقتة.</p>
-            <div id="detailComments"></div>
-            <form autocomplete="off" id="detailCommentForm" class="detail-comment-form" novalidate>
-              <div class="field"><label for="commentName">اسمك الظاهر</label><input id="commentName" class="form-control" dir="auto" minlength="2" maxlength="80" required></div>
-              <div class="field"><label for="commentText">تعليقك</label><textarea id="commentText" class="form-control" dir="auto" rows="3" maxlength="1000" required></textarea></div>
-              <button class="btn btn-orange" type="submit">إضافة تعليق</button><p id="commentStatus" class="profile-status" role="status"></p>
-            </form>
-          </section>
-        </div>
-        <aside class="account-stack" aria-label="التفاصيل ونموذج المعاينة">
-          <section class="account-panel"><h2>نظرة سريعة.</h2><dl id="detailFacts" class="detail-facts"></dl></section>
-          <section class="account-panel">
-            <h2 id="previewFormTitle">معاينة الطلب</h2>
-            <form autocomplete="off" id="previewForm" novalidate>
-              <div class="field"><label for="previewName">اسمك</label><input id="previewName" class="form-control" dir="auto" autocomplete="name" minlength="2" maxlength="80" required></div>
-              <div class="field"><label for="previewEmail">البريد الإلكتروني</label><input id="previewEmail" class="form-control" type="email" autocomplete="email" maxlength="200" required dir="ltr"></div>
-              <div id="messageField" class="field"><label for="previewMessage">خطة عملك</label><textarea id="previewMessage" class="form-control" dir="auto" rows="3" maxlength="1000" required></textarea></div>
-              <button class="btn btn-orange w-100" type="submit">معاينة النموذج ←</button>
-            </form>
-            <div id="previewSuccess" role="status" tabindex="-1" hidden>
-              <h3 class="fs-5">اكتملت المعاينة!</h3><p class="demo-note">اجتازت البيانات التحقق من الحقول ثم مُسحت. لم يُحفظ أو يُرسل أي شيء.</p><button id="previewAgain" class="text-button" type="button">جرّب مجددًا</button>
-            </div>
-          </section>
-        </aside>
-      </div>
+      <section class="course-intro"><div><p class="eyebrow">أفق / الأكاديمية</p><h1 id="detailTitle"></h1><p id="detailDescription"></p><div id="courseInstructor"></div><div id="courseFacts" class="course-facts"></div></div><aside class="purchase-panel"><img id="courseCover" width="800" height="450" alt=""><strong id="coursePrice"></strong><button id="buyCourse" type="button" class="learn-primary"></button><button id="addCart" type="button" class="learn-secondary">أضف إلى السلة</button><button id="wishCourse" type="button" class="learn-text" aria-pressed="false">♡ أضف للمفضلة</button><p>دروس تفاعلية · مشروع تطبيقي · تقدّم محفوظ محليًا</p></aside></section>
+      <section class="outcomes"><h2>ماذا ستتعلّم؟</h2><ul id="learningOutcomes"></ul><p id="courseProject"></p></section>
+      <section id="classroom" class="classroom" aria-label="مشغّل الدروس">
+        <div class="lecture-main"><div class="lecture-screen" id="lectureScreen"><div class="lecture-topline"><span>أفق / درس تفاعلي</span><span id="slideNumber"></span></div><div class="lecture-slide"><p id="slideEyebrow"></p><h2 id="slideTitle"></h2><p id="slideBody"></p><pre id="slideExample" dir="auto"></pre></div><div class="lecture-controls"><button id="playLesson" type="button" aria-label="تشغيل الدرس">▶ تشغيل</button><button id="previousSlide" type="button" aria-label="الشريحة السابقة">السابق</button><button id="nextSlide" type="button" aria-label="الشريحة التالية">التالي</button><label>السرعة<select id="playbackSpeed"><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label><button id="fullscreenLesson" type="button" aria-label="ملء الشاشة">⛶</button></div><progress id="slideProgress" value="0" max="100" aria-label="تقدّم تشغيل الدرس"></progress></div><div class="lecture-info"><p id="previewAccess" class="learning-demo"></p><h2 id="lessonTitle"></h2><div class="lesson-actions"><button id="completeLesson" type="button" class="learn-primary">تحديد الدرس كمكتمل</button><button id="nextLesson" type="button" class="learn-secondary">الدرس التالي ←</button></div><p id="lessonFeedback" role="status"></p><label for="lessonNotes">ملاحظاتي على الدرس</label><textarea id="lessonNotes" rows="4" maxlength="3000" placeholder="اكتب ملاحظاتك هنا…"></textarea><small id="notesStatus" role="status"></small></div></div>
+        <aside class="curriculum"><h2>محتوى الدورة</h2><div class="progress-heading"><strong id="progressPercent">0%</strong><span id="progressSummary"></span></div><progress id="courseProgress" max="100" value="0" aria-label="نسبة إكمال الدورة"></progress><div id="curriculumList"></div><div id="completionBanner" hidden><strong>أكملت الدورة! 🎉</strong><p>أنهيت جميع الدروس. جرّب الاختبار وطبّق مشروعك.</p></div></aside>
+      </section>
+      <section class="course-quiz" id="courseQuiz"><h2>اختبر فهمك</h2><p id="quizQuestion"></p><div id="quizOptions"></div><button id="checkQuiz" class="learn-primary" type="button">تحقّق من الإجابة</button><p id="quizResult" role="status"></p></section>
     </div>
   </main>
   <footer class="page-footer container-xl">
@@ -91,6 +59,9 @@
   
   
   
+  <script src="../catalog.js"></script>
+  <script src="../learning.js"></script>
+  <script src="../lesson-content.js"></script>
   <script src="course.js"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 // Forms are interface examples. Only search and filter forms process their inputs.
 document.addEventListener('submit', function (event) {
   const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
+  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   form.reset();
@@ -298,8 +298,8 @@ if (!record) {
     get('previewMessage').required = false;
   } else {
     addFact('الجهة', record.company);
-    addFact('الموقع', record.location);
-    addFact('النوع', record.itemType);
+    addFact('نمط العمل', record.location);
+    addFact('مدة التدريب', record.itemType);
     addFact('المقابل', record.offer);
     addFact(kind === 'event' ? 'تاريخ الفعالية' : 'آخر موعد للتقديم', new Intl.DateTimeFormat('ar-JO', {dateStyle:'medium', timeZone:'UTC'}).format(new Date(record.deadline+'T12:00:00Z')));
     showList('detailTasks', record.details);

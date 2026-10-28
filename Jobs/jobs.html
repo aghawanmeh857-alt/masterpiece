@@ -13,10 +13,11 @@
     
   <link rel="stylesheet" href="jobs.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <link rel="stylesheet" href="../assets/opportunity-cards.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
 </head>
-<body data-section="jobs">
+<body data-section="jobs" class="opportunity-page">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
   <!-- المكونات المشتركة -->
   <header class="site-header">
@@ -48,13 +49,10 @@
         </ol>
       </nav>
     </div>
-    <div class="section-note panel">
-      <span class="note-symbol" aria-hidden="true">↗</span>
-      <div><strong>ابحث عن عمل يناسب خطوتك القادمة.</strong>
-        <p>استكشف الوظائف حسب المجال ونمط العمل والخبرة.</p></div>
-    </div>
+    <section class="opportunity-intro" aria-labelledby="opportunityIntroTitle"><div class="opportunity-intro-copy"><p class="eyebrow">أفق / الوظائف</p><h2 id="opportunityIntroTitle">مكانك القادم.<br>بداية لفصل جديد.</h2><p>اكتشف فرصًا تناسب خبرتك، وتعرّف على الفرق اللي تقدر تصنع معها فرقًا.</p><div class="opportunity-shortcuts"><a class="btn btn-orange" href="#opportunityResults">استكشف الوظائف ↓</a></div></div><img class="opportunity-intro-image" src="../assets/project-covers/dashboard.svg" width="800" height="450" alt="" aria-hidden="true"></section>
     <div class="workspace">
       <aside class="filter-panel panel" aria-labelledby="filterTitle">
+        <form autocomplete="off" id="searchForm" class="opportunity-search"><label for="searchQuery">بحث</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…"></div></form>
   <div class="filter-heading">
     <h2 id="filterTitle">ابحث عن وظيفتك</h2>
     <button id="clearFilters" class="text-button" type="button">مسح الكل</button>
@@ -97,27 +95,18 @@
           <option value="senior">خبير</option>
       </select>
     </div>
-    <button class="btn btn-orange w-100" type="submit">تطبيق الفلاتر <span aria-hidden="true">→</span></button>
   </form>
   <p class="filter-footnote"><span class="live-dot"></span> خطوتك القادمة تبدأ هنا.</p>
 </aside>
-      <section class="results" aria-label="الوظائف المتاحة">
-        <form autocomplete="off" id="searchForm" class="search-toolbar panel">
-          <div class="search-field main-search">
-            <label class="visually-hidden" for="searchQuery">البحث عن وظيفة</label>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
-            <input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…">
-          </div>
-          <button class="btn btn-orange search-button" type="submit">بحث</button>
-          <div class="sort-field">
+      <section class="results opportunity-results" id="opportunityResults" aria-label="الوظائف المتاحة">
+        <div class="opportunity-toolbar"><h2>الوظائف المتاحة</h2>          <div class="sort-field">
             <label for="sortBy">الترتيب حسب</label>
             <select id="sortBy" class="form-select">
               <option value="recent">الأحدث</option>
               <option value="soon">الأقرب انتهاءً</option>
               <option value="reward">الأعلى أجرًا</option>
             </select>
-          </div>
-        </form>
+          </div></div>
         <div class="results-meta">
           <p id="resultCount" role="status" aria-live="polite"></p>
           <span>وظائف توضيحية</span>

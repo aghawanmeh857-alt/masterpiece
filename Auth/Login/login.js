@@ -2,7 +2,7 @@
 // Forms are interface examples. Only search and filter forms process their inputs.
 document.addEventListener('submit', function (event) {
   const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
+  if (['searchForm', 'filterForm', 'authForm'].includes(form.id)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   form.reset();
@@ -129,6 +129,8 @@ form.addEventListener('submit', event => {
   const success = document.getElementById('authSuccess');
   success.hidden = false;
   success.focus();
+  window.OfoqDemoAuth.signIn();
+  location.assign(window.siteThemeUrl(window.OfoqDemoAuth.destination()));
 });
 
 document.getElementById('tryAgain').addEventListener('click', () => {

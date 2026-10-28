@@ -275,15 +275,14 @@ async function startListings() {
   function itemCard(item) {
     const isEvent = pageData.section === 'events';
     const detailFile = { jobs: 'Job/job.html', internships: 'Internship/internship.html', events: 'Event/event.html' }[pageData.section];
-    const dateBlock = isEvent
-      ? `<div class="event-date"><strong>${item.deadline.slice(8)}</strong><span>${new Intl.DateTimeFormat('ar-JO', {month:'short', timeZone:'UTC'}).format(new Date(item.deadline+'T12:00:00Z'))} ${item.deadline.slice(0,4)}</span></div>`
-      : `<div class="listing-symbol ${item.category}" aria-hidden="true">${safeText(item.symbol)}</div>`;
+    const detailUrl = detailFile + '?id=' + encodeURIComponent(item.id);
+    const cover = {development: 'dashboard', design: 'mobile', marketing: 'marketing', career: 'code'}[item.category] || 'dashboard';
     return `
       <article class="listing-card" data-item="${item.id}">
-        ${dateBlock}
+        <div class="opportunity-media"><a class="opportunity-cover" href="${detailUrl}" aria-label="تفاصيل ${safeText(item.title)}"><img src="../assets/project-covers/${cover}.svg" alt="" width="800" height="450" loading="lazy"><span class="opportunity-badge">${labels[item.itemType]}</span></a></div>
         <div class="listing-details">
           <p class="listing-category">${labels[item.category]}</p>
-          <h2>${safeText(item.title)}</h2>
+          <h2><a href="${detailUrl}">${safeText(item.title)}</a></h2>
           ${window.OfoqPublishers.card(window.OfoqPublishers.forRecord(pageData.section, item))}
           <p class="listing-description">${safeText(item.description)}</p>
           <div class="listing-tags">
@@ -334,6 +333,8 @@ async function startListings() {
     openDetails(pageData.items.find(item => item.id === id));
   });
 
+  get('filterForm').addEventListener('change', renderItems);
+  get('searchQuery').addEventListener('input', renderItems);
   get('filterForm').addEventListener('submit', event => {
     event.preventDefault();
     renderItems();

@@ -22,6 +22,7 @@
 
   <link rel="stylesheet" href="freelance.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <link rel="stylesheet" href="marketplace.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
 </head>
@@ -74,58 +75,28 @@
       </nav>
     </div>
 
-    <section class="community-banner" aria-labelledby="shareTitle">
-      <div>
-        <p class="eyebrow mb-2">فكرتك / الفريق المناسب</p>
-        <h2 id="shareTitle">عندك فكرة؟ خلّينا نبنيها معًا.</h2>
-        <p>شارك مشروعك وتواصل مع مستقلين يساعدونك على تنفيذه.</p>
-      </div>
-      <button id="openPost" class="btn btn-orange" type="button">+ شارك مشروعًا</button>
-    </section>
+
 
     <div class="workspace">
 
       <!-- فلاتر Freelance -->
       <aside class="filter-panel panel" aria-labelledby="filterTitle">
-        <div class="filter-heading"><h2 id="filterTitle">الفلاتر</h2><button id="clearFilters" class="text-button" type="button">مسح الكل</button></div>
+        <form autocomplete="off" id="searchForm" class="market-search"><label for="searchQuery">بحث</label><div class="search-field"><input id="searchQuery" class="form-control" type="search" placeholder="ابحث عن مشروع أو مهارة…"></div></form>
+        <section class="category-browser" aria-labelledby="categoriesTitle"><h2 id="categoriesTitle">الأقسام</h2><div id="categoryList"></div></section>
+        <div class="filter-heading"><h2 id="filterTitle">تصفية النتائج</h2><button id="clearFilters" class="text-button" type="button">مسح الكل</button></div>
         <form autocomplete="off" id="filterForm">
           <div class="field"><label for="category">المجال</label><select id="category" class="form-select"><option value="">كل المجالات</option><option value="development">التطوير</option><option value="design">التصميم</option><option value="marketing">التسويق</option></select></div>
           <div class="field"><label for="budget">الميزانية</label><select id="budget" class="form-select"><option value="">كل الميزانيات</option><option value="low">حتى 300 دولار</option><option value="medium">من 301 إلى 600 دولار</option><option value="high">أكثر من 600 دولار</option></select></div>
           <div class="field"><label for="deadline">موعد التسليم</label><select id="deadline" class="form-select"><option value="">كل المواعيد</option><option value="1">خلال أسبوع</option><option value="2">خلال أسبوعين</option><option value="4">خلال 4 أسابيع</option></select></div>
           <div class="field"><label for="projectType">نوع المشروع</label><select id="projectType" class="form-select"><option value="">كل الأنواع</option><option value="fixed">بسعر ثابت</option><option value="ongoing">مشروع مستمر</option></select></div>
           <div class="field"><label for="skills">المهارات</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="skills" class="form-control" type="search" placeholder="ابحث عن مهارة…"></div></div>
-          <button class="btn btn-orange w-100" type="submit">تطبيق الفلاتر <span aria-hidden="true">→</span></button>
         </form>
         <p class="filter-footnote"><span class="live-dot"></span> اصنع طريقك بنفسك.</p>
       </aside>
 
       <section class="results" aria-label="المشاريع المتاحة">
 
-        <form autocomplete="off" id="searchForm" class="search-toolbar panel">
-
-          <div class="search-field main-search">
-            <label for="searchQuery" class="visually-hidden">
-              البحث عن مشروع بالعنوان أو المهارة
-            </label>
-
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="10.5" cy="10.5" r="6.5"></circle>
-              <path d="m16 16 4.5 4.5"></path>
-            </svg>
-
-            <input
-              id="searchQuery"
-              class="form-control"
-              type="search"
-              placeholder="ابحث بالعنوان أو المهارة…"
-            >
-          </div>
-
-          <button class="btn btn-orange search-button" type="submit">
-            بحث
-          </button>
-
-          <div class="sort-field">
+        <div class="market-toolbar"><h2>المشاريع المتاحة</h2>          <div class="sort-field">
             <label for="sortBy">الترتيب حسب</label>
 
             <select id="sortBy" class="form-select">
@@ -134,9 +105,7 @@
               <option value="budget-low">الأقل ميزانية</option>
               <option value="deadline">الأقرب تسليمًا</option>
             </select>
-          </div>
-
-        </form>
+          </div></div>
 
         <div class="results-meta">
           <p id="resultCount" role="status" aria-live="polite"></p>
@@ -167,6 +136,15 @@
 
       </section>
     </div>
+
+    <section class="community-banner" aria-labelledby="shareTitle">
+      <div>
+        <p class="eyebrow mb-2">فكرتك / الفريق المناسب</p>
+        <h2 id="shareTitle">عندك فكرة؟ خلّينا نبنيها معًا.</h2>
+        <p>شارك مشروعك وتواصل مع مستقلين يساعدونك على تنفيذه.</p>
+      </div>
+      <button id="openPost" class="btn btn-orange" type="button">+ شارك مشروعًا</button>
+    </section>
 
     <section id="community" class="community-section" aria-labelledby="communityTitle">
       <div class="community-heading">

@@ -2,7 +2,7 @@
 // Forms are interface examples. Only search and filter forms process their inputs.
 document.addEventListener('submit', function (event) {
   const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
+  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   form.reset();
@@ -220,6 +220,22 @@ async function startListings() {
   if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
   await window.componentsReady;
 
+  const savedKey = 'ofoq-saved-internships-v1';
+  const knownIds = new Set(pageData.items.map(item => item.id));
+  let saved = new Set();
+  let savedOnly = false;
+  function readSaved() {
+    try {
+      const data = JSON.parse(localStorage.getItem(savedKey) || '[]');
+      saved = new Set(Array.isArray(data) ? data.filter(id => knownIds.has(id)) : []);
+    } catch { /* Keep the current selection if browser storage is unavailable. */ }
+  }
+  readSaved();
+  function saveFavorites() {
+    try { localStorage.setItem(savedKey, JSON.stringify([...saved])); get('savedNotice').hidden = true; }
+    catch { get('savedNotice').hidden = false; get('savedNotice').textContent = 'التخزين غير متاح؛ المفضلة محفوظة خلال هذه الزيارة فقط.'; }
+  }
+
   function get(id) {
     return document.getElementById(id);
   }
@@ -250,6 +266,7 @@ async function startListings() {
     const query = get('searchQuery').value.trim().toLowerCase();
     const filters = ['category', 'location', 'itemType', 'extra'];
     const results = pageData.items.filter(item => {
+      if (savedOnly && !saved.has(item.id)) return false;
       const text = [item.title, item.company, item.description,
         ...item.details, ...item.requirements].join(' ').toLowerCase();
       if (query && !text.includes(query)) return false;
@@ -266,20 +283,29 @@ async function startListings() {
     get('itemList').innerHTML = results.map(itemCard).join('');
     get('resultCount').textContent = results.length + ' من الفرص المتاحة';
     get('emptyState').hidden = results.length > 0;
+    get('savedCount').textContent = saved.size;
+    get('savedShortcutCount').textContent = saved.size;
+    get('savedOpportunities').setAttribute('aria-pressed', String(savedOnly));
+    get('allOpportunities').setAttribute('aria-pressed', String(!savedOnly));
+    get('emptyTitle').textContent = savedOnly ? 'لا توجد فرص محفوظة مطابقة' : 'لا توجد فرص تدريب مطابقة';
+    get('resetEmpty').textContent = savedOnly ? 'عرض كل الفرص' : 'مسح البحث والفلاتر';
   }
 
   function itemCard(item) {
-    const isEvent = pageData.section === 'events';
-    const detailFile = { jobs: 'Job/job.html', internships: 'Internship/internship.html', events: 'Event/event.html' }[pageData.section];
-    const dateBlock = isEvent
-      ? `<div class="event-date"><strong>${item.deadline.slice(8)}</strong><span>${new Intl.DateTimeFormat('ar-JO', {month:'short', timeZone:'UTC'}).format(new Date(item.deadline+'T12:00:00Z'))} ${item.deadline.slice(0,4)}</span></div>`
-      : `<div class="listing-symbol ${item.category}" aria-hidden="true">${safeText(item.symbol)}</div>`;
+    const detailUrl = 'Internship/internship.html?id=' + encodeURIComponent(item.id);
+    const cover = {design: 'mobile', development: 'code', marketing: 'marketing', career: 'dashboard'}[item.category] || 'dashboard';
     return `
       <article class="listing-card" data-item="${item.id}">
-        ${dateBlock}
+        <div class="opportunity-media">
+        <a class="opportunity-cover" href="${detailUrl}" aria-label="تفاصيل ${safeText(item.title)}">
+          <img src="../assets/project-covers/${cover}.svg" alt="" width="800" height="450" loading="lazy">
+          <span class="opportunity-badge">${labels[item.itemType]}</span>
+        </a>
+        <button class="save-internship" type="button" data-save-id="${safeText(item.id)}" aria-label="${saved.has(item.id) ? 'إزالة من المفضلة: ' : 'حفظ في المفضلة: '}${safeText(item.title)}" aria-pressed="${saved.has(item.id)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
         <div class="listing-details">
           <p class="listing-category">${labels[item.category]}</p>
-          <h2>${safeText(item.title)}</h2>
+          <h2><a href="${detailUrl}">${safeText(item.title)}</a></h2>
           ${window.OfoqPublishers.card(window.OfoqPublishers.forRecord(pageData.section, item))}
           <p class="listing-description">${safeText(item.description)}</p>
           <div class="listing-tags">
@@ -287,12 +313,12 @@ async function startListings() {
             <span>${labels[item.itemType]}</span>
             <span>${labels[item.extra]}</span>
           </div>
-          <p class="listing-date">${isEvent ? safeText(item.eventTime) : 'آخر موعد للتقديم: ' + dateLabel(item.deadline)}</p>
+          <p class="listing-date">آخر موعد للتقديم: ${dateLabel(item.deadline)}</p>
         </div>
         <div class="listing-offer">
           <strong>${safeText(item.offer)}</strong>
           <button type="button" class="btn btn-orange" aria-label="عرض ${safeText(item.title)}">${pageData.action} ↗</button>
-          <a class="details-link" href="${detailFile}?id=${encodeURIComponent(item.id)}">التفاصيل الكاملة ←</a>
+          <a class="details-link" href="${detailUrl}">التفاصيل الكاملة ←</a>
         </div>
       </article>`;
   }
@@ -324,12 +350,24 @@ async function startListings() {
   }
 
   get('itemList').addEventListener('click', event => {
+    const saveButton = event.target.closest('button[data-save-id]');
+    if (saveButton) {
+      const id = saveButton.dataset.saveId;
+      if (!knownIds.has(id)) return;
+      saved.has(id) ? saved.delete(id) : saved.add(id);
+      saveFavorites(); renderItems();
+      const replacement = get('itemList').querySelector('button[data-save-id="' + id + '"]');
+      (replacement || get('savedOpportunities')).focus();
+      return;
+    }
     const button = event.target.closest('button');
     if (!button) return;
     const id = button.closest('.listing-card').dataset.item;
     openDetails(pageData.items.find(item => item.id === id));
   });
 
+  get('filterForm').addEventListener('change', renderItems);
+  get('searchQuery').addEventListener('input', renderItems);
   get('filterForm').addEventListener('submit', event => {
     event.preventDefault();
     renderItems();
@@ -341,7 +379,15 @@ async function startListings() {
   get('searchQuery').addEventListener('search', renderItems);
   get('sortBy').addEventListener('change', renderItems);
   get('clearFilters').addEventListener('click', clearFilters);
-  get('resetEmpty').addEventListener('click', clearFilters);
+  get('resetEmpty').addEventListener('click', () => { savedOnly = false; clearFilters(); });
+  get('allOpportunities').addEventListener('click', () => { savedOnly = false; renderItems(); });
+  get('savedOpportunities').addEventListener('click', () => { savedOnly = true; renderItems(); });
+  get('savedShortcut').addEventListener('click', () => {
+    savedOnly = true; renderItems();
+    get('internshipResults').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  });
+  addEventListener('pageshow', () => { readSaved(); renderItems(); });
+  addEventListener('storage', event => { if (event.key === savedKey) { readSaved(); renderItems(); } });
 
   get('previewForm').addEventListener('submit', event => {
     event.preventDefault();

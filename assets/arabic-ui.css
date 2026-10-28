@@ -74,7 +74,7 @@ html[lang="ar"] :is(.stat-card span, .stat-card small, .activity-label, .activit
 .site-header .site-navigation .section-nav {
   width: auto;
   order: initial;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: clamp(12px, 1.5vw, 24px);
   overflow: visible;
@@ -194,6 +194,10 @@ body[data-section="hero"] .story > p:not(.room-label) { font-size: 15px; }
 @media (max-height: 650px) and (max-width: 767px) {
   body[data-section="hero"] .scene-caption, body[data-section="hero"] .chapter-tags { display: none; }
   body[data-section="hero"] .story { bottom: 70px; max-height: calc(100svh - 250px); overflow-y: auto; }
+}
+@media (max-width: 767px) {
+  .search-toolbar:not(:has(button[type="submit"])) { grid-template-columns: minmax(0, 1fr); }
+  .search-toolbar:not(:has(button[type="submit"])) .sort-field { grid-column: 1 / -1; }
 }
 .application-error { color: #bd302b; font-size: 13px; line-height: 1.8; margin: 6px 0 0; }
 [data-theme="dark"] .application-error { color: #ffaaa4; }

@@ -678,9 +678,9 @@ a {
 
 @media (max-width: 767px) { .room-nav { flex-wrap: nowrap; } .room-nav button { flex: 0 0 auto; } }
 /* More scroll distance gives a small camera movement per wheel gesture. */
-.chapter { height: 320vh; }
+.chapter { height: 400vh; }
 .chapter:last-child { height: 100vh; }
-@media (max-width: 767px) { .chapter { height: 300vh; } }
+@media (max-width: 767px) { .chapter { height: 375vh; } }
 
 /* ألوان النهار والليل والقائمة، مجمعة هنا. */
 /* Shared colors: day is light; night keeps OFOQ navy and orange. */

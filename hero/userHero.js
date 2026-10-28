@@ -190,7 +190,9 @@ function jumpTo(index) {
 }
 
 buttons.forEach(button => {
-  button.addEventListener('click', () => {
+  button.addEventListener('click', event => {
+    if (button.tagName === 'A' && button.dataset.room !== '0') return;
+    event.preventDefault();
     jumpTo(Number(button.dataset.room));
   });
 });
@@ -263,7 +265,7 @@ function progressAtScroll() {
   if (adminPreview) return;
   const stop = chapters[5].offsetTop,
     raw = Math.min(5, Math.max(0, scrollY / stop * 5));
-  setRoom(Math.min(5, Math.floor(raw + .18)));
+  setRoom(Math.min(5, Math.floor(raw + .12)));
   $('progress').style.width = raw / 5 * 100 + '%';
   sceneApi?.move(raw);
 }
@@ -1412,7 +1414,7 @@ async function createBuildingTour(container, {
     stops = [0, 27, 36, 45, 54, 64];
   let time = 0,
     disposed = false;
-  // قيمة الهدف تأتي من السكرول، والزمن الحالي يقترب منها تدريجيًا.
+  // تتبع الكاميرا السكرول مباشرة، مع انتقال ناعم ومساحة ثابتة لعرض كل غرفة.
   let targetTime = 0;
   let roomJump = null;
   let cameraSmoothness = 0.65; // قيمة أكبر تعني انتقالًا أهدأ.
@@ -1450,9 +1452,12 @@ async function createBuildingTour(container, {
     const r = Math.max(0, Math.min(5, raw)),
       i = Math.min(4, Math.floor(r)),
       u = r - i;
-    targetTime = stops[i] + (stops[i + 1] - stops[i]) * u;
-    if (roomJump && Math.abs(targetTime - roomJump.target) > .01) roomJump = null;
-    if (reducedMotion) seek(targetTime);
+    // Hold the view around each room and ease in/out without post-scroll drift.
+    const transition = Math.max(0, Math.min(1, (u - .12) / .76));
+    const eased = reducedMotion ? u : transition * transition * transition * (transition * (transition * 6 - 15) + 10);
+    targetTime = stops[i] + (stops[i + 1] - stops[i]) * eased;
+    roomJump = null;
+    seek(targetTime);
   }
 
   function resize() {

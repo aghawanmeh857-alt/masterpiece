@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const adminPreview = new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
+if (adminPreview) document.documentElement.classList.add('admin-scene-preview');
 // 1. الوضع النهاري والليلي وروابط الصفحات، دون تخزين.
 window.siteThemeUrl = function (href) {
   const url = new URL(href, location.href);
@@ -258,6 +260,7 @@ $('exploreModal').addEventListener('show.bs.modal', () => {
 setRoom(0);
 
 function progressAtScroll() {
+  if (adminPreview) return;
   const stop = chapters[5].offsetTop,
     raw = Math.min(5, Math.max(0, scrollY / stop * 5));
   setRoom(Math.min(5, Math.floor(raw + .18)));
@@ -301,6 +304,13 @@ async function initScene() {
   $('nightMode').addEventListener('click', () => setTimeOfDay(true));
   $('status').textContent = 'مرحبًا بك في OFOQ';
   restoreRoom();
+  if (adminPreview) {
+    addEventListener('message', event => {
+      if (event.source !== parent || event.origin !== location.origin || event.data?.type !== 'ofoq-preview-config') return;
+      sceneApi.configurePreview(event.data);
+    });
+    parent.postMessage({type: 'ofoq-preview-ready'}, location.origin);
+  }
 }
 initScene().catch(error => {
   console.error('OFOQ 3D:', error);
@@ -309,6 +319,7 @@ initScene().catch(error => {
   document.querySelector('.day-night-controls').hidden = true;
   $('status').textContent = 'تعذّر عرض المشهد، يمكنك فتح الأقسام من القائمة.';
   document.documentElement.dataset.sceneReady = 'false';
+  if (adminPreview) parent.postMessage({type: 'ofoq-preview-error'}, location.origin);
 });
 
 
@@ -1404,7 +1415,9 @@ async function createBuildingTour(container, {
   // قيمة الهدف تأتي من السكرول، والزمن الحالي يقترب منها تدريجيًا.
   let targetTime = 0;
   let roomJump = null;
-  const cameraSmoothness = 0.65; // قيمة أكبر تعني انتقالًا أهدأ.
+  let cameraSmoothness = 0.65; // قيمة أكبر تعني انتقالًا أهدأ.
+  let preview = adminPreview ? {active: false} : null;
+  let previewCity = true, previewPeople = true;
   const cameraSpeed = 3; // الحد الأقصى لتغيّر مسار الكاميرا في الثانية.
   const cameraPath = new THREE.CatmullRomCurve3(keys.map(key => new THREE.Vector3(...key[1])), false, 'centripetal');
   const lookPath = new THREE.CatmullRomCurve3(keys.map(key => new THREE.Vector3(...key[2])), false, 'centripetal');
@@ -1468,6 +1481,13 @@ async function createBuildingTour(container, {
     const dt = Math.min(elapsedMs / 1000, .05);
     last = now;
     if (document.hidden) { sampleTime = 0; sampleFrames = 0; return; }
+    if (preview && !preview.active) return;
+    if (preview?.playing) {
+      preview.elapsed = Math.min(preview.duration, preview.elapsed + dt);
+      // Follow the entrance portion of the existing tour, including the sliding doors.
+      targetTime = 15 * preview.elapsed / preview.duration;
+      if (preview.elapsed === preview.duration) preview.playing = false;
+    }
     if (roomJump) {
       const progress = Math.max(0, Math.min(1, (now - roomJump.started) / 1800));
       seek(THREE.MathUtils.lerp(roomJump.start, roomJump.target, smooth(progress)));
@@ -1483,7 +1503,8 @@ async function createBuildingTour(container, {
     let activePeople = 0;
     people.forEach(holder => {
       const mixer = holder.userData.mixer;
-      if (!mixer) return;
+      if (!previewPeople) { holder.visible = false; return; }
+      if (!mixer) { holder.visible = true; return; }
       characterBounds.center.copy(holder.position); characterBounds.center.y += 1;
       const distance = camera.position.distanceToSquared(characterBounds.center);
       holder.visible = distance < 28 * 28 && frustum.intersectsSphere(characterBounds);
@@ -1734,6 +1755,7 @@ async function createBuildingTour(container, {
   createCityNeighborhood(THREE, scene).then(neighborhood => {
     if (disposed) { neighborhood.destroy(); return; }
     city = neighborhood;
+    scene.getObjectByName('OFOQCity').visible = previewCity;
     city.setNight(cityLightLevel);
     renderer.shadowMap.needsUpdate = true;
     skylineFallback.forEach(mesh => { scene.remove(mesh); mesh.geometry.dispose(); });
@@ -1744,6 +1766,25 @@ async function createBuildingTour(container, {
   document.documentElement.dataset.modelLoad = 'loading';
   loadModels();
   return {
+    configurePreview(config) {
+      if (!adminPreview) return;
+      if (config.theme) this.setNight(config.theme === 'dark', true);
+      if (config.active === false) { if (preview) preview.active = false; return; }
+      if (config.resume && preview) { preview.active = true; return; }
+      const duration = Number(config.duration), smoothness = Number(config.smoothness);
+      preview = {
+        duration: Number.isFinite(duration) ? Math.max(8, Math.min(40, duration)) : 16,
+        elapsed: 0, active: true, playing: Boolean(config.autoplay) && !reducedMotion
+      };
+      cameraSmoothness = Number.isFinite(smoothness) ? Math.max(.2, Math.min(2, smoothness)) : .65;
+      previewCity = config.city !== false; previewPeople = config.people !== false;
+      skylineFallback.forEach(mesh => { mesh.visible = previewCity; });
+      const cityGroup = scene.getObjectByName('OFOQCity');
+      if (cityGroup) cityGroup.visible = previewCity;
+      people.forEach(holder => { holder.visible = previewPeople; });
+      roomJump = null; targetTime = 0; seek(0);
+      renderer.shadowMap.needsUpdate = true;
+    },
     setNight: (night, immediate = false) => {
       requestedNight = night;
       coastal.setNight(night, immediate);

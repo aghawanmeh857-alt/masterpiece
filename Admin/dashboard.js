@@ -2,7 +2,7 @@
 // Forms are interface examples. Only search and filter forms process their inputs.
 document.addEventListener('submit', function (event) {
   const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
+  if (['searchForm', 'filterForm', 'sceneSettings'].includes(form.id)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   form.reset();
@@ -425,6 +425,10 @@ const examples = {
 const $ = id => document.getElementById(id);
 const make = (tag, text, className) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; };
 let model, current = 'overview', page = 1, editing = null, deleting = null, toastTimer;
+let sceneReady = false;
+function sendScene(config) {
+  if (sceneReady) $('sceneFrame').contentWindow.postMessage({type: 'ofoq-preview-config', ...config}, location.origin);
+}
 const pageSize = 7;
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 3500); }
 function action(text, actionName, record, className = 'secondary') { const button = make('button', text, className); button.type = 'button'; button.dataset.action = actionName; button.dataset.id = record.id; button.dataset.section = record.section; return button; }
@@ -462,12 +466,18 @@ function records() {
 function show(view, updateHash = true) {
   current = sections[view] ? view : 'overview'; page = 1;
   $('pageTitle').textContent = sections[current][0]; $('pageDescription').textContent = sections[current][2]; $('breadcrumb').textContent = sections[current][0];
-  ['overview', 'records', 'settings', 'scene', 'logs'].forEach(key => $(key + 'عرض').hidden = key !== (model.data[current] || current === 'review' ? 'records' : current));
+  ['overview', 'records', 'settings', 'scene', 'logs'].forEach(key => $(key + 'View').hidden = key !== (model.data[current] || current === 'review' ? 'records' : current));
   document.querySelectorAll('#navigation button').forEach(button => { if (button.dataset.view === current) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
   $('addButton').hidden = !model.data[current]; $('addButton').textContent = '+ إضافة ' + (current === 'users' ? 'مستخدم' : 'سجل');
   $('search').value = ''; $('statusFilter').value = ''; render();
   $('sidebar').classList.remove('open'); $('menuButton').setAttribute('aria-expanded', 'false');
   if (updateHash) history.replaceState(null, '', '#' + current);
+  if (current === 'scene') {
+    if (!$('sceneFrame').hasAttribute('src')) {
+      $('sceneLoading').textContent = 'جارٍ تحميل المشهد ثلاثي الأبعاد…';
+      $('sceneFrame').src = $('sceneFrame').dataset.src;
+    } else scenePreview();
+  } else sendScene({active: false});
 }
 function render() { overview(); if (model.data[current] || current === 'review') records(); activityList('fullActivity', model.activity.length); }
 function openEditor(section, id = null) {
@@ -481,10 +491,21 @@ function openEditor(section, id = null) {
 function scenePreview() {
   const form = $('sceneSettings'), duration = form.elements.duration.value, smoothness = form.elements.smoothness.value;
   $('durationValue').textContent = duration + ' ثانية'; $('smoothnessValue').textContent = smoothness + ' ثانية';
-  $('sceneSummary').textContent = `مدة الاقتراب: ${duration} ثانية · نعومة السكرول: ${smoothness} ثانية.`;
-  const demo = $('sceneDemo'); demo.style.setProperty('--duration', duration + 's'); demo.querySelector('.demo-city').hidden = !form.elements.city.checked; demo.querySelector('.demo-person').hidden = !form.elements.people.checked;
-  demo.classList.remove('playing'); void demo.offsetWidth; if (form.elements.autoplay.checked) demo.classList.add('playing');
+  $('sceneSummary').textContent = `مدة المسار: ${duration} ثانية · نعومة الكاميرا: ${smoothness} ثانية · ${form.elements.autoplay.checked ? 'اقتراب من المبنى وفتح الباب' : 'لقطة ثابتة للمشهد'}.`;
+  sendScene({duration, smoothness, city: form.elements.city.checked, people: form.elements.people.checked,
+    autoplay: form.elements.autoplay.checked, active: current === 'scene', theme: document.documentElement.dataset.theme});
 }
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== $('sceneFrame').contentWindow) return;
+  if (event.data?.type === 'ofoq-preview-ready') {
+    sceneReady = true; $('sceneLoading').hidden = true; scenePreview();
+  } else if (event.data?.type === 'ofoq-preview-error') {
+    $('sceneLoading').hidden = false;
+    $('sceneLoading').textContent = 'تعذّر عرض المشهد. افتح المشهد الأصلي من الرابط أدناه أو أعد تحميل الصفحة.';
+  }
+});
+new MutationObserver(() => sendScene({resume: true, active: current === 'scene', theme: document.documentElement.dataset.theme}))
+  .observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
 document.addEventListener('click', event => {
   const button = event.target.closest('button'); if (!button || !model) return;
   if (button.dataset.close) $(button.dataset.close).close();
@@ -502,6 +523,7 @@ $('previousPage').addEventListener('click', () => { page--; records(); }); $('ne
 $('menuButton').addEventListener('click', () => { const open = $('sidebar').classList.toggle('open'); $('menuButton').setAttribute('aria-expanded', String(open)); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') { $('sidebar').classList.remove('open'); $('menuButton').setAttribute('aria-expanded', 'false'); } });
 $('sceneSettings').addEventListener('input', () => { $('durationValue').textContent = $('sceneSettings').elements.duration.value + ' ثانية'; $('smoothnessValue').textContent = $('sceneSettings').elements.smoothness.value + ' ثانية'; });
+$('sceneSettings').addEventListener('submit', event => { event.preventDefault(); scenePreview(); });
 $('replayScene').addEventListener('click', scenePreview);
 try {
   model = createModel(examples);

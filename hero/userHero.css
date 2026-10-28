@@ -1029,6 +1029,9 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 }
 
 /* القائمة العلوية فوق أزرار الأقسام والليل والنهار. */
+.admin-scene-preview, .admin-scene-preview body { height: 100%; overflow: hidden; }
+.admin-scene-preview body > :not(#scene) { display: none !important; }
+.admin-scene-preview #scene { display: block !important; position: fixed; inset: 0; width: 100%; height: 100%; }
 .topbar { z-index: 40; overflow: visible; }
 .topbar .account-menu-links {
   left: 0; right: auto;

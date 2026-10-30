@@ -13,8 +13,9 @@
   
   <link rel="stylesheet" href="dashboard.css">
   <link rel="stylesheet" href="../assets/arabic-ui.css">
+  <link rel="stylesheet" href="../assets/dashboard-interactions.css?v=3">
 </head>
-<body data-section="lobby">
+<body data-section="lobby" data-dashboard="admin">
   <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
   <aside class="sidebar" id="sidebar" aria-label="قائمة الإدارة">
     <a class="brand" href="../hero/userHero.html#lobby"><span class="logo-frame"><img src="../assets/branding/ofoq-logo.png" alt="أفق | OFOQ" width="1254" height="1254"></span><span>لوحة الإدارة<small>إدارة أفق</small></span></a>
@@ -48,5 +49,6 @@
   <dialog id="deleteDialog"><div class="dialog-heading"><h2>حذف السجل؟</h2><button type="button" class="icon-button" data-close="deleteDialog" aria-label="إغلاق">×</button></div><p id="deleteText"></p><p class="muted">الحذف يخص البيانات التجريبية في هذه الجلسة فقط.</p><div class="dialog-actions"><button class="secondary" data-close="deleteDialog">إلغاء</button><button id="confirmDelete" class="danger">حذف السجل</button></div></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="dashboard.js"></script>
+  <script defer src="../assets/dashboard-interactions.js?v=2"></script>
 </body>
 </html>

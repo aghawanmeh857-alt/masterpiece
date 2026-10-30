@@ -1,5 +1,18 @@
 // Native disclosure menus work with keyboard and touch; desktop sections stay visible.
 (() => {
+  const sharedScript = [...document.scripts].find(script => script.src.endsWith('/assets/arabic-ui.js'));
+  if (sharedScript) {
+    const companyUrl = new URL('../company/dashboard.html', sharedScript.src);
+    companyUrl.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
+    document.querySelectorAll('.account-menu-links').forEach(menu => {
+      if (menu.querySelector('[data-company-dashboard]')) return;
+      const link = document.createElement('a');
+      link.href = companyUrl.href;
+      link.dataset.companyDashboard = '';
+      link.textContent = 'لوحة الشركة';
+      menu.append(link);
+    });
+  }
   const navigation = document.querySelector('.site-navigation');
   const desktop = matchMedia('(min-width: 992px)');
   const syncNavigation = () => { if (navigation) navigation.open = desktop.matches; };

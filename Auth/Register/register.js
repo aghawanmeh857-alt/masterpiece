@@ -2,7 +2,7 @@
 // Forms are interface examples. Only search and filter forms process their inputs.
 document.addEventListener('submit', function (event) {
   const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
+  if (['searchForm', 'filterForm', 'authForm'].includes(form.id)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   form.reset();
@@ -117,6 +117,7 @@ form.addEventListener('submit', event => {
   }
   if (!form.reportValidity()) return;
 
+  const companyAccount = document.getElementById("accountType").value === "company";
   // Clear passwords immediately after previewing the form.
   form.reset();
   checkPasswords();
@@ -127,6 +128,9 @@ form.addEventListener('submit', event => {
   });
   form.hidden = true;
   const success = document.getElementById('authSuccess');
+  const destination = success.querySelector("a");
+  destination.href = window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : "../../Freelance/freelance.html");
+  destination.textContent = companyAccount ? "افتح لوحة الشركة ←" : "استكشف العمل الحر ←";
   success.hidden = false;
   success.focus();
 });

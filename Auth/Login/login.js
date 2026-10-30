@@ -117,6 +117,7 @@ form.addEventListener('submit', event => {
   }
   if (!form.reportValidity()) return;
 
+  const companyAccount = document.getElementById("accountType").value === "company";
   // Clear passwords immediately after previewing the form.
   form.reset();
   checkPasswords();
@@ -130,7 +131,7 @@ form.addEventListener('submit', event => {
   success.hidden = false;
   success.focus();
   window.OfoqDemoAuth.signIn();
-  location.assign(window.siteThemeUrl(window.OfoqDemoAuth.destination()));
+  location.assign(window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : window.OfoqDemoAuth.destination()));
 });
 
 document.getElementById('tryAgain').addEventListener('click', () => {

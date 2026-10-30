@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime } from './tour-motion.js';
+import { doorProximity, advanceDoor } from './door-motion.js';
 const adminPreview = new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
 if (adminPreview) document.documentElement.classList.add('admin-scene-preview');
 // 1. الوضع النهاري والليلي وروابط الصفحات، دون تخزين.
@@ -181,7 +183,7 @@ function jumpTo(index) {
     top: y,
     behavior: 'instant'
   });
-  setRoom(index);
+  if (!sceneApi) setRoom(index);
   sceneApi?.goToRoom?.(index);
 
   if (location.hash !== `#${rooms[index].id}`) {
@@ -265,7 +267,7 @@ function progressAtScroll() {
   if (adminPreview) return;
   const stop = chapters[5].offsetTop,
     raw = Math.min(5, Math.max(0, scrollY / stop * 5));
-  setRoom(Math.min(5, Math.floor(raw + .12)));
+  if (!sceneApi) setRoom(Math.min(5, Math.floor(raw + .12)));
   $('progress').style.width = raw / 5 * 100 + '%';
   sceneApi?.move(raw);
 }
@@ -289,7 +291,8 @@ restoreRoom();
 async function initScene() {
 
   sceneApi = await createBuildingTour($('scene'), {
-    reducedMotion
+    reducedMotion,
+    onRoomChange: setRoom
   });
   document.documentElement.dataset.sceneReady = 'true';
   function setTimeOfDay(night, immediate = false) {
@@ -911,7 +914,8 @@ async function createCityNeighborhood(THREE, scene) {
 
 // 6. بناء المشهد وحركة الكاميرا والأداء.
 async function createBuildingTour(container, {
-  reducedMotion = false
+  reducedMotion = false,
+  onRoomChange = () => {}
 } = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#c9dce9');
@@ -1136,6 +1140,32 @@ async function createBuildingTour(container, {
   });
   const doorLeft = box(1.5, 3, .14, -.77, 1.5, 2.05, doorMat),
     doorRight = box(1.5, 3, .14, .77, 1.5, 2.05, doorMat);
+  const roomDoors = [];
+  function slidingRoomDoor(name, x, z, rotation, width = 5.1, height = 3.35) {
+    const group = new THREE.Group();
+    group.name = 'GlassDoor-' + name;
+    group.position.set(x, 0, z);
+    group.rotation.y = rotation;
+    // All moving leaves and their trim must stay out of static geometry batches.
+    group.userData.dynamicDoor = true;
+    scene.add(group);
+    const half = width / 2;
+    const leaves = [-1, 1].map(side => {
+      const leaf = new THREE.Group();
+      leaf.position.x = side * width / 4;
+      group.add(leaf);
+      box(half - .04, height - .06, .14, 0, height / 2, 0, doorMat, leaf);
+      for (const edge of [-1, 1]) box(.045, height, .17, edge * (half / 2 - .025), height / 2, 0, steel, leaf);
+      for (const y of [.035, height - .035]) box(half, .07, .17, 0, y, 0, steel, leaf);
+      // A narrow safety stripe makes the closed glass visible from both sides.
+      box(half - .1, .055, .15, 0, 1.25, 0, steel, leaf);
+      return leaf;
+    });
+    for (const side of [-1, 1]) box(.1, height + .1, .24, side * half, height / 2, 0, steel, group);
+    box(width + .15, .12, .3, 0, height + .025, 0, navy, group);
+    roomDoors.push({ name, x, z, height, width, leaves, amount: 0 });
+    document.documentElement.dataset.roomDoorCount = String(roomDoors.length);
+  }
   box(.1, 3, .1, -1.55, 1.5, 2.1, steel);
   box(.1, 3, .1, 1.55, 1.5, 2.1, steel);
   plant(-4, 6);
@@ -1188,6 +1218,7 @@ async function createBuildingTour(container, {
     box(.18, 4.7, 4.3, partition, 2.35, r.z - 4.7, wall);
     box(.18, 4.7, 4.3, partition, 2.35, r.z + 4.7, wall);
     box(.18, 1.3, 5.1, partition, 4.05, r.z, wall);
+    slidingRoomDoor(r.name, partition, r.z, Math.PI / 2);
     sign(r.name, 5.6, .72, r.x, 3.7, r.z - 6.66, {
       color: '#ff783d',
       size: 85
@@ -1254,6 +1285,10 @@ async function createBuildingTour(container, {
     color: '#a9c3d8'
   });
   // Events: enclosed auditorium at the end of the same corridor.
+  // A glass entrance spans the hall, leaving a central sliding doorway.
+  for (const side of [-1, 1]) box(7.7, 3.35, .14, side * 6.15, 1.675, -70.8, doorMat);
+  box(20, 1.3, .18, 0, 4.05, -70.8, wall);
+  slidingRoomDoor('الفعاليات', 0, -70.8, 0, 4.5);
   box(15, .35, 3.5, 0, .2, -80, wood);
   box(8, 2.5, .15, 0, 2.9, -82.72, navy);
   sign('فعاليات أفق', 7.2, 1, 0, 3.1, -82.59, {
@@ -1288,6 +1323,7 @@ async function createBuildingTour(container, {
       if (!mesh.isMesh || mesh.isSkinnedMesh || excluded.has(mesh) || Array.isArray(mesh.material) || mesh.material.transparent) return;
       let ancestor = mesh;
       while (ancestor) {
+        if (ancestor.userData.dynamicDoor) return;
         if (ancestor === coastal.group || ancestor.name === 'OFOQCoast' || ancestor.name === 'OFOQCity' || ancestor.userData.mixer) return;
         ancestor = ancestor.parent;
       }
@@ -1411,16 +1447,15 @@ async function createBuildingTour(container, {
   ];
 
   const smooth = x => x * x * (3 - 2 * x),
-    stops = [0, 27, 36, 45, 54, 64];
+    stops = TOUR_STOPS;
   let time = 0,
     disposed = false;
-  // تتبع الكاميرا السكرول مباشرة، مع انتقال ناعم ومساحة ثابتة لعرض كل غرفة.
+  // السكرول يحدّد الوجهة فقط؛ حلقة الرسم تحرّك الكاميرا تدريجيًا.
   let targetTime = 0;
   let roomJump = null;
-  let cameraSmoothness = 0.65; // قيمة أكبر تعني انتقالًا أهدأ.
+  let cameraSmoothness = .28;
   let preview = adminPreview ? {active: false} : null;
   let previewCity = true, previewPeople = true;
-  const cameraSpeed = 3; // الحد الأقصى لتغيّر مسار الكاميرا في الثانية.
   const cameraPath = new THREE.CatmullRomCurve3(keys.map(key => new THREE.Vector3(...key[1])), false, 'centripetal');
   const lookPath = new THREE.CatmullRomCurve3(keys.map(key => new THREE.Vector3(...key[2])), false, 'centripetal');
   const lookTarget = new THREE.Vector3();
@@ -1446,18 +1481,14 @@ async function createBuildingTour(container, {
     doorRight.position.x = .77 + 1.55 * open;
     document.documentElement.dataset.tourTime = time.toFixed(2);
     document.documentElement.dataset.doorOpen = String(open > .95);
+    if (!adminPreview) onRoomChange(roomAtTourTime(time));
   }
 
   function move(raw) {
-    const r = Math.max(0, Math.min(5, raw)),
-      i = Math.min(4, Math.floor(r)),
-      u = r - i;
-    // Hold the view around each room and ease in/out without post-scroll drift.
-    const transition = Math.max(0, Math.min(1, (u - .12) / .76));
-    const eased = reducedMotion ? u : transition * transition * transition * (transition * (transition * 6 - 15) + 10);
-    targetTime = stops[i] + (stops[i + 1] - stops[i]) * eased;
+    targetTime = tourTarget(raw, reducedMotion);
+    document.documentElement.dataset.tourTarget = targetTime.toFixed(2);
     roomJump = null;
-    seek(targetTime);
+    if (reducedMotion) seek(targetTime);
   }
 
   function resize() {
@@ -1498,10 +1529,21 @@ async function createBuildingTour(container, {
       seek(THREE.MathUtils.lerp(roomJump.start, roomJump.target, smooth(progress)));
       if (progress === 1) roomJump = null;
     } else if (Math.abs(targetTime - time) > .0001) {
-      const difference = (targetTime - time) * (1 - Math.exp(-dt / cameraSmoothness));
-      const step = THREE.MathUtils.clamp(difference, -cameraSpeed * dt, cameraSpeed * dt);
-      seek(time + step);
+      seek(reducedMotion ? targetTime : advanceTour(time, targetTime, dt, cameraSmoothness));
     }
+    let doorsChanged = false;
+    for (const door of roomDoors) {
+      const target = doorProximity(camera.position, door);
+      const amount = advanceDoor(door.amount, target, dt, reducedMotion);
+      if (Math.abs(amount - door.amount) > .0001) doorsChanged = true;
+      door.amount = amount;
+      door.leaves.forEach((leaf, index) => {
+        const side = index === 0 ? -1 : 1;
+        leaf.position.x = side * (door.width / 4 + (door.width / 2 + .06) * amount);
+      });
+    }
+    if (doorsChanged) renderer.shadowMap.needsUpdate = true;
+    document.documentElement.dataset.roomDoors = JSON.stringify(roomDoors.map(door => ({ name: door.name, open: Number(door.amount.toFixed(2)) })));
     camera.updateMatrixWorld();
     viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(viewProjection);

@@ -1,0 +1,42 @@
+/* Calm, shared motion for the company and admin workspaces. */
+:root { --dashboard-motion: 240ms; --dashboard-ease: cubic-bezier(.22, 1, .36, 1); }
+:where(.workspace, .sidebar, dialog) button,
+:where(.workspace, .sidebar, dialog) .primary,
+:where(.workspace, .sidebar, dialog) .secondary,
+#navigation button {
+  transition: background-color var(--dashboard-motion) var(--dashboard-ease), border-color var(--dashboard-motion) var(--dashboard-ease), color var(--dashboard-motion) var(--dashboard-ease), box-shadow var(--dashboard-motion) var(--dashboard-ease), transform var(--dashboard-motion) var(--dashboard-ease);
+}
+tbody tr, tbody td strong, .company-status, .badge { transition: background-color var(--dashboard-motion) var(--dashboard-ease), color var(--dashboard-motion) var(--dashboard-ease), filter var(--dashboard-motion) var(--dashboard-ease); }
+.dashboard-tooltip:not([hidden]) { animation: dashboard-hint-in 160ms ease-out; }
+@keyframes dashboard-hint-in { from { opacity: 0; } to { opacity: 1; } }
+#toast { transition-timing-function: var(--dashboard-ease); transition-duration: var(--dashboard-motion); }
+.sidebar { transition-timing-function: var(--dashboard-ease); }
+tbody td { transition: background-color var(--dashboard-motion) var(--dashboard-ease), box-shadow var(--dashboard-motion) var(--dashboard-ease); }
+tbody td:focus-visible { outline: 2px solid #ff965e; outline-offset: -3px; background: #ff783d0b; }
+tbody tr:focus-within { background: var(--surface-raised); }
+
+button:active:not(:disabled) { transform: scale(.99); }
+.dashboard-tooltip { position: fixed; z-index: 200; width: max-content; max-width: min(320px, calc(100vw - 24px)); padding: 11px 15px; border: 1px solid #ffffff20; border-radius: 11px; color: #f4f7fc; background: #152940; box-shadow: 0 8px 28px #06132630; font-size: 12px; line-height: 1.9; white-space: pre-line; overflow-wrap: anywhere; text-align: start; }
+@media (hover: hover) and (pointer: fine) {
+  tbody tr:hover { background: var(--surface-raised); }
+  tbody td:hover { background: #ff783d0b; box-shadow: inset 0 -2px #ff9c6370; }
+  tbody td:hover strong { color: var(--accent-text); }
+  button:hover:not(:disabled) { transform: translateY(-1px); }
+  button:active:not(:disabled) { transform: translateY(0) scale(.99); }
+  .secondary:hover { box-shadow: 0 4px 12px #13264012; }
+  .icon-button:hover, .theme-toggle:hover { background: #ff783d12; border-color: #ff996c80; color: var(--accent-text); }
+  [data-action='publish']:hover { color: var(--green-text); border-color: #31987370; background: #31987312; }
+  [data-action='pause']:hover { color: var(--accent-text); border-color: #ff783d80; background: #ff783d12; }
+  [data-action='archive']:hover, #rejectApplicant:hover { color: #b53c43; background: #b53c4312; }
+  [data-action='delete']:hover { color: #b53c43; background: #b53c4312; border-color: #b53c4380; }
+  [data-action='approve']:hover { color: var(--green-text); background: #31987312; border-color: #31987370; }
+  [data-theme='dark'] [data-action='archive']:hover, [data-theme='dark'] #rejectApplicant:hover { color: #ff9fa4; }
+  [data-theme='dark'] [data-action='delete']:hover { color: #ff9fa4; }
+  .count-button:hover { color: var(--accent-text); background: #ff783d12; border-radius: 6px; box-shadow: 0 0 0 5px #ff783d12; }
+  #navigation button:hover { transform: translateX(-1px); }
+  .company-status:hover { filter: brightness(1.03); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace *, .sidebar *, dialog *, .dashboard-tooltip { animation: none !important; transition: none !important; }
+  button:hover:not(:disabled), button:active:not(:disabled), #navigation button:hover { transform: none; }
+}

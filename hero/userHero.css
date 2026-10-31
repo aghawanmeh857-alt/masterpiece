@@ -1038,3 +1038,80 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
   width: 190px; max-width: calc(100vw - 24px);
   max-height: calc(100dvh - 130px); overflow-y: auto;
 }
+
+/* On phones each room label briefly appears, then gives way to the scene. */
+@media (max-width: 767px) {
+  .story, .scene-caption {
+    transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+  }
+  .mobile-tour-started .story,
+  .mobile-tour-started .scene-caption {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(12px);
+  }
+  .mobile-tour-started .tour-footer {
+    height: 4px;
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    pointer-events: none;
+  }
+  .mobile-tour-started .tour-footer > :not(.progress-track) {
+    visibility: hidden;
+  }
+  .mobile-tour-started .scene-vignette {
+    background: linear-gradient(0deg, rgba(var(--page-rgb), .12), transparent 20%);
+  }
+}
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .story, .scene-caption { transition: none; }
+}
+
+/* The last room remains behind a final, normally scrolling site footer. */
+.journey-end {
+  position: relative;
+  z-index: 5;
+  padding: 48px max(6%, calc((100% - 1180px) / 2)) 24px;
+  background: rgba(var(--surface-rgb), .97);
+  border-top: 1px solid var(--field-border);
+  backdrop-filter: blur(20px);
+  color: var(--text-main);
+}
+.journey-end-content {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1fr;
+  gap: 48px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+.tour-at-end .journey-end-content { opacity: 1; transform: none; }
+.journey-end-brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 26px; font-weight: 800; }
+.journey-end-brand small { display: block; color: var(--text-muted); font-size: 10px; letter-spacing: 3px; }
+.journey-end-brand .ofoq-brand { position: relative; display: block; overflow: hidden; flex: 0 0 auto; inset: auto; transform: none; width: 50px; height: 54px; background: #fffdf9; border-radius: 9px; }
+.journey-end-brand .ofoq-logo { width: 87px; height: 87px; left: -19px; top: -16px; }
+.journey-end-eyebrow { color: var(--accent-text); font-size: 11px; font-weight: 700; }
+.journey-end h2 { font-size: clamp(22px, 2.5vw, 32px); line-height: 1.6; margin-bottom: 12px; }
+.journey-end-intro > p:not(.journey-end-eyebrow) { color: var(--text-muted); font-size: 13px; line-height: 2; max-width: 390px; }
+.journey-restart { display: inline-flex; align-items: center; gap: 24px; margin-top: 12px; padding: 12px 18px; border: 0; border-radius: 10px; background: #ff783d; color: #111e30; font: inherit; font-size: 12px; font-weight: 700; }
+.journey-restart:hover { background: #ff986b; }
+.journey-end-links { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding-top: 12px; }
+.journey-end-links h3 { font-size: 14px; font-weight: 800; margin: 0 0 10px; }
+.journey-end-links a { color: var(--text-muted); font-size: 12px; line-height: 1.8; }
+.journey-end-links a:hover { color: var(--accent-text); }
+.journey-end-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--field-border); margin-top: 36px; padding-top: 20px; color: var(--text-muted); font-size: 10px; line-height: 2; }
+.tour-at-end .story, .tour-at-end .scene-caption, .tour-at-end .tour-footer { visibility: hidden; opacity: 0; pointer-events: none; }
+@media (max-width: 767px) {
+  .journey-end { padding: 32px 6% 24px; }
+  .journey-end-content { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 18px; }
+  .journey-end-intro { grid-column: 1 / -1; }
+  .journey-end-brand { margin-bottom: 16px; }
+  .journey-end-links { gap: 10px; }
+  .journey-end-bottom { margin-top: 26px; flex-direction: column; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-end-content { transition: none; transform: none; }
+}

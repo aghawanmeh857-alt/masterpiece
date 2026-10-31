@@ -47,7 +47,7 @@
       <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
     </a>
     <details class="site-navigation hero-navigation" open>
-      <summary>الأقسام <span aria-hidden="true">☰</span></summary>
+      <summary aria-label="الأقسام"><span class="hero-menu-label">الأقسام</span><span aria-hidden="true">☰</span></summary>
       <nav class="room-nav" aria-label="أقسام أفق">
         <a href="#lobby" data-room="0" class="active" aria-current="location">الرئيسية</a>
         <a href="#freelance" data-room="1">العمل الحر</a>
@@ -116,6 +116,37 @@
     ></section>
 
   </main>
+
+  <footer id="journeyEnd" class="journey-end" aria-label="ختام الجولة" aria-hidden="true" inert>
+    <div class="journey-end-content">
+      <div class="journey-end-intro">
+        <a class="journey-end-brand" href="#lobby" aria-label="أفق — العودة لبداية الجولة">
+          <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
+          <span>أفق <small>OFOQ</small></span>
+        </a>
+        <p class="journey-end-eyebrow">نهاية الجولة، وبداية فرصتك</p>
+        <h2>خطوتك التالية تبدأ من هنا.</h2>
+        <p>تعلّم، اكتشف فرصًا جديدة، وتواصل مع أشخاص يشاركونك الطموح.</p>
+        <button id="restartTour" class="journey-restart" type="button">العودة لبداية الجولة <span aria-hidden="true">↑</span></button>
+      </div>
+      <nav class="journey-end-links" aria-label="استكشف أقسام أفق">
+        <h3>استكشف أفق</h3>
+        <a href="../Freelance/freelance.html">العمل الحر</a>
+        <a href="../Academy/academy.html">الأكاديمية</a>
+        <a href="../Internships/internships.html">فرص التدريب</a>
+        <a href="../Jobs/jobs.html">الوظائف</a>
+        <a href="../Events/events.html">الفعاليات</a>
+      </nav>
+      <nav class="journey-end-links" aria-label="التواصل والحساب">
+        <h3>خلّينا على تواصل</h3>
+        <a href="../Account/Messages/messages.html">الرسائل والتواصل</a>
+        <a href="../Account/Profile/profile.html">الملف الشخصي</a>
+        <a href="../Auth/Register/register.html">انضم إلى أفق</a>
+        <a href="../Credits/credits.html">مصادر المجسّمات</a>
+      </nav>
+    </div>
+    <div class="journey-end-bottom"><span>© <span id="tourFooterYear">2026</span> أفق — جميع الحقوق محفوظة.</span><span>مساحة تجمع التعلّم والعمل والطموح.</span></div>
+  </footer>
 
   <!-- معلومات الغرفة -->
   <aside class="story" aria-label="الغرفة الحالية">

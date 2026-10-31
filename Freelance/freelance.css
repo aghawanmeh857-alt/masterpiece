@@ -1642,6 +1642,26 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
   color: var(--accent-text);
 }
 
+.project-favorite-button, .project-favorites-filter {
+  border: 1px solid var(--field-border, #cbd5e1);
+  border-radius: 9px;
+  background: var(--surface, #fff);
+  color: var(--text-main, #15283e);
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.project-favorite-button[aria-pressed="true"], .project-favorites-filter[aria-pressed="true"] {
+  color: var(--accent-text, #b6440c);
+  border-color: #ff783d;
+  background: #ff783d14;
+}
+.project-favorite-button:focus-visible, .project-favorites-filter:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
+.project-favorites-filter span { margin-inline-start: 6px; }
+.favorites-status { margin: 0; color: var(--text-muted); font-size: 12px; }
+.favorites-status:empty { display: none; }
+
 @media (max-width: 767px) {
   .site-header .account-links {
     width: 100%;

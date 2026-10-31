@@ -66,3 +66,82 @@ body[data-section="hero"] .hero-navbar .header-actions {
   .hero-navbar .brand .ofoq-logo { width: 70px; height: 70px; left: -15px; top: -13px; }
   .hero-navbar .hero-navigation > summary { padding-inline: 8px; }
 }
+
+/* One compact row leaves the phone viewport available for the 3D tour. */
+@media (max-width: 767px) {
+  body[data-section="hero"] .topbar.hero-navbar {
+    inset: 8px 3% auto;
+    display: grid;
+    grid-template-columns: 34px 34px minmax(0, 1fr);
+    gap: 5px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+  .hero-navbar .brand .ofoq-brand { width: 32px; height: 36px; }
+  .hero-navbar .brand .ofoq-logo { width: 56px; height: 56px; left: -12px; top: -10px; }
+  .hero-navbar .hero-navigation { min-width: 0; }
+  .hero-navbar .hero-menu-label { display: none; }
+  .hero-navbar .hero-navigation > summary {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    padding: 0;
+    justify-content: center;
+    font-size: 16px;
+    gap: 0;
+  }
+  .hero-navbar .hero-navigation > summary::after { content: none; }
+  body[data-section="hero"] .hero-navbar .header-actions {
+    min-width: 0;
+    gap: 5px;
+    margin: 0;
+    justify-content: flex-end;
+  }
+  .hero-navbar .header-actions > * { flex-shrink: 0; }
+  .hero-navbar .header-actions .theme-toggle {
+    width: 32px;
+    min-width: 32px;
+    height: 34px;
+    min-height: 34px;
+    padding: 0;
+    border: 1px solid var(--field-border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text-main);
+    display: grid;
+    place-items: center;
+  }
+  .hero-navbar :is(.navbar-login, .navbar-logout) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    min-height: 34px;
+    padding: 5px 6px;
+    font-size: 9px;
+    border-radius: 9px;
+  }
+  .hero-navbar .account-menu > summary {
+    height: 34px;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 6px;
+    font-size: 10px;
+    border-radius: 9px;
+  }
+  .hero-navbar .theme-toggle::before { font-size: 17px; }
+  .hero-navbar .room-nav a { min-height: 34px; padding: 6px 8px; font-size: 11px; }
+}
+@media (max-width: 360px) {
+  body[data-section="hero"] .topbar.hero-navbar {
+    grid-template-columns: 32px 34px minmax(0, 1fr);
+    gap: 4px;
+    padding: 6px;
+  }
+  .hero-navbar .brand .ofoq-brand { width: 32px; height: 36px; }
+  .hero-navbar .brand .ofoq-logo { width: 56px; height: 56px; left: -12px; top: -10px; }
+  .hero-navbar .hero-navigation > summary { width: 34px; }
+  body[data-section="hero"] .hero-navbar .header-actions { gap: 4px; }
+}

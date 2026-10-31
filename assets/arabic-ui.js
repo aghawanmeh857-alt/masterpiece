@@ -5,6 +5,19 @@
     const cartUrl = new URL('../Academy/Cart/cart.html', sharedScript.src);
     document.querySelectorAll('.header-actions').forEach(actions => {
       if (actions.closest('.hero-navbar')) return;
+      if (document.body.dataset.section === 'freelance') {
+        if (actions.querySelector('.project-favorites-link')) return;
+        const favorites = document.createElement('a');
+        const url = new URL('../Freelance/freelance.html', sharedScript.src);
+        url.searchParams.set('favorites', '1');
+        url.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
+        url.hash = 'project-favorites';
+        favorites.className = 'project-favorites-link';
+        favorites.href = url.href;
+        favorites.textContent = '♡ المفضلة';
+        actions.prepend(favorites);
+        return;
+      }
       if (actions.querySelector('.shopping-cart-link')) return;
       const link = document.createElement('a');
       link.className = 'shopping-cart-link';

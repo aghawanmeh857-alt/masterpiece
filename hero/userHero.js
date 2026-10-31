@@ -10,6 +10,10 @@ import { createStreetLife, createCityAircraft } from './street-life.js';
 import { createCityTraffic } from './city-traffic.js';
 import { createModernCity } from './modern-city.js';
 import { createBeachLife } from './beach-life.js';
+import { HEADQUARTERS_MODEL, placeHeadquartersModel } from '../3D/model-layout.js';
+import { createAutumnWalk } from '../3D/autumn-walk.js';
+import { createPlazaFountain } from '../3D/plaza-fountain.js';
+import { loadRealisticFurniture } from '../3D/realistic-furniture.js';
 const adminPreview = new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
 if (adminPreview) document.documentElement.classList.add('admin-scene-preview');
 // 1. الوضع النهاري والليلي وروابط الصفحات، دون تخزين.
@@ -176,8 +180,7 @@ function setRoom(index) {
       button.removeAttribute('aria-current');
     }
   });
-
-
+  showMobileRoomOverlay();
 }
 
 function jumpTo(index) {
@@ -188,6 +191,7 @@ function jumpTo(index) {
     behavior: 'instant'
   });
   if (!sceneApi) setRoom(index);
+  else if (currentRoom === index) showMobileRoomOverlay();
   sceneApi?.goToRoom?.(index);
 
   if (location.hash !== `#${rooms[index].id}`) {
@@ -199,6 +203,11 @@ buttons.forEach(button => {
   button.addEventListener('click', event => {
     event.preventDefault();
     jumpTo(Number(button.dataset.room));
+    const navigation = button.closest('.hero-navigation');
+    if (navigation && matchMedia('(max-width: 991px)').matches) {
+      navigation.open = false;
+      navigation.querySelector('summary').focus({ preventScroll: true });
+    }
   });
 });
 
@@ -264,9 +273,50 @@ $('exploreModal').addEventListener('show.bs.modal', () => {
 });
 
 
+const mobileTour = matchMedia('(max-width: 767px)');
+const tourStory = document.querySelector('.story');
+const tourFooter = document.querySelector('.tour-footer');
+const tourCaption = document.querySelector('.scene-caption');
+const tourEnd = document.getElementById('journeyEnd');
+let tourEndVisible = false;
+const mobileRoomLabelDuration = 3500;
+let mobileOverlayExpired = false;
+let mobileOverlayTimer = null;
+function syncMobileTourOverlay() {
+  const hide = tourEndVisible || (mobileTour.matches && mobileOverlayExpired);
+  document.documentElement.classList.toggle('mobile-tour-started', hide);
+  for (const element of [tourStory, tourFooter, tourCaption]) {
+    if (!element) continue;
+    element.inert = hide;
+    element.setAttribute('aria-hidden', String(hide));
+  }
+}
+function showMobileRoomOverlay() {
+  clearTimeout(mobileOverlayTimer);
+  mobileOverlayExpired = false;
+  syncMobileTourOverlay();
+  if (mobileTour.matches && !adminPreview) {
+    mobileOverlayTimer = setTimeout(() => {
+      mobileOverlayExpired = true;
+      syncMobileTourOverlay();
+    }, mobileRoomLabelDuration);
+  }
+}
+mobileTour.addEventListener('change', showMobileRoomOverlay);
 setRoom(0);
+document.getElementById('tourFooterYear').textContent = new Date().getFullYear();
+document.getElementById('restartTour').addEventListener('click', () => jumpTo(0));
+document.querySelector('.journey-end-brand').addEventListener('click', event => {
+  event.preventDefault();
+  jumpTo(0);
+});
 
 function progressAtScroll() {
+  tourEndVisible = !adminPreview && scrollY + innerHeight > tourEnd.offsetTop + 60;
+  document.documentElement.classList.toggle('tour-at-end', tourEndVisible);
+  tourEnd.inert = !tourEndVisible;
+  tourEnd.setAttribute('aria-hidden', String(!tourEndVisible));
+  syncMobileTourOverlay();
   if (adminPreview) return;
   const stop = chapters[5].offsetTop,
     raw = Math.min(5, Math.max(0, scrollY / stop * 5));
@@ -401,6 +451,8 @@ function createOutdoorFacilities(THREE, scene) {
   const leafGeometry = new THREE.SphereGeometry(1, 14, 10);
   function tree(x, z, scale, index) {
     const group = new THREE.Group();
+    group.userData.autumnReplacement = z > 0 && Math.abs(x) < 20;
+    group.visible = !(group.userData.autumnReplacement && document.documentElement.dataset.autumnWalk === 'ready');
     group.position.set(x, .35, z);
     group.scale.setScalar(scale);
     park.add(group);
@@ -457,16 +509,21 @@ function createOutdoorFacilities(THREE, scene) {
   }
 
   // A small fountain sits to the side, away from the door and camera route.
-  cylinder(3.5, 3.5, .28, [-24, .24, 15], stone);
-  const rim = mesh(new THREE.TorusGeometry(3.15, .18, 10, 40), darkStone, [-24, .45, 15]);
+  const fountainFallback = new THREE.Group();
+  fountainFallback.name = 'OFOQFountainFallback';
+  fountainFallback.userData.dynamicScene = true;
+  fountainFallback.visible = document.documentElement.dataset.plazaFountain !== 'ready';
+  park.add(fountainFallback);
+  cylinder(3.5, 3.5, .28, [-24, .24, 15], stone, fountainFallback);
+  const rim = mesh(new THREE.TorusGeometry(3.15, .18, 10, 40), darkStone, [-24, .45, 15], fountainFallback);
   rim.rotation.x = Math.PI / 2;
   const water = new THREE.MeshPhysicalMaterial({
     color: '#6bafb9', roughness: .15, metalness: .15, clearcoat: 1
   });
-  cylinder(2.98, 2.98, .035, [-24, .39, 15], water);
-  cylinder(.28, .45, 1.25, [-24, .98, 15], stone);
-  cylinder(1.15, 1.15, .12, [-24, 1.62, 15], darkStone);
-  cylinder(1.02, 1.02, .03, [-24, 1.7, 15], water);
+  cylinder(2.98, 2.98, .035, [-24, .39, 15], water, fountainFallback);
+  cylinder(.28, .45, 1.25, [-24, .98, 15], stone, fountainFallback);
+  cylinder(1.15, 1.15, .12, [-24, 1.62, 15], darkStone, fountainFallback);
+  cylinder(1.02, 1.02, .03, [-24, 1.7, 15], water, fountainFallback);
 
   // Visitor bicycle parking on the opposite side of the plaza.
   box([5, .1, 2.4], [24, .1, 14], stone);
@@ -940,6 +997,7 @@ async function createBuildingTour(container, {
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance'
   });
+  renderer.localClippingEnabled = true;
   renderer.setSize(innerWidth, innerHeight);
   const maxPixelRatio = () => Math.min(devicePixelRatio, 1.25, Math.sqrt(1200000 / (innerWidth * innerHeight)));
   let renderScale = maxPixelRatio();
@@ -1203,8 +1261,13 @@ async function createBuildingTour(container, {
   plant(-7, -4);
   plant(8, -4);
   for (let z of [-5, -8]) {
-    box(2.8, .52, 1, -6, .6, z, navy);
-    box(2.8, .65, .18, -6, 1.1, z - .43, navy);
+    const sofa = new THREE.Group();
+    sofa.position.set(-6, .05, z);
+    sofa.userData.lobbySofa = true;
+    sofa.userData.dynamicScene = true;
+    scene.add(sofa);
+    box(2.8, .52, 1, 0, .6, 0, navy, sofa);
+    box(2.8, .65, .18, 0, 1.1, -.43, navy, sofa);
   }
   box(1.3, .08, 1.3, -4, .5, -6.5, wood);
   cylinder(.15, .5, -4, .25, -6.5, steel);
@@ -1328,7 +1391,7 @@ async function createBuildingTour(container, {
   plant(8, -80);
 
   let city = null;
-  let streetLife = null, traffic = null;
+  let streetLife = null, traffic = null, autumnWalk = null, plazaFountain = null, realisticFurniture = null;
   const aircraft = createCityAircraft(THREE, scene, reducedMotion);
   let cityLightLevel = 0;
   const localLights = [];
@@ -1386,8 +1449,8 @@ async function createBuildingTour(container, {
     [0, [50, 36, 78],
       [0, 29, -8]
     ],
-    [4, [26, 22, 48],
-      [0, 27, -8]
+    [4, [0, 3.1, 35],
+      [0, 3.2, 14]
     ],
     [7, [0, 3.0, 17],
       [0, 2.7, 0]
@@ -1582,6 +1645,8 @@ async function createBuildingTour(container, {
     });
     // Stop invisible ocean geometry updates after entering the building.
     coastal.update(dt, camera, time < 7, previewPeople && !requestedNight);
+    autumnWalk?.update(dt, time < 15);
+    plazaFountain?.update(dt, time < 15);
     // Four nearby local lights keep illumination without evaluating eighteen per pixel.
     if (localLights.length) {
       const nearest = localLights.map(light => ({light, distance: camera.position.distanceToSquared(light.position)})).sort((a,b) => a.distance-b.distance).slice(0,4);
@@ -1615,91 +1680,21 @@ async function createBuildingTour(container, {
       scene.environment = env.texture;
       const loader = new GLTFLoader(),
         assetRoot = './assets/3d/';
-      const [buildings, office, boss, woman, colleague] = await Promise.all([
-        loader.loadAsync(assetRoot + 'building/low-poly-skyscrapers.glb'),
+      const [headquarters, office, boss, woman, colleague, furnitureAssets] = await Promise.all([
+        loader.loadAsync(new URL('../3D/' + HEADQUARTERS_MODEL, import.meta.url).href),
         loader.loadAsync(assetRoot + 'furniture/modern-office.glb'),
     
         loader.loadAsync(assetRoot + 'people/formal-boss.glb'),
         loader.loadAsync(assetRoot + 'people/formal-businesswoman.glb'),
-        loader.loadAsync(new URL('../3D/business-male-4.glb', import.meta.url).href).catch(() => null)
+        loader.loadAsync(new URL('../3D/business-male-4.glb', import.meta.url).href).catch(() => null),
+        loadRealisticFurniture(THREE, new GLTFLoader()).catch(error => {
+          console.warn('OFOQ: keeping existing furniture because the new models failed to load.', error);
+          return null;
+        })
       ]);
-      if (disposed) return;
-      // The source pack merges seven buildings by material. Separate them across the gaps in X.
-      buildings.scene.updateMatrixWorld(true);
-      const parts = [],
-        xs = [];
-      buildings.scene.traverse(node => {
-        if (!node.isMesh) return;
-        const geometry = (node.geometry.index ? node.geometry.toNonIndexed() : node.geometry.clone()).applyMatrix4(node.matrixWorld);
-        parts.push({
-          geometry,
-          name: node.name
-        });
-        const a = geometry.attributes.position;
-        for (let i = 0; i < a.count; i++) xs.push(Math.round(a.getX(i) * 10000) / 10000);
-      });
-      const unique = [...new Set(xs)].sort((a, b) => a - b),
-        gaps = unique.slice(1).map((v, i) => ({
-          gap: v - unique[i],
-          cut: (v + unique[i]) / 2
-        })).sort((a, b) => b.gap - a.gap).slice(0, 6).map(g => g.cut).sort((a, b) => a - b);
-      const ranges = [-Infinity, ...gaps, Infinity],
-        bounds = Array.from({
-          length: 7
-        }, () => new THREE.Box3());
-      for (const {
-          geometry
-        }
-        of parts) {
-        const a = geometry.attributes.position;
-        for (let i = 0; i < a.count; i++) {
-          const x = a.getX(i),
-            slot = ranges.findIndex((r, n) => n < 7 && x >= r && x < ranges[n + 1]);
-          if (slot >= 0) bounds[slot].expandByPoint(new THREE.Vector3(x, a.getY(i), a.getZ(i)));
-        }
-      }
-      const slot = bounds.map((b, i) => ({
-        i,
-        height: b.max.y - b.min.y
-      })).sort((a, b) => b.height - a.height)[0].i;
-      const tower = new THREE.Group(),
-        towerBounds = bounds[slot],
-        towerSize = towerBounds.getSize(new THREE.Vector3()),
-        towerCenter = towerBounds.getCenter(new THREE.Vector3());
-      const silver = new THREE.MeshStandardMaterial({
-        color: '#b8c7cf',
-        metalness: .8,
-        roughness: .23,
-        envMapIntensity: 1.2
-      });
-      for (const {
-          geometry,
-          name
-        }
-        of parts) {
-        const attributes = geometry.attributes,
-          data = {};
-        for (const key of Object.keys(attributes)) data[key] = [];
-        const p = attributes.position;
-        for (let i = 0; i < p.count; i += 3) {
-          const x = (p.getX(i) + p.getX(i + 1) + p.getX(i + 2)) / 3;
-          if (x < ranges[slot] || x >= ranges[slot + 1]) continue;
-          for (const [key, a] of Object.entries(attributes))
-            for (let v = i; v < i + 3; v++)
-              for (let c = 0; c < a.itemSize; c++) data[key].push(a.array[v * a.itemSize + c]);
-        }
-        if (!data.position.length) continue;
-        const cut = new THREE.BufferGeometry();
-        for (const key of Object.keys(data)) cut.setAttribute(key, new THREE.Float32BufferAttribute(data[key], attributes[key].itemSize));
-        const material = /windows/i.test(name) ? glass : /bottom|roof/i.test(name) ? navy : silver;
-        const mesh = new THREE.Mesh(cut, material);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        tower.add(mesh);
-        geometry.dispose();
-      }
-      tower.scale.set(20 / towerSize.x, 55 / towerSize.y, 20 / towerSize.z);
-      tower.position.set(-towerCenter.x * tower.scale.x, 5 - towerBounds.min.y * tower.scale.y, -8 - towerCenter.z * tower.scale.z);
+      if (disposed) { furnitureAssets?.destroy(); return; }
+      realisticFurniture = furnitureAssets;
+      const tower = placeHeadquartersModel(THREE, headquarters.scene);
       scene.add(tower);
       const outdoor = createOutdoorFacilities(THREE, scene);
       const setOutdoorNight = outdoor.userData.setNight;
@@ -1713,8 +1708,8 @@ async function createBuildingTour(container, {
         renderer, sun, ambient, outdoor, reducedMotion
       });
       coastal.setNight(document.documentElement.dataset.theme === 'dark', true);
-      document.documentElement.dataset.buildingModel = 'sketchfab';
-      document.documentElement.dataset.buildingMaterial = 'reflective-glass';
+      document.documentElement.dataset.buildingModel = 'free-london-skyscraper';
+      document.documentElement.dataset.buildingMaterial = 'original-london-materials';
       // Extract only furniture, keeping the source room's posters and walls out of the tour.
       function collect(asset, pattern) {
         const group = new THREE.Group();
@@ -1752,16 +1747,25 @@ async function createBuildingTour(container, {
       chair.position.z += .9;
       for (const g of deskGroups) {
         g.clear();
-        g.add(furniture.clone(true));
-        g.add(chair.clone(true));
-        box(.82, .52, .08, 0, 1.32, -.25, black, g);
-        box(.72, .42, .012, 0, 1.32, -.202, new THREE.MeshStandardMaterial({
-          color: '#75bdd8',
-          emissive: '#2c6586',
-          emissiveIntensity: .4
+        g.userData.dynamicScene = true;
+        g.add((furnitureAssets?.desk || furniture).clone(true));
+        g.add((furnitureAssets?.chair || chair).clone(true));
+        const screenHeight = furnitureAssets ? 1.16 : 1.32;
+        box(.82, .48, .06, 0, screenHeight, -.15, black, g);
+        box(.72, .38, .012, 0, screenHeight, -.112, new THREE.MeshStandardMaterial({
+          color: '#9cb5c8',
+          emissive: '#203243',
+          emissiveIntensity: .12
         }), g);
-        box(.08, .22, .08, 0, .96, -.25, steel, g);
+        box(.07, .18, .07, 0, furnitureAssets ? .87 : .96, -.15, steel, g);
+        box(.3, .025, .2, 0, furnitureAssets ? .8 : .86, -.15, black, g);
+        box(.48, .025, .16, 0, furnitureAssets ? .795 : .87, .2, navy, g);
       }
+      if (furnitureAssets) scene.traverse(node => {
+        if (!node.userData.lobbySofa) return;
+        node.clear();
+        node.add(furnitureAssets.sofa.clone(true));
+      });
       // Source props provide extra plants and desk lamps, placed around the reception.
       const plants = fit(collect(office, /Window_Plant_0/), 1.3);
       for (const x of [-7.5, 8]) {
@@ -1806,7 +1810,8 @@ async function createBuildingTour(container, {
       }
       document.documentElement.dataset.realisticPeople = String(people.length);
       document.documentElement.dataset.characterModels = '2';
-      document.documentElement.dataset.furnitureModels = '1';
+      document.documentElement.dataset.furnitureModels = furnitureAssets ? '4' : '1';
+      document.documentElement.dataset.realisticFurniture = furnitureAssets ? 'ready' : 'fallback';
       streetLife = createStreetLife(THREE, scene, { boss, woman, colleague, clone, reducedMotion });
     
     
@@ -1840,6 +1845,25 @@ async function createBuildingTour(container, {
   });
   document.documentElement.dataset.modelLoad = 'loading';
   loadModels();
+  createPlazaFountain(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(fountain => {
+    if (disposed) { fountain.destroy(); return; }
+    plazaFountain = fountain;
+    const fallback = scene.getObjectByName('OFOQFountainFallback');
+    if (fallback) fallback.visible = false;
+    renderer.shadowMap.needsUpdate = true;
+  }).catch(error => {
+    document.documentElement.dataset.plazaFountain = 'unavailable';
+    console.warn('OFOQ: imported plaza fountain could not be loaded.', error);
+  });
+  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(walk => {
+    if (disposed) { walk.destroy(); return; }
+    autumnWalk = walk;
+    scene.traverse(node => { if (node.userData.autumnReplacement) node.visible = false; });
+    renderer.shadowMap.needsUpdate = true;
+  }).catch(error => {
+    document.documentElement.dataset.autumnWalk = 'unavailable';
+    console.warn('OFOQ: autumn maples could not be loaded.', error);
+  });
   aircraft.loadModel(new GLTFLoader()).catch(error => {
     document.documentElement.dataset.aircraftSource = 'procedural-fallback';
     console.warn('OFOQ: aircraft model unavailable; using the lightweight fallback.', error);
@@ -1891,6 +1915,9 @@ async function createBuildingTour(container, {
       if (renderFrame !== null) cancelAnimationFrame(renderFrame);
       removeEventListener('resize', resize);
       coastal.destroy?.();
+      autumnWalk?.destroy();
+      plazaFountain?.destroy();
+      realisticFurniture?.destroy();
       city?.destroy();
       streetLife?.destroy();
       traffic?.destroy();

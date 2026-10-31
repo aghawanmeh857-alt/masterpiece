@@ -149,7 +149,17 @@ Promise.resolve().then(() => {
 
   const $ = id => document.getElementById(id);
 
+  const favoritesKey = 'ofoq-project-favorites-v1';
+  let savedProjects = new Set();
+  function readFavorites() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+      savedProjects = new Set(Array.isArray(stored) ? stored.filter(id => projects.some(project => project.id === id)) : []);
+    } catch { savedProjects = new Set(); }
+  }
+  readFavorites();
   const state = {
+    savedOnly: new URLSearchParams(location.search).get('favorites') === '1',
     query: "",
     category: "",
     budget: "",
@@ -171,6 +181,7 @@ Promise.resolve().then(() => {
     const skills = normalize(state.skills);
 
     return projects.filter(project => {
+      if (state.savedOnly && !savedProjects.has(project.id)) return false;
       const haystack = (
         project.title + " " +
         project.description + " " +
@@ -297,7 +308,26 @@ Promise.resolve().then(() => {
     detailsLink.className = 'details-link';
     detailsLink.href = './Project/project.html?id=' + project.id;
     detailsLink.textContent = 'تفاصيل المشروع ←';
-    offer.append(price, duration, apply, detailsLink);
+    const favorite = document.createElement('button');
+    favorite.type = 'button';
+    favorite.className = 'project-favorite-button';
+    const saved = savedProjects.has(project.id);
+    favorite.textContent = saved ? '♥ في المفضلة' : '♡ أضف للمفضلة';
+    favorite.setAttribute('aria-pressed', String(saved));
+    favorite.setAttribute('aria-label', (saved ? 'إزالة من المفضلة: ' : 'إضافة للمفضلة: ') + project.title);
+    favorite.addEventListener('click', () => {
+      if (savedProjects.has(project.id)) savedProjects.delete(project.id);
+      else savedProjects.add(project.id);
+      const nowSaved = savedProjects.has(project.id);
+      try {
+        localStorage.setItem(favoritesKey, JSON.stringify([...savedProjects]));
+        $('favoritesStatus').textContent = nowSaved ? 'أُضيف المشروع إلى المفضلة.' : 'أُزيل المشروع من المفضلة.';
+      } catch {
+        $('favoritesStatus').textContent = 'تم تحديث المفضلة لهذه الجلسة؛ تعذّر حفظها في المتصفح.';
+      }
+      render();
+    });
+    offer.append(price, duration, favorite, apply, detailsLink);
     article.append(cover, details, offer);
 
     return article;
@@ -305,6 +335,8 @@ Promise.resolve().then(() => {
 
   function render() {
     const list = filteredProjects();
+    $('projectFavoritesCount').textContent = savedProjects.size;
+    $('project-favorites').setAttribute('aria-pressed', String(state.savedOnly));
 
     $("projectList").replaceChildren(
       ...list.map(createProjectCard)
@@ -397,6 +429,7 @@ Promise.resolve().then(() => {
   }
 
   function clearAll() {
+    state.savedOnly = false;
     const keys = [
       "query",
       "category",
@@ -461,6 +494,11 @@ Promise.resolve().then(() => {
 
   $("clearFilters").addEventListener("click", clearAll);
   $("resetEmpty").addEventListener("click", clearAll);
+  $('project-favorites').addEventListener('click', () => { state.savedOnly = !state.savedOnly; render(); });
+  addEventListener('storage', event => {
+    if (event.key === favoritesKey || event.key === null) { readFavorites(); render(); }
+  });
+  addEventListener('pageshow', () => { readFavorites(); render(); });
 
   function openApplication(project) {
     $("applicationForm").reset();

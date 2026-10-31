@@ -1580,3 +1580,23 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
     margin-left: auto;
   }
 }
+.listing-offer .internship-cart-button {
+  flex-basis: 100%; width: 100%; min-height: 46px; padding: 11px 16px;
+  border: 1px solid #ff783d; border-radius: 10px; background: #ff783d14;
+  color: var(--text-main, #14263d); font: inherit; font-weight: 700; cursor: pointer;
+  transition: background .18s ease, box-shadow .18s ease;
+}
+.listing-offer .internship-cart-button:is(:hover, [aria-pressed="true"]) { background: #ff783d30; box-shadow: 0 3px 12px #ff783d20; }
+[data-theme="dark"] .listing-offer .internship-cart-button { color: #f3f6fb; }
+.internship-cart-button:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .listing-offer .internship-cart-button { transition: none; } }
+.opportunity-shortcuts .internship-cart-shortcut {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 56px; padding: 12px 20px; border: 1px solid #ffffff55;
+  border-radius: 10px; background: #ffffff0d; color: #fff;
+  font-weight: 700; text-decoration: none; transition: background .18s ease;
+}
+.opportunity-shortcuts .internship-cart-shortcut:hover { background: #ffffff20; }
+.internship-cart-shortcut span { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding-inline: 6px; border-radius: 50%; background: #ff783d; color: #14263d; }
+.internship-cart-shortcut:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .opportunity-shortcuts .internship-cart-shortcut { transition: none; } }

@@ -105,7 +105,17 @@ const courses = window.OfoqCourses;
       if(owned)location.assign(cover.href);else if(course.price)store.checkout([course.id],()=>location.assign(cover.href));else{store.enroll([course.id]);location.assign(cover.href);}
     }));
     const wish=button(store.state.wishlist.includes(course.id)?'♥':'♡',()=>{store.toggle('wishlist',course.id);render();},'learn-wish');wish.setAttribute('aria-label','المفضلة: '+course.title);wish.setAttribute('aria-pressed',String(store.state.wishlist.includes(course.id)));actions.append(wish);
-    if(!owned&&course.price)actions.append(button(store.state.cart.includes(course.id)?'إزالة من السلة':'أضف للسلة',()=>{store.toggle('cart',course.id);render();},'learn-text'));
+    if (!owned && course.price) {
+      const inCart = store.state.cart.includes(course.id);
+      const cartButton = button(inCart ? '✓ في السلة · إزالة' : 'إضافة إلى السلة', () => {
+        store.toggle('cart', course.id);
+        render();
+        document.querySelector('[data-course="' + course.id + '"] .course-add-cart')?.focus({preventScroll: true});
+      }, 'learn-secondary course-add-cart');
+      cartButton.setAttribute('aria-label', (inCart ? 'إزالة من السلة: ' : 'إضافة إلى السلة: ') + course.title);
+      cartButton.setAttribute('aria-pressed', String(inCart));
+      actions.append(cartButton);
+    }
     body.append(badge,title,owner,meta,price);
     if(owned){const progress=node('progress');progress.max=100;progress.value=store.percent(course.id);progress.setAttribute('aria-label','تقدّمك في '+course.title);body.append(progress,node('small',store.percent(course.id)+'% مكتمل'));}
     body.append(actions);article.append(cover,body);return article;

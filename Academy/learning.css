@@ -69,6 +69,15 @@ body[data-section="academy"] .overview-learning .course-grid { grid-template-col
 .learning-badge { width: fit-content; font-size: 10px; padding: 2px 7px; font-weight: 700; background: #ff783d20; color: var(--accent-text); }
 .course-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 8px; }
 .course-actions .learn-primary { flex: 1; font-size: 12px; padding: 9px; }
+.course-actions .course-add-cart {
+  flex-basis: 100%; min-height: 44px; border: 1px solid #ff783d;
+  border-radius: 10px; background: #ff783d12; color: var(--text-main);
+  font-size: 13px; font-weight: 700;
+  transition: background .18s ease, box-shadow .18s ease;
+}
+.course-actions .course-add-cart:is(:hover, [aria-pressed="true"]) { background: #ff783d26; box-shadow: 0 3px 12px #ff783d18; }
+.course-add-cart:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .course-actions .course-add-cart { transition: none; } }
 .learn-primary, .learn-secondary, .learn-wish, .learn-text { font: inherit; cursor: pointer; }
 .learn-primary { background: #ff783d; color: #101f32; padding: 11px 18px; border: 1px solid #ff783d; border-radius: 5px; font-weight: 800; }
 .learn-primary:hover { background: #ff986b; }

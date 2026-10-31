@@ -6,6 +6,10 @@ import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime } from './tour-motion.js';
 import { doorProximity, advanceDoor } from './door-motion.js';
+import { createStreetLife, createCityAircraft } from './street-life.js';
+import { createCityTraffic } from './city-traffic.js';
+import { createModernCity } from './modern-city.js';
+import { createBeachLife } from './beach-life.js';
 const adminPreview = new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
 if (adminPreview) document.documentElement.classList.add('admin-scene-preview');
 // 1. الوضع النهاري والليلي وروابط الصفحات، دون تخزين.
@@ -193,7 +197,6 @@ function jumpTo(index) {
 
 buttons.forEach(button => {
   button.addEventListener('click', event => {
-    if (button.tagName === 'A' && button.dataset.room !== '0') return;
     event.preventDefault();
     jumpTo(Number(button.dataset.room));
   });
@@ -521,6 +524,7 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
   const beach = new THREE.Mesh(sand, sandMaterial);
   beach.receiveShadow = true;
   coast.add(beach);
+  const beachLife = createBeachLife(THREE, coast, { reducedMotion });
 
   // Promenade and a short boardwalk link the coast to the existing plaza.
   box([4, .16, 148], [-28, .20, -5], pathMaterial);
@@ -745,8 +749,9 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
 
   const positions = waterGeometry.attributes.position;
   let elapsed = 0;
-  function update(dt, camera, oceanVisible = true) {
+  function update(dt, camera, oceanVisible = true, peopleVisible = true) {
     if (destroyed) return;
+    beachLife.update(dt, oceanVisible, peopleVisible);
     // Reconcile both directions with the visible page, including late model loading.
     const nightRequested = document.documentElement.dataset.theme === 'dark';
     if (Number(nightRequested) !== transitionTarget) setNight(nightRequested);
@@ -777,6 +782,7 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
     setNight, update,
     destroy() {
       destroyed = true;
+      beachLife.destroy();
       themeObserver.disconnect();
       if (transitionFrame !== null) cancelAnimationFrame(transitionFrame);
     }
@@ -885,6 +891,14 @@ async function createCityNeighborhood(THREE, scene) {
     box([.22, .015, 3.5], [94, -.005, z], marking);
   }
   for (let x = -10; x < 130; x += 9) box([3.5, .015, .22], [x, -.005, -95], marking);
+  // Raised sidewalks and curb edges separate pedestrian paths from traffic.
+  for (const x of [22.5, 38.5, 85, 102]) {
+    box([4.6, .08, 100], [x, .01, -20], pavement);
+    for (let z = -67; z < 27; z += 2.5) box([4.6, .006, .035], [x, .054, z], marking);
+  }
+  for (const x of [24.8, 35.2, 88.8, 99.2]) box([.16, .16, 108], [x, .03, -20], pavement);
+  // Crosswalks are visible at the front of the business district.
+  for (const x of [30, 94]) for (let z = 7.5; z < 12; z += .9) box([9.5, .018, .45], [x, -.002, z], marking);
 
   model.scene.traverse(object => object.geometry?.dispose());
   scene.add(city);
@@ -1141,6 +1155,7 @@ async function createBuildingTour(container, {
   const doorLeft = box(1.5, 3, .14, -.77, 1.5, 2.05, doorMat),
     doorRight = box(1.5, 3, .14, .77, 1.5, 2.05, doorMat);
   const roomDoors = [];
+  let mainDoorAmount = 0;
   function slidingRoomDoor(name, x, z, rotation, width = 5.1, height = 3.35) {
     const group = new THREE.Group();
     group.name = 'GlassDoor-' + name;
@@ -1313,6 +1328,8 @@ async function createBuildingTour(container, {
   plant(8, -80);
 
   let city = null;
+  let streetLife = null, traffic = null;
+  const aircraft = createCityAircraft(THREE, scene, reducedMotion);
   let cityLightLevel = 0;
   const localLights = [];
   function batchStaticMeshes() {
@@ -1323,7 +1340,7 @@ async function createBuildingTour(container, {
       if (!mesh.isMesh || mesh.isSkinnedMesh || excluded.has(mesh) || Array.isArray(mesh.material) || mesh.material.transparent) return;
       let ancestor = mesh;
       while (ancestor) {
-        if (ancestor.userData.dynamicDoor) return;
+        if (ancestor.userData.dynamicDoor || ancestor.userData.dynamicScene) return;
         if (ancestor === coastal.group || ancestor.name === 'OFOQCoast' || ancestor.name === 'OFOQCity' || ancestor.userData.mixer) return;
         ancestor = ancestor.parent;
       }
@@ -1475,12 +1492,7 @@ async function createBuildingTour(container, {
       camera.fov = fov;
       camera.updateProjectionMatrix();
     }
-    const open = smooth(Math.min(1, Math.max(0, (time - 8) / 3)));
-    if (Math.abs(doorLeft.position.x - (-.77 - 1.55 * open)) > .001) renderer.shadowMap.needsUpdate = true;
-    doorLeft.position.x = -.77 - 1.55 * open;
-    doorRight.position.x = .77 + 1.55 * open;
     document.documentElement.dataset.tourTime = time.toFixed(2);
-    document.documentElement.dataset.doorOpen = String(open > .95);
     if (!adminPreview) onRoomChange(roomAtTourTime(time));
   }
 
@@ -1531,7 +1543,17 @@ async function createBuildingTour(container, {
     } else if (Math.abs(targetTime - time) > .0001) {
       seek(reducedMotion ? targetTime : advanceTour(time, targetTime, dt, cameraSmoothness));
     }
-    let doorsChanged = false;
+    streetLife?.update(dt, camera, previewCity, previewPeople && !requestedNight);
+    traffic?.update(dt, camera, previewCity);
+    aircraft.update(dt, time < 17, previewCity);
+    const entranceTarget = Math.max(doorProximity(camera.position, { x: 0, z: 2.05, height: 3 }), streetLife?.entranceProximity() || 0);
+    const mainDoorNext = advanceDoor(mainDoorAmount, entranceTarget, dt, reducedMotion);
+    let doorsChanged = Math.abs(mainDoorNext - mainDoorAmount) > .0001;
+    mainDoorAmount = mainDoorNext;
+    doorLeft.position.x = -.77 - 1.55 * mainDoorAmount;
+    doorRight.position.x = .77 + 1.55 * mainDoorAmount;
+    document.documentElement.dataset.doorOpen = String(mainDoorAmount > .95);
+    document.documentElement.dataset.entranceDoorAmount = mainDoorAmount.toFixed(2);
     for (const door of roomDoors) {
       const target = doorProximity(camera.position, door);
       const amount = advanceDoor(door.amount, target, dt, reducedMotion);
@@ -1559,7 +1581,7 @@ async function createBuildingTour(container, {
       mixer.update(dt); activePeople++;
     });
     // Stop invisible ocean geometry updates after entering the building.
-    coastal.update(dt, camera, time < 7);
+    coastal.update(dt, camera, time < 7, previewPeople && !requestedNight);
     // Four nearby local lights keep illumination without evaluating eighteen per pixel.
     if (localLights.length) {
       const nearest = localLights.map(light => ({light, distance: camera.position.distanceToSquared(light.position)})).sort((a,b) => a.distance-b.distance).slice(0,4);
@@ -1593,12 +1615,13 @@ async function createBuildingTour(container, {
       scene.environment = env.texture;
       const loader = new GLTFLoader(),
         assetRoot = './assets/3d/';
-      const [buildings, office, boss, woman] = await Promise.all([
+      const [buildings, office, boss, woman, colleague] = await Promise.all([
         loader.loadAsync(assetRoot + 'building/low-poly-skyscrapers.glb'),
         loader.loadAsync(assetRoot + 'furniture/modern-office.glb'),
     
         loader.loadAsync(assetRoot + 'people/formal-boss.glb'),
-        loader.loadAsync(assetRoot + 'people/formal-businesswoman.glb')
+        loader.loadAsync(assetRoot + 'people/formal-businesswoman.glb'),
+        loader.loadAsync(new URL('../3D/business-male-4.glb', import.meta.url).href).catch(() => null)
       ]);
       if (disposed) return;
       // The source pack merges seven buildings by material. Separate them across the gaps in X.
@@ -1684,6 +1707,7 @@ async function createBuildingTour(container, {
         cityLightLevel = amount;
         if (typeof setOutdoorNight === 'function') setOutdoorNight(amount);
         city?.setNight(amount);
+        traffic?.setNight(amount);
       };
       coastal = await createCoastalEnvironment(THREE, scene, {
         renderer, sun, ambient, outdoor, reducedMotion
@@ -1783,6 +1807,7 @@ async function createBuildingTour(container, {
       document.documentElement.dataset.realisticPeople = String(people.length);
       document.documentElement.dataset.characterModels = '2';
       document.documentElement.dataset.furnitureModels = '1';
+      streetLife = createStreetLife(THREE, scene, { boss, woman, colleague, clone, reducedMotion });
     
     
     
@@ -1799,7 +1824,10 @@ async function createBuildingTour(container, {
   }
   // City assets are optional: loading them cannot interrupt the tour or sky.
   document.documentElement.dataset.cityStatus = 'loading';
-  createCityNeighborhood(THREE, scene).then(neighborhood => {
+  createModernCity(THREE, scene, new GLTFLoader()).catch(error => {
+    console.warn('OFOQ: modern city unavailable; loading the previous district.', error);
+    return createCityNeighborhood(THREE, scene);
+  }).then(neighborhood => {
     if (disposed) { neighborhood.destroy(); return; }
     city = neighborhood;
     scene.getObjectByName('OFOQCity').visible = previewCity;
@@ -1812,6 +1840,19 @@ async function createBuildingTour(container, {
   });
   document.documentElement.dataset.modelLoad = 'loading';
   loadModels();
+  aircraft.loadModel(new GLTFLoader()).catch(error => {
+    document.documentElement.dataset.aircraftSource = 'procedural-fallback';
+    console.warn('OFOQ: aircraft model unavailable; using the lightweight fallback.', error);
+  });
+  document.documentElement.dataset.trafficStatus = 'loading';
+  createCityTraffic(THREE, scene, { loader: new GLTFLoader(), mergeGeometries, reducedMotion }).then(result => {
+    if (disposed) { result.destroy(); return; }
+    traffic = result;
+    traffic.setNight(requestedNight ? 1 : cityLightLevel);
+  }).catch(error => {
+    if (!disposed) document.documentElement.dataset.trafficStatus = 'unavailable';
+    console.warn('OFOQ: the sedan asset could not be loaded.', error);
+  });
   return {
     configurePreview(config) {
       if (!adminPreview) return;
@@ -1834,6 +1875,7 @@ async function createBuildingTour(container, {
     },
     setNight: (night, immediate = false) => {
       requestedNight = night;
+      if (immediate || document.documentElement.dataset.modelLoad !== 'ready') traffic?.setNight(night ? 1 : 0);
       coastal.setNight(night, immediate);
     },
     move,
@@ -1850,6 +1892,9 @@ async function createBuildingTour(container, {
       removeEventListener('resize', resize);
       coastal.destroy?.();
       city?.destroy();
+      streetLife?.destroy();
+      traffic?.destroy();
+      aircraft.destroy();
       logoTexture.dispose();
       logoMaterials.forEach(material => { material.map?.dispose(); material.dispose(); });
       renderer.dispose();

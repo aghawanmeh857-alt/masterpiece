@@ -17,6 +17,8 @@ class Element {
   fire(name, event = {}) { for (const fn of this.listeners[name] || []) fn(event); }
   setAttribute(name, value) { this.attributes[name] = value; }
   querySelector() { return null; }
+  append() {}
+  after() {}
   focus() {}
   scrollIntoView() {}
   reset() {}
@@ -28,9 +30,10 @@ async function fixture(memory = new Map(), blocked = false) {
   elements.get('filterForm').reset = () => { for (const id of ['category', 'location', 'itemType', 'extra']) elements.get(id).value = ''; };
   let modalOpens = 0;
   const context = vm.createContext({
-    pageData, console,
+    pageData, console, URL,
+    location: {search: '', href: 'https://ofoq.example/Internships/internships.html'},
     window: {componentsReady: Promise.resolve(), OfoqPublishers: {card: () => '', forRecord: () => ({})}},
-    document: {getElementById: id => elements.get(id), createElement: () => new Element()},
+    document: {getElementById: id => elements.get(id), createElement: () => new Element(), documentElement: {dataset: {theme: 'light'}}},
     localStorage: {
       getItem(key) { if (blocked) throw Error('blocked'); return memory.get(key) || null; },
       setItem(key, value) { if (blocked) throw Error('blocked'); memory.set(key, value); }

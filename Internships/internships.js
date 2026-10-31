@@ -217,6 +217,29 @@ const pageData = {
 (async function () {
 // أدوات بسيطة مشتركة لصفحات التدريب والوظائف والفعاليات.
 async function startListings() {
+  const cartKey = 'ofoq-internship-cart-v1';
+  let internshipCart = [];
+  const readCart = () => {
+    try { const value = JSON.parse(localStorage.getItem(cartKey) || '[]'); internshipCart = Array.isArray(value) ? value.filter(item => item && typeof item.id === 'string') : []; } catch { internshipCart = []; }
+  };
+  readCart();
+  const cartShortcut = document.createElement('a');
+  cartShortcut.className = 'internship-cart-shortcut';
+  cartShortcut.href = '../Academy/Cart/cart.html' + location.search;
+  const cartCount = document.createElement('span');
+  cartShortcut.append('عرض السلة ', cartCount);
+  document.getElementById('savedShortcut').after(cartShortcut);
+  function updateCartCount() {
+    let courseCount = 0;
+    try {
+      const learning = JSON.parse(localStorage.getItem('ofoq-learning-v1') || '{}');
+      if (Array.isArray(learning?.cart)) courseCount = new Set(learning.cart).size;
+    } catch {}
+    const count = internshipCart.length + courseCount;
+    cartCount.textContent = count;
+    cartShortcut.setAttribute('aria-label', 'عرض سلة المشتريات، ' + count + ' عناصر');
+  }
+  updateCartCount();
   if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
   await window.componentsReady;
 
@@ -317,6 +340,7 @@ async function startListings() {
         </div>
         <div class="listing-offer">
           <strong>${safeText(item.offer)}</strong>
+          <button type="button" class="internship-cart-button" data-cart-id="${safeText(item.id)}" aria-pressed="${internshipCart.some(entry => entry.id === item.id)}" aria-label="إضافة إلى السلة: ${safeText(item.title)}">${internshipCart.some(entry => entry.id === item.id) ? '✓ في السلة · عرض السلة' : 'إضافة إلى السلة'}</button>
           <button type="button" class="btn btn-orange" aria-label="عرض ${safeText(item.title)}">${pageData.action} ↗</button>
           <a class="details-link" href="${detailUrl}">التفاصيل الكاملة ←</a>
         </div>
@@ -350,6 +374,26 @@ async function startListings() {
   }
 
   get('itemList').addEventListener('click', event => {
+    const cartButton = event.target.closest('button[data-cart-id]');
+    if (cartButton) {
+      const item = pageData.items.find(item => item.id === cartButton.dataset.cartId);
+      if (!item) return;
+      if (internshipCart.some(entry => entry.id === item.id)) {
+        const url = new URL('../Academy/Cart/cart.html', location.href);
+        url.searchParams.set('theme', document.documentElement.dataset.theme || 'light');
+        location.assign(url.href);
+        return;
+      }
+      const next = [...internshipCart, {id: item.id, title: item.title, company: item.company}];
+      try { localStorage.setItem(cartKey, JSON.stringify(next)); }
+      catch { get('savedNotice').hidden = false; get('savedNotice').textContent = 'تعذّر حفظ الفرصة في السلة. يرجى السماح بالتخزين في المتصفح والمحاولة مجددًا.'; return; }
+      internshipCart = next;
+      updateCartCount();
+      cartButton.textContent = '✓ في السلة · عرض السلة';
+      cartButton.setAttribute('aria-pressed', 'true');
+      cartButton.setAttribute('aria-label', 'عرض السلة: ' + item.title);
+      return;
+    }
     const saveButton = event.target.closest('button[data-save-id]');
     if (saveButton) {
       const id = saveButton.dataset.saveId;
@@ -386,7 +430,8 @@ async function startListings() {
     savedOnly = true; renderItems();
     get('internshipResults').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   });
-  addEventListener('pageshow', () => { readSaved(); renderItems(); });
+  addEventListener('pageshow', () => { readCart(); updateCartCount(); readSaved(); renderItems(); });
+  addEventListener('storage', event => { if ([cartKey, 'ofoq-learning-v1', null].includes(event.key)) { readCart(); updateCartCount(); renderItems(); } });
   addEventListener('storage', event => { if (event.key === savedKey) { readSaved(); renderItems(); } });
 
   get('previewForm').addEventListener('submit', event => {

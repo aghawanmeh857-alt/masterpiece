@@ -2,6 +2,26 @@
 (() => {
   const sharedScript = [...document.scripts].find(script => script.src.endsWith('/assets/arabic-ui.js'));
   if (sharedScript) {
+    const cartUrl = new URL('../Academy/Cart/cart.html', sharedScript.src);
+    document.querySelectorAll('.header-actions').forEach(actions => {
+      if (actions.closest('.hero-navbar')) return;
+      if (actions.querySelector('.shopping-cart-link')) return;
+      const link = document.createElement('a');
+      link.className = 'shopping-cart-link';
+      link.href = cartUrl.href;
+      link.setAttribute('aria-label', 'سلة المشتريات');
+      link.title = 'سلة المشتريات';
+      link.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h2l2.4 12h11.2l2-8H6"/><path d="M8 15l-1 3h12"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg><span>السلة</span>';
+      const syncCartTheme = () => {
+        const url = new URL(cartUrl.href);
+        url.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
+        link.href = url.href;
+      };
+      syncCartTheme();
+      link.addEventListener('click', syncCartTheme);
+      if (location.pathname === cartUrl.pathname) link.setAttribute('aria-current', 'page');
+      actions.prepend(link);
+    });
     const companyUrl = new URL('../company/dashboard.html', sharedScript.src);
     companyUrl.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
     document.querySelectorAll('.account-menu-links').forEach(menu => {

@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -88,7 +72,7 @@ window.componentsReady.then(() => {
 }).catch(() => {});
 
 if (document.body.dataset.page === 'messages') {
-  const conversations = [
+  const conversations = window.OfoqFrontend.conversations || [
     { name: 'لينا حداد', role: 'مصممة · محادثة توضيحية', messages: [
       { mine: false, text: 'مرحبًا! ما المساعدة التي تحتاجها في التصميم؟' },
       { mine: true, text: 'أعمل على فكرة تطبيق تعليمي وأحتاج إلى مساعدة في تصميم الواجهات.' }
@@ -97,6 +81,7 @@ if (document.body.dataset.page === 'messages') {
       { mine: false, text: 'مرحبًا! هل لديك نبذة عن فكرة الموقع؟' }
     ] }
   ];
+  window.OfoqFrontend.conversations = conversations;
   let selected = 0;
   const recipientId = new URLSearchParams(location.search).get('recipient');
   const recipient = window.OfoqPublishers.get(recipientId);
@@ -127,7 +112,8 @@ if (document.body.dataset.page === 'messages') {
     name.textContent = conversation.name;
     const role = document.createElement('small');
     role.textContent = conversation.role;
-    text.append(name, role);
+    const preview=document.createElement('span');preview.className='conversation-preview';preview.textContent=conversation.messages.at(-1)?.text||'ابدأ الحوار';
+    text.append(name, role,preview);
     button.append(image, text);
     list.append(button);
   });
@@ -145,6 +131,7 @@ if (document.body.dataset.page === 'messages') {
     get('startMeeting').href = window.siteThemeUrl(meetingUrl.href);
     get('startMeeting').setAttribute('aria-label', 'بدء اجتماع فيديو مع ' + account.name);
     get('startMeeting').title = 'بدء اجتماع فيديو مع ' + account.name;
+    list.querySelectorAll('[data-conversation]').forEach(button=>{const row=conversations[Number(button.dataset.conversation)];button.querySelector('.conversation-preview').textContent=row.messages.at(-1)?.text||'ابدأ الحوار';});
     get('chatMessages').replaceChildren();
     if (!conversation.messages.length) {
       const empty = document.createElement('div');
@@ -162,7 +149,7 @@ if (document.body.dataset.page === 'messages') {
       bubble.className = message.mine ? 'chat-bubble mine' : 'chat-bubble';
       bubble.textContent = message.text;
       bubble.dir = 'auto';
-      get('chatMessages').append(bubble);
+      const row=document.createElement('div');row.className=message.mine?'chat-message-row mine':'chat-message-row';const sender=document.createElement('small');sender.className='chat-message-sender';sender.textContent=message.mine?'أنت':conversation.name;row.append(sender,bubble);get('chatMessages').append(row);
     });
     get('chatMessages').scrollTop = get('chatMessages').scrollHeight;
     document.querySelectorAll('[data-conversation]').forEach(button => {
@@ -192,6 +179,16 @@ if (document.body.dataset.page === 'messages') {
   });
 
   get('messageInput').addEventListener('input', event => event.target.setCustomValidity(''));
+  get('messageForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const text = get('messageInput').value.trim();
+    get('messageInput').setCustomValidity(text ? '' : 'اكتب رسالة أولًا.');
+    if (!get('messageForm').reportValidity()) return;
+    conversations[selected].messages.push({ mine: true, text });
+    showConversation();
+    get('messageStatus').textContent = 'أُضيفت رسالتك إلى المحادثة خلال هذه الزيارة. لا تُرسل إلى طرف آخر.';
+    get('messageInput').focus();
+  });
   showConversation();
 }
 

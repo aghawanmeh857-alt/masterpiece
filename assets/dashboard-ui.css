@@ -1,0 +1,55 @@
+/* Shared SAEI management layout; each dashboard keeps its own actions. */
+body:is([data-section=company],[data-dashboard=admin]) .sidebar{padding:22px 16px;border-inline-end:1px solid var(--field-border)}
+body:is([data-section=company],[data-dashboard=admin]) #navigation{display:flex;flex-direction:column;gap:5px}
+body:is([data-section=company],[data-dashboard=admin]) #navigation button{min-height:43px;padding:11px 13px;border-radius:10px;font-size:12px;font-weight:500;text-align:start}
+body:is([data-section=company],[data-dashboard=admin]) #navigation button[aria-current=page]{background:#ff783d12;color:var(--accent-text);box-shadow:inset -3px 0 #ff783d}
+body:is([data-section=company],[data-dashboard=admin]) .topbar{min-height:72px;border-bottom:1px solid var(--field-border)}
+body:is([data-section=company],[data-dashboard=admin]) #main{padding:28px;max-width:1500px;width:100%;margin-inline:auto}
+body:is([data-section=company],[data-dashboard=admin]) .page-heading h1{font-size:29px;line-height:1.6;margin-bottom:8px}
+body:is([data-section=company],[data-dashboard=admin]) .page-heading p{font-size:13px;line-height:1.8}
+body:is([data-section=company],[data-dashboard=admin]) :is(.panel,.stat){border:1px solid var(--field-border);border-radius:16px;background:var(--surface);box-shadow:none}
+body:is([data-section=company],[data-dashboard=admin]) :is(.panel,.stat) h2{font-size:18px;line-height:1.7}
+body:is([data-section=company],[data-dashboard=admin]) :is(.primary,.secondary,.text-button){font-size:12px;border-radius:9px;min-height:36px;padding:8px 13px}
+body:is([data-section=company],[data-dashboard=admin]) :is(.primary,.secondary):focus-visible{outline:2px solid #ff783d;outline-offset:3px}
+body:is([data-section=company],[data-dashboard=admin]) [hidden]{display:none!important}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-file-link{display:inline-block;margin:6px 5px;padding:6px 10px;border:1px solid var(--field-border);border-radius:7px;background:var(--surface);color:var(--accent-text);font-size:11px;text-decoration:none}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields{padding:20px;border-radius:12px}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields legend{font-size:15px}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid var(--field-border)}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind]>.form-row{grid-column:1/-1}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind]>label:has(textarea){grid-column:1/-1}
+body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind]>label{margin:0;min-width:0}
+body:is([data-section=company],[data-dashboard=admin]) dialog{width:min(900px,calc(100% - 32px));padding:26px;max-height:90dvh;overflow-y:auto;border:1px solid var(--field-border);border-radius:18px;background:var(--surface);color:var(--text-main);box-shadow:0 20px 80px #0004}
+body:is([data-section=company],[data-dashboard=admin]) dialog::backdrop{background:#081322b0;backdrop-filter:blur(3px)}
+body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading h2{font-size:21px;line-height:1.7}
+body:is([data-section=company],[data-dashboard=admin]) dialog :is(label,input,textarea,select){font-size:13px}
+body:is([data-section=company],[data-dashboard=admin]) dialog :is(input,select,textarea){width:100%;min-width:0;padding:11px 12px;border:1px solid var(--field-border);border-radius:9px;background:var(--field-bg);color:var(--text-main);margin-top:7px;font-family:inherit}
+body:is([data-section=company],[data-dashboard=admin]) dialog input[type=checkbox]{width:auto}
+body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-actions{display:flex;justify-content:flex-end;gap:10px;padding-top:18px;border-top:1px solid var(--field-border);margin-top:20px}
+body:is([data-section=company],[data-dashboard=admin]) dialog .form-error:empty{display:none}
+body[data-section=company] .company-opportunity-toolbar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 0 22px}
+.company-opportunity-toolbar h2{font-size:20px;margin:0 0 8px}.company-opportunity-toolbar p{font-size:12px;color:var(--text-muted);margin:0}
+body[data-section=company] .page-heading .eyebrow,body[data-section=company] #today,body[data-section=company] #companyOpportunityTitle{display:none}
+body[data-section=company] #pageDescription{max-width:600px;font-size:12px}
+body[data-section=company] .company-opportunity-toolbar{margin-top:8px;margin-bottom:18px}
+body[data-section=company] #companyOpportunitySummary:empty{display:none}
+body[data-section=company] .company-profile-preview{display:none}
+body[data-section=company] #profileView .settings-grid{grid-template-columns:minmax(0,1fr)}
+body[data-dashboard=admin] .page-heading .heading-actions:has(#addButton[hidden]){display:none}
+body[data-section=company] .company-empty{padding:28px 20px;border-style:solid;font-size:12px;background:var(--surface)}
+.company-opportunity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
+body[data-section=company] .company-opportunity-card{display:flex;flex-direction:column;gap:16px;padding:22px;min-width:0}
+.company-opportunity-card>.company-label{align-self:flex-start;font-size:10px;padding:4px 8px}
+.company-opportunity-card h3{font-size:17px;font-weight:700;line-height:1.8;margin:0}
+.company-opportunity-card>p{font-size:12px;line-height:1.9;color:var(--text-muted);margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.company-opportunity-card dl{display:grid;gap:9px;margin:0;padding:14px;border:1px solid var(--field-border);border-radius:10px;background:var(--field-bg)}
+.company-opportunity-card dl>div{display:flex;justify-content:space-between;gap:14px;font-size:11px}.company-opportunity-card dt{color:var(--text-muted);font-weight:400}.company-opportunity-card dd{margin:0;font-weight:500;text-align:end;overflow-wrap:anywhere}
+.company-opportunity-card>.row-actions{margin-top:auto;padding-top:16px;border-top:1px solid var(--field-border);display:flex;flex-wrap:wrap;gap:8px}
+.company-opportunity-card>.row-actions button{flex:1}
+.company-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}
+.company-editor-grid label{min-width:0;margin:0}.company-field-wide{grid-column:1/-1}
+.company-empty{grid-column:1/-1;padding:40px 24px;text-align:center;border:1px dashed var(--field-border);border-radius:14px;background:var(--field-bg);color:var(--text-muted);font-size:13px;line-height:1.9}
+.company-applicant-list{display:grid;gap:16px}.company-applicant-card{display:flex;justify-content:space-between;gap:20px;padding:22px;align-items:center}.company-applicant-card h3{font-size:16px;margin:0 0 8px}.company-applicant-card p{font-size:12px;line-height:1.8;color:var(--text-muted)}
+body[data-dashboard=admin] .row-actions{gap:7px;flex-wrap:wrap}body[data-dashboard=admin] table td{vertical-align:top;padding-block:18px}
+@media(max-width:900px){body:is([data-section=company],[data-dashboard=admin]) #main{padding:20px}body:is([data-section=company],[data-dashboard=admin]) .sidebar{border-inline-end:0}.company-applicant-card{flex-direction:column;align-items:stretch}}
+@media(max-width:600px){body:is([data-section=company],[data-dashboard=admin]) #main{padding:18px 14px}body:is([data-section=company],[data-dashboard=admin]) dialog{padding:18px 16px}body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind],.company-editor-grid{grid-template-columns:minmax(0,1fr)}body:is([data-section=company],[data-dashboard=admin]) .publisher-fields{padding:16px}.company-opportunity-toolbar{flex-direction:column;align-items:stretch}.company-opportunity-grid{grid-template-columns:minmax(0,1fr)}}

@@ -1,3 +1,4 @@
+import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js';
 // المشهد ثلاثي الأبعاد يحتاج Three.js. بقية الشاشات لا تستخدم مكتبات.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -56,7 +57,7 @@ const rooms = [{
   action: 'ابدأ رحلتك',
   tags: ['تعلّم', 'تواصل', 'انطلق'],
   cards: [
-    ['مساحتك للعمل', 'تعرّف على غرف OFOQ الست واختر المسار المناسب لك.'],
+    ['مساحتك للعمل', 'تعرّف على غرف SAEI الست واختر المسار المناسب لك.'],
     ['مجتمع الطموح', 'تواصل مع أشخاص يشاركونك رحلة التطور.'],
     ['خطوتك القادمة', 'استكشف التعلّم والفرص المهنية في مكان واحد.']
   ]
@@ -135,21 +136,68 @@ const reducedMotion = matchMedia(
 
 let currentRoom = -1;
 let sceneApi = null;
+let renderedTourTime = 0;
+const receptionTime = 19;
 
 
 const chapters = [...document.querySelectorAll('.chapter')];
 const buttons = [...document.querySelectorAll('[data-room]')];
+const readingStops = chapters.map((chapter, index) => {
+  const data = ROOM_SECTIONS[index];
+  const article = document.createElement('article'); article.className = 'station-content';
+  const label = document.createElement('p'); label.className = 'station-label'; label.textContent = String(index + 1).padStart(2, '0') + ' / ' + rooms[index].name;
+  const title = document.createElement(index === 0 ? 'h1' : 'h2'); title.className = 'station-title'; title.innerHTML = data.title;
+  const description = document.createElement('p'); description.className = 'station-description'; description.textContent = data.description;
+  const services = document.createElement('div'); services.className = 'room-sections'; renderRoomSections(services, index, window.siteThemeUrl);
+  const action = document.createElement('a'); action.className = 'btn btn-orange station-action';
+  const destinations = ['../Auth/Register/register.html','../Freelance/freelance.html','../Academy/academy.html','../Internships/internships.html','../Jobs/jobs.html','../Events/events.html'];
+  action.href = window.siteThemeUrl(destinations[index]); action.textContent = index === 0 ? 'إنشاء حساب ←' : rooms[index].action + ' ←';
+  const hint = document.createElement('p'); hint.className = 'station-scroll-hint'; hint.textContent = index === 5 ? 'تابع التمرير للوصول إلى ختام الجولة ↓' : 'تابع التمرير للانتقال إلى القسم التالي ↓';
+  article.append(label, title, description, services, action, hint); chapter.append(article);
+  return { chapter, article, reading: 0, travel: 0 };
+});
+function refreshReadingPanels() {
+  readingStops.forEach((stop, index) => {
+    const local = scrollY - stop.chapter.offsetTop;
+    const readingLocal = local - (stop.opening || 0);
+    const active = index === currentRoom && readingLocal >= -20 && readingLocal < stop.reading && (index !== 0 || renderedTourTime >= receptionTime - .5);
+    const fadeDistance = Math.max(1, Math.min(180, stop.reading * .3));
+    const remaining = Math.max(0, Math.min(1, (stop.reading - readingLocal) / fadeDistance));
+    const opacity = remaining * remaining * (3 - 2 * remaining);
+    stop.article.style.setProperty('--station-opacity', String(opacity));
+    stop.article.classList.toggle('station-active', active);
+    stop.article.inert = !active || opacity < .15;
+    stop.article.setAttribute('aria-hidden', String(!active || opacity < .15));
+    const overflow = Math.max(0, stop.article.offsetHeight - (innerHeight - 210));
+    stop.article.style.setProperty('--reading-offset', Math.min(Math.max(readingLocal, 0), overflow) + 'px');
+  });
+}
+function measureReadingStops() {
+  readingStops.forEach((stop, index) => {
+    stop.opening = index === 0 ? innerHeight * 1.8 : 0;
+    stop.reading = Math.max(innerHeight * .65, stop.article.offsetHeight - innerHeight + 380);
+    stop.travel = index === 5 ? innerHeight * .35 : innerHeight * 1.15;
+    stop.chapter.style.setProperty('--station-height', (stop.opening + stop.reading + stop.travel) + 'px');
+  });
+}
+measureReadingStops();
+new ResizeObserver(() => { measureReadingStops(); progressAtScroll(); }).observe(document.querySelector('.station-content'));
+document.fonts.ready.then(() => { measureReadingStops(); progressAtScroll(); });
+
 
 // تحديث واجهة القسم الحالي.
 function setRoom(index) {
   if (currentRoom === index) return;
 
   currentRoom = index;
+  refreshReadingPanels();
 
   const room = rooms[index];
+  const section = ROOM_SECTIONS[index];
 
-  $('headline').innerHTML = room.title;
-  $('description').textContent = room.description;
+  $('headline').innerHTML = section.title;
+  $('description').textContent = section.description;
+  renderRoomSections($('roomSections'), index, window.siteThemeUrl);
 
   $('roomLabel').textContent =
     `${String(index + 1).padStart(2, '0')} / ${room.name}`;
@@ -233,7 +281,7 @@ $('exploreModal').addEventListener('show.bs.modal', () => {
   const room = rooms[Math.max(currentRoom, 0)];
 
   $('modalTitle').textContent =
-    currentRoom === 0 ? 'مساحات OFOQ' : room.action;
+    currentRoom === 0 ? 'مساحات SAEI' : room.action;
 
   $('modalIntro').textContent = room.description;
 
@@ -275,6 +323,7 @@ $('exploreModal').addEventListener('show.bs.modal', () => {
 
 const mobileTour = matchMedia('(max-width: 767px)');
 const tourStory = document.querySelector('.story');
+tourStory.hidden = true;
 const tourFooter = document.querySelector('.tour-footer');
 const tourCaption = document.querySelector('.scene-caption');
 const tourEnd = document.getElementById('journeyEnd');
@@ -317,17 +366,27 @@ function progressAtScroll() {
   tourEnd.inert = !tourEndVisible;
   tourEnd.setAttribute('aria-hidden', String(!tourEndVisible));
   syncMobileTourOverlay();
+  refreshReadingPanels();
   if (adminPreview) return;
-  const stop = chapters[5].offsetTop,
-    raw = Math.min(5, Math.max(0, scrollY / stop * 5));
+  let index = 0;
+  for (let i = 1; i < readingStops.length; i++) if (scrollY >= readingStops[i].chapter.offsetTop) index = i;
+  const stop = readingStops[index];
+  const local = scrollY - stop.chapter.offsetTop;
+  const travel = Math.max(0, Math.min(1, (local - stop.opening - stop.reading) / stop.travel));
+  const raw = index === 5 ? 5 : index + (travel === 0 ? 0 : .12 + .76 * travel);
   if (!sceneApi) setRoom(Math.min(5, Math.floor(raw + .12)));
   $('progress').style.width = raw / 5 * 100 + '%';
-  sceneApi?.move(raw);
+  if (index === 0) {
+    const approach = Math.max(0, Math.min(1, local / stop.opening));
+    const eased = approach * approach * (3 - 2 * approach);
+    const journeyTime = local < stop.opening ? receptionTime * eased : receptionTime + (TOUR_STOPS[1] - receptionTime) * travel * travel * (3 - 2 * travel);
+    sceneApi?.moveToTime(journeyTime);
+  } else sceneApi?.move(raw);
 }
 addEventListener('scroll', progressAtScroll, {
   passive: true
 });
-addEventListener('resize', progressAtScroll);
+addEventListener('resize', () => { measureReadingStops(); progressAtScroll(); });
 
 function restoreRoom() {
   const index = rooms.findIndex(r => location.hash === '#' + r.id);
@@ -345,7 +404,8 @@ async function initScene() {
 
   sceneApi = await createBuildingTour($('scene'), {
     reducedMotion,
-    onRoomChange: setRoom
+    onRoomChange: setRoom,
+    onTourProgress: value => { renderedTourTime = value; refreshReadingPanels(); }
   });
   document.documentElement.dataset.sceneReady = 'true';
   function setTimeOfDay(night, immediate = false) {
@@ -360,7 +420,7 @@ async function initScene() {
   $('nightMode').disabled = false;
   $('dayMode').addEventListener('click', () => setTimeOfDay(false));
   $('nightMode').addEventListener('click', () => setTimeOfDay(true));
-  $('status').textContent = 'مرحبًا بك في OFOQ';
+  $('status').textContent = 'مرحبًا بك في SAEI';
   restoreRoom();
   if (adminPreview) {
     addEventListener('message', event => {
@@ -371,7 +431,7 @@ async function initScene() {
   }
 }
 initScene().catch(error => {
-  console.error('OFOQ 3D:', error);
+  console.error('SAEI 3D:', error);
   document.body.classList.add('fallback');
   document.querySelector('.theme-toggle').disabled = false;
   document.querySelector('.day-night-controls').hidden = true;
@@ -986,7 +1046,8 @@ async function createCityNeighborhood(THREE, scene) {
 // 6. بناء المشهد وحركة الكاميرا والأداء.
 async function createBuildingTour(container, {
   reducedMotion = false,
-  onRoomChange = () => {}
+  onRoomChange = () => {},
+  onTourProgress = () => {}
 } = {}) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#c9dce9');
@@ -1100,25 +1161,63 @@ async function createBuildingTour(container, {
   }
 
   const logoMaterials = [];
-  const logoTexture = new THREE.TextureLoader().load(new URL('../assets/branding/ofoq-logo.png?v=ofoq-11', import.meta.url).href,
+  let indoorLogoTexture;
+  const logoTexture = new THREE.TextureLoader().load(new URL('../assets/branding/saei-logo.png', import.meta.url).href,
     texture => {
       if (disposed) { texture.dispose(); return; }
-      // Keep precisely the approved artwork; trim only its presentation whitespace.
+      const indoorFace = document.createElement('canvas');
+      indoorFace.width = texture.image.width; indoorFace.height = texture.image.height;
+      const indoorContext = indoorFace.getContext('2d');
+      indoorContext.fillStyle = '#ffffff';
+      indoorContext.fillRect(0, 0, indoorFace.width, indoorFace.height);
+      indoorContext.drawImage(texture.image, indoorFace.width * .04, indoorFace.height * .04, indoorFace.width * .92, indoorFace.height * .92);
+      indoorLogoTexture = new THREE.CanvasTexture(indoorFace);
+      indoorLogoTexture.colorSpace = THREE.SRGBColorSpace;
+      indoorLogoTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      // White lettering and orange steps on a transparent face blend into the facade.
+      const face = document.createElement('canvas');
+      face.width = texture.image.width; face.height = texture.image.height;
+      const context = face.getContext('2d');
+      context.drawImage(texture.image, face.width * .025, face.height * .025, face.width * .95, face.height * .95);
+      const pixels = context.getImageData(0, 0, face.width, face.height);
+      for (let i = 0; i < pixels.data.length; i += 4) {
+        if (!pixels.data[i + 3]) continue;
+        // Preserve the orange brand mark, recolor the dark wordmark for glass facades.
+        if (pixels.data[i] < 100 && pixels.data[i + 1] < 120 && pixels.data[i + 2] < 145) {
+          pixels.data[i] = 245; pixels.data[i + 1] = 248; pixels.data[i + 2] = 255;
+        }
+      }
+      context.putImageData(pixels, 0, 0);
+      texture.image = face;
       texture.colorSpace = THREE.SRGBColorSpace;
-      texture.repeat.set(740 / 1254, 770 / 1254);
-      texture.offset.set(260 / 1254, (1254 - 245 - 770) / 1254);
-      logoMaterials.forEach(material => { material.map = texture; material.needsUpdate = true; });
-    }, undefined, error => console.warn('OFOQ: logo image unavailable.', error));
-  function logo(width, x, y, z) {
-    const c = document.createElement('canvas'); c.width = 740; c.height = 770;
+      texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      texture.repeat.set(1, 1);
+      texture.offset.set(0, 0);
+      texture.needsUpdate = true;
+      logoMaterials.forEach(material => { const map = material.userData.television ? indoorLogoTexture : texture; material.userData.dayMap = map; const off = requestedNight && material.userData.television; material.map = off ? null : map; material.color.set(off ? '#05070b' : '#ffffff'); material.needsUpdate = true; });
+    }, undefined, error => console.warn('SAEI: logo image unavailable.', error));
+  function logo(width, x, y, z, television = false) {
+    const c = document.createElement('canvas'); c.width = 740; c.height = 296;
     const ctx = c.getContext('2d');
-    ctx.fillStyle = '#fffdf9'; ctx.fillRect(0, 0, 740, 770);
-    ctx.fillStyle = '#111e30'; ctx.textAlign = 'center'; ctx.font = 'bold 130px Arial';
-    ctx.fillText('OFOQ', 370, 430);
+    if (television) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height); }
+    ctx.fillStyle = television ? '#111e30' : '#f5f8ff'; ctx.textAlign = 'center'; ctx.font = 'bold 80px Arial';
+    ctx.fillText('SAEI', 370, 175);
     const fallback = new THREE.CanvasTexture(c); fallback.colorSpace = THREE.SRGBColorSpace;
-    const material = new THREE.MeshBasicMaterial({map: fallback});
+    const material = new THREE.MeshBasicMaterial({map: fallback, transparent: true, alphaTest: .05});
+    material.toneMapped = false;
+    material.userData.dayMap = fallback;
+    material.userData.television = television;
     logoMaterials.push(material);
-    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(width, width * 770 / 740), material);
+    const screenHeight = width * .39990;
+    if (television) {
+    box(width + .16, screenHeight + .18, .14, x, y, z - .08, mat('#111821'));
+    box(width + .04, .025, .025, x, y - screenHeight / 2 - .055, z + .005, mat('#303a48'));
+    const indicatorMaterial = new THREE.MeshBasicMaterial({color:'#63d8b1',toneMapped:false});
+    const indicator = new THREE.Mesh(new THREE.SphereGeometry(.015,8,6), indicatorMaterial);
+    indicator.position.set(x + width / 2 - .05, y - screenHeight / 2 - .055, z + .022);scene.add(indicator);
+    material.userData.indicator = indicatorMaterial;
+    }
+    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(width, width * 0.39990), material);
     plaque.position.set(x, y, z); scene.add(plaque);
   }
 
@@ -1182,7 +1281,7 @@ async function createBuildingTour(container, {
   box(20, .2, 20, 0, .02, 10, mat('#b4b8bd'));
   box(5, .04, 20, 0, .15, 10, mat('#d8d6cd'));
   // Enclosed podium and a slender, closed skyscraper facade above its entrance.
-  logo(6, 0, 55.5, 2.25);
+  logo(11.5, 0, 43, 2.3);
   const skylineFallback = [];
   for (const [x, z, h] of [
       [60, -75, 27],
@@ -1200,7 +1299,7 @@ async function createBuildingTour(container, {
   box(8.35, 4.8, .3, -5.8, 2.4, 2, glass);
   box(8.35, 4.8, .3, 5.8, 2.4, 2, glass);
   box(3.3, 1.35, .45, 0, 4.15, 2, navy);
-  logo(1.4, 0, 4.05, 2.25);
+  logo(2.1, 0, 4.05, 2.3);
   box(4.7, .18, 3.1, 0, 3.15, 3.3, steel);
   box(3.2, .08, .16, 0, 3.03, 4.85, lightMat);
   const doorMat = new THREE.MeshStandardMaterial({
@@ -1254,10 +1353,10 @@ async function createBuildingTour(container, {
   // Lobby: reception, waiting lounge and a clear passage into the corridor.
   box(3.6, 1.1, 1.2, 5, .55, -8, wood);
   box(3.5, .2, .05, 5, .86, -7.37, orange);
-  person(5, -9.05, {
+  const receptionist = person(5, -9.05, {
     color: '#344d7a'
   });
-  logo(3, 5, 2.8, -12);
+  logo(3, 5, 2.8, -12, true);
   plant(-7, -4);
   plant(8, -4);
   for (let z of [-5, -8]) {
@@ -1369,7 +1468,7 @@ async function createBuildingTour(container, {
   slidingRoomDoor('الفعاليات', 0, -70.8, 0, 4.5);
   box(15, .35, 3.5, 0, .2, -80, wood);
   box(8, 2.5, .15, 0, 2.9, -82.72, navy);
-  sign('فعاليات أفق', 7.2, 1, 0, 3.1, -82.59, {
+  sign('فعاليات سعي', 7.2, 1, 0, 3.1, -82.59, {
     color: '#ff783d',
     size: 85
   });
@@ -1434,7 +1533,37 @@ async function createBuildingTour(container, {
     document.documentElement.dataset.batchedMeshes = String(saved);
   }
   let env = null;
-  let requestedNight = false;
+  let requestedNight = document.documentElement.dataset.theme === 'dark';
+  let screenBrightness = requestedNight ? 0 : 1;
+  const employeeExits = new Map();
+  function restoreEmployees() {
+    employeeExits.clear();
+    people.forEach(holder => {
+      const home = holder.userData.home;
+      if (!home) return;
+      holder.position.copy(home.position); holder.rotation.y = home.rotation;
+      holder.scale.setScalar(1);
+      holder.userData.fadeMaterials?.forEach(({ material, opacity, transparent, depthWrite }) => {
+        material.opacity = opacity; material.transparent = transparent; material.depthWrite = depthWrite; material.needsUpdate = true;
+      });
+      holder.userData.mixer?.stopAllAction();
+      holder.userData.restAction?.reset().setEffectiveWeight(1).play();
+      if (holder.children[0] && home.modelPosition) holder.children[0].position.copy(home.modelPosition);
+    });
+  }
+  function beginEmployeeExits() {
+    restoreEmployees();
+    people.forEach((holder, index) => {
+      const direction = Math.abs(holder.position.x) > 1 ? -Math.sign(holder.position.x) : 0;
+      const target = holder.position.clone().add(new THREE.Vector3(direction * 2.4, 0, direction ? 0 : 2.4));
+      employeeExits.set(holder, { delay: (index % 5) * .45, points: [target], started: false, elapsed: 0 });
+    });
+  }
+  function employeeDoorProximity(door) {
+    let proximity = 0;
+    employeeExits.forEach((_, holder) => { proximity = Math.max(proximity, doorProximity(holder.position, door)); });
+    return proximity;
+  }
   let coastal = {
     update() {},
     setNight(night) {
@@ -1556,7 +1685,7 @@ async function createBuildingTour(container, {
       camera.updateProjectionMatrix();
     }
     document.documentElement.dataset.tourTime = time.toFixed(2);
-    if (!adminPreview) onRoomChange(roomAtTourTime(time));
+    if (!adminPreview) { onRoomChange(roomAtTourTime(time)); onTourProgress(time); }
   }
 
   function move(raw) {
@@ -1606,10 +1735,42 @@ async function createBuildingTour(container, {
     } else if (Math.abs(targetTime - time) > .0001) {
       seek(reducedMotion ? targetTime : advanceTour(time, targetTime, dt, cameraSmoothness));
     }
+    screenBrightness = THREE.MathUtils.damp(screenBrightness, requestedNight ? 0 : 1, 3.5, dt);
+    logoMaterials.forEach(material => {
+      if (!material.userData.television) return;
+      const off = screenBrightness < .008;
+      const map = off ? null : material.userData.dayMap;
+      if (material.map !== map) { material.map = map; material.needsUpdate = true; }
+      material.color.setScalar(off ? .002 : screenBrightness);
+      material.userData.indicator?.color.set(off ? '#d15a43' : '#63d8b1');
+    });
+    employeeExits.forEach((exit, holder) => {
+      exit.delay -= dt;
+      if (exit.delay > 0) return;
+      if (!exit.started) {
+        exit.started = true;
+        holder.userData.mixer?.stopAllAction();
+        (holder.userData.walkAction || holder.userData.idleAction)?.reset().fadeIn(.4).play();
+        if (holder.children[0] && holder.userData.standingPosition) holder.children[0].position.copy(holder.userData.standingPosition);
+      }
+      exit.elapsed += dt;
+      const target = exit.points[0];
+      const dx = target.x - holder.position.x, dz = target.z - holder.position.z;
+      const distance = Math.hypot(dx, dz), step = dt * 1.25;
+      holder.rotation.y = Math.atan2(dx, dz);
+      if (distance <= step) { holder.position.copy(target); }
+      else { holder.position.x += dx / distance * step; holder.position.z += dz / distance * step; }
+      const fade = THREE.MathUtils.clamp((exit.elapsed - .9) / 1.1, 0, 1);
+      holder.userData.fadeMaterials?.forEach(({ material, opacity }) => {
+        if (fade > 0 && !material.transparent) { material.transparent = true; material.depthWrite = false; material.needsUpdate = true; }
+        material.opacity = opacity * (1 - fade);
+      });
+      if (fade === 1) { holder.visible = false; employeeExits.delete(holder); }
+    });
     streetLife?.update(dt, camera, previewCity, previewPeople && !requestedNight);
     traffic?.update(dt, camera, previewCity);
     aircraft.update(dt, time < 17, previewCity);
-    const entranceTarget = Math.max(doorProximity(camera.position, { x: 0, z: 2.05, height: 3 }), streetLife?.entranceProximity() || 0);
+    const entranceTarget = Math.max(doorProximity(camera.position, { x: 0, z: 2.05, height: 3 }), streetLife?.entranceProximity() || 0, employeeDoorProximity({ x: 0, z: 2.05, height: 3 }));
     const mainDoorNext = advanceDoor(mainDoorAmount, entranceTarget, dt, reducedMotion);
     let doorsChanged = Math.abs(mainDoorNext - mainDoorAmount) > .0001;
     mainDoorAmount = mainDoorNext;
@@ -1618,7 +1779,7 @@ async function createBuildingTour(container, {
     document.documentElement.dataset.doorOpen = String(mainDoorAmount > .95);
     document.documentElement.dataset.entranceDoorAmount = mainDoorAmount.toFixed(2);
     for (const door of roomDoors) {
-      const target = doorProximity(camera.position, door);
+      const target = Math.max(doorProximity(camera.position, door), employeeDoorProximity(door));
       const amount = advanceDoor(door.amount, target, dt, reducedMotion);
       if (Math.abs(amount - door.amount) > .0001) doorsChanged = true;
       door.amount = amount;
@@ -1635,7 +1796,7 @@ async function createBuildingTour(container, {
     let activePeople = 0;
     people.forEach(holder => {
       const mixer = holder.userData.mixer;
-      if (!previewPeople) { holder.visible = false; return; }
+      if (!previewPeople || (requestedNight && !(employeeExits.has(holder)))) { holder.visible = false; return; }
       if (!mixer) { holder.visible = true; return; }
       characterBounds.center.copy(holder.position); characterBounds.center.y += 1;
       const distance = camera.position.distanceToSquared(characterBounds.center);
@@ -1688,7 +1849,7 @@ async function createBuildingTour(container, {
         loader.loadAsync(assetRoot + 'people/formal-businesswoman.glb'),
         loader.loadAsync(new URL('../3D/business-male-4.glb', import.meta.url).href).catch(() => null),
         loadRealisticFurniture(THREE, new GLTFLoader()).catch(error => {
-          console.warn('OFOQ: keeping existing furniture because the new models failed to load.', error);
+          console.warn('SAEI: keeping existing furniture because the new models failed to load.', error);
           return null;
         })
       ]);
@@ -1799,14 +1960,29 @@ async function createBuildingTour(container, {
           center = b.getCenter(new THREE.Vector3());
         model.scale.setScalar(scale);
         model.position.set(-center.x * scale, -b.min.y * scale, -center.z * scale);
+        const fadeMaterials = [];
         model.traverse(o => {
           if (o.isMesh) {
+            const copyMaterial = source => {
+              const material = source.clone();
+              fadeMaterials.push({ material, opacity: material.opacity, transparent: material.transparent, depthWrite: material.depthWrite });
+              return material;
+            };
+            o.material = Array.isArray(o.material) ? o.material.map(copyMaterial) : copyMaterial(o.material);
             o.castShadow = false;
             o.receiveShadow = true;
           }
         });
+        holder.userData.fadeMaterials = fadeMaterials;
         holder.add(model);
         holder.userData.mixer = mixer;
+        holder.userData.idleAction = idleAction;
+        holder.userData.restAction = seated ? mixer.clipAction(asset.animations.find(a => a.name.endsWith('SitIdle1'))) : idleAction;
+        holder.userData.home = { position: holder.position.clone(), rotation: holder.rotation.y, modelPosition: model.position.clone() };
+        const standingCenter = standing.getCenter(new THREE.Vector3());
+        holder.userData.standingPosition = new THREE.Vector3(-standingCenter.x * scale, -standing.min.y * scale, -standingCenter.z * scale);
+        const walkClip = asset.animations.find(a => /walk/i.test(a.name));
+        if (walkClip) holder.userData.walkAction = mixer.clipAction(walkClip);
       }
       document.documentElement.dataset.realisticPeople = String(people.length);
       document.documentElement.dataset.characterModels = '2';
@@ -1823,14 +1999,14 @@ async function createBuildingTour(container, {
       renderer.shadowMap.needsUpdate = true;
       document.documentElement.dataset.modelLoad = 'ready';
     } catch (error) {
-      console.warn('OFOQ: using the base tour because model loading failed.', error);
+      console.warn('SAEI: using the base tour because model loading failed.', error);
       document.documentElement.dataset.modelLoad = 'fallback';
     }
   }
   // City assets are optional: loading them cannot interrupt the tour or sky.
   document.documentElement.dataset.cityStatus = 'loading';
   createModernCity(THREE, scene, new GLTFLoader()).catch(error => {
-    console.warn('OFOQ: modern city unavailable; loading the previous district.', error);
+    console.warn('SAEI: modern city unavailable; loading the previous district.', error);
     return createCityNeighborhood(THREE, scene);
   }).then(neighborhood => {
     if (disposed) { neighborhood.destroy(); return; }
@@ -1841,7 +2017,7 @@ async function createBuildingTour(container, {
     skylineFallback.forEach(mesh => { scene.remove(mesh); mesh.geometry.dispose(); });
   }).catch(error => {
     if (!disposed) document.documentElement.dataset.cityStatus = 'fallback';
-    console.warn('OFOQ: city models unavailable; keeping the base skyline.', error);
+    console.warn('SAEI: city models unavailable; keeping the base skyline.', error);
   });
   document.documentElement.dataset.modelLoad = 'loading';
   loadModels();
@@ -1853,7 +2029,7 @@ async function createBuildingTour(container, {
     renderer.shadowMap.needsUpdate = true;
   }).catch(error => {
     document.documentElement.dataset.plazaFountain = 'unavailable';
-    console.warn('OFOQ: imported plaza fountain could not be loaded.', error);
+    console.warn('SAEI: imported plaza fountain could not be loaded.', error);
   });
   createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(walk => {
     if (disposed) { walk.destroy(); return; }
@@ -1862,11 +2038,11 @@ async function createBuildingTour(container, {
     renderer.shadowMap.needsUpdate = true;
   }).catch(error => {
     document.documentElement.dataset.autumnWalk = 'unavailable';
-    console.warn('OFOQ: autumn maples could not be loaded.', error);
+    console.warn('SAEI: autumn maples could not be loaded.', error);
   });
   aircraft.loadModel(new GLTFLoader()).catch(error => {
     document.documentElement.dataset.aircraftSource = 'procedural-fallback';
-    console.warn('OFOQ: aircraft model unavailable; using the lightweight fallback.', error);
+    console.warn('SAEI: aircraft model unavailable; using the lightweight fallback.', error);
   });
   document.documentElement.dataset.trafficStatus = 'loading';
   createCityTraffic(THREE, scene, { loader: new GLTFLoader(), mergeGeometries, reducedMotion }).then(result => {
@@ -1875,7 +2051,7 @@ async function createBuildingTour(container, {
     traffic.setNight(requestedNight ? 1 : cityLightLevel);
   }).catch(error => {
     if (!disposed) document.documentElement.dataset.trafficStatus = 'unavailable';
-    console.warn('OFOQ: the sedan asset could not be loaded.', error);
+    console.warn('SAEI: the sedan asset could not be loaded.', error);
   });
   return {
     configurePreview(config) {
@@ -1893,16 +2069,24 @@ async function createBuildingTour(container, {
       skylineFallback.forEach(mesh => { mesh.visible = previewCity; });
       const cityGroup = scene.getObjectByName('OFOQCity');
       if (cityGroup) cityGroup.visible = previewCity;
-      people.forEach(holder => { holder.visible = previewPeople; });
+      people.forEach(holder => { holder.visible = previewPeople && !requestedNight; });
       roomJump = null; targetTime = 0; seek(0);
       renderer.shadowMap.needsUpdate = true;
     },
     setNight: (night, immediate = false) => {
+      const changed = requestedNight !== night;
       requestedNight = night;
+      if (immediate || reducedMotion) screenBrightness = night ? 0 : 1;
+      if (!night) restoreEmployees();
+      else if (changed && !immediate && !reducedMotion && previewPeople) beginEmployeeExits();
+      else if (immediate || reducedMotion) employeeExits.clear();
+      logoMaterials.forEach(material => { const off = screenBrightness < .008 && material.userData.television; material.map = off ? null : material.userData.dayMap; material.color.set(off ? '#05070b' : '#ffffff'); material.userData.indicator?.color.set(off ? '#d15a43' : '#63d8b1'); material.needsUpdate = true; });
+      people.forEach(holder => { holder.visible = previewPeople && (!night || (employeeExits.has(holder))); });
       if (immediate || document.documentElement.dataset.modelLoad !== 'ready') traffic?.setNight(night ? 1 : 0);
       coastal.setNight(night, immediate);
     },
     move,
+    moveToTime(value) { roomJump = null; targetTime = Math.max(0, Math.min(68, value)); if (reducedMotion) seek(targetTime); },
     seek(value) { roomJump = null; targetTime = value; seek(value); },
     goToRoom(index) {
       if (!Number.isInteger(index) || index < 0 || index >= stops.length || disposed) return;
@@ -1923,6 +2107,7 @@ async function createBuildingTour(container, {
       traffic?.destroy();
       aircraft.destroy();
       logoTexture.dispose();
+      indoorLogoTexture?.dispose();
       logoMaterials.forEach(material => { material.map?.dispose(); material.dispose(); });
       renderer.dispose();
       env?.dispose();

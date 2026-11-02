@@ -41,6 +41,7 @@ async function fixture(memory = new Map(), blocked = false) {
     bootstrap: {Modal: {getOrCreateInstance: () => ({show() { modalOpens++; }})}},
     matchMedia: () => ({matches: true}), addEventListener() {}
   });
+  context.window.OfoqFrontend = { memory: context.localStorage };
   vm.runInContext(runtime, context);
   await new Promise(setImmediate);
   const get = id => elements.get(id);

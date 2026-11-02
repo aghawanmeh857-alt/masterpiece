@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -145,26 +129,49 @@ if (profileForm) {
   showProfile();
 }
 
-// One account can publish projects and apply as a freelancer.
-const filterButtons = document.querySelectorAll('[data-filter]');
-const sections = {
-  project: ['مشاريعي', 'المشاريع التي نشرتها، ومتابعة المتقدّمين عليها.', 'مشاريع منشورة'],
-  application: ['طلباتي', 'المشاريع التي قدّمت عليها كمستقل، وحالة كل طلب.', 'طلبات تقديم'],
-  course: ['تعلّمي', 'مساراتك التعليمية والتقدّم فيها.', 'مسارات تعلّم']
+// The dashboard reflects only actions from this tab's current visit.
+const app = window.OfoqFrontend;
+const get = id => document.getElementById(id);
+const root = new URL('../../', location.href);
+const catalog = app.courses || [];
+const learning = app.learning || {enrolled:[], progress:{}};
+const buttons = [...document.querySelectorAll('[data-filter]')];
+const panel = get('activityTitle').closest('section');
+panel.querySelectorAll('[data-activity]').forEach(card => card.remove());
+const rows = {
+ project: app.ideas.map(item => ({title:item.title, description:item.description, href:new URL('Freelance/freelance.html#idea-'+item.id, root).href})),
+ application: app.applications.map(item => ({...item, description:({project:'مشروع',job:'وظيفة',internship:'تدريب'}[item.kind] || '')+' · '+item.status})),
+ course: learning.enrolled.map(id => {const course=catalog.find(item=>item.id===id);return course ? {title:course.title,description:Math.round((learning.progress[id]?.length||0)/course.syllabus.length*100)+'% مكتمل',href:new URL('Academy/Course/course.html?id='+id,root).href}:null;}).filter(Boolean),
+ event: app.registrations.map(item => ({...item, description:'تم تأكيد التسجيل خلال هذه الزيارة'}))
 };
-function showSection(filter) {
-  const [title, description, countLabel] = sections[filter];
-  filterButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === filter)));
-  let count = 0;
-  document.querySelectorAll('[data-activity]').forEach(card => {
-    card.hidden = card.dataset.activity !== filter;
-    if (!card.hidden) count++;
-  });
-  document.getElementById('activityTitle').textContent = title;
-  document.getElementById('activityDescription').textContent = description;
-  document.getElementById('activityCount').textContent = `${count} · ${countLabel} توضيحية`;
+const eventButton = document.createElement('button');eventButton.type='button';eventButton.dataset.filter='event';eventButton.textContent='فعالياتي';
+panel.querySelector('.activity-toolbar').append(eventButton);buttons.push(eventButton);
+const labels={project:'منشوراتي',application:'طلباتي',course:'تعلّمي',event:'فعالياتي'};
+const stats=document.querySelectorAll('.stat-card');
+[rows.project.length,rows.application.length,rows.course.length,rows.event.length].forEach((value,index)=>{
+ stats[index].querySelector('strong').textContent=value;
+ stats[index].querySelector('small').textContent='خلال هذه الزيارة';
+});
+stats[3].querySelector('span').textContent='الفعاليات';
+document.querySelector('.preview-note').textContent='نشاطك خلال هذه الزيارة. تحديث الصفحة يبدأ تجربة جديدة بدون حفظ بيانات.';
+function showSection(filter){
+ if(!rows[filter])filter='application';
+ panel.querySelectorAll('[data-activity]').forEach(card=>card.remove());
+ get('activityTitle').textContent=labels[filter];
+ get('activityDescription').textContent='نشاطك الحالي في '+labels[filter];
+ get('activityCount').textContent=rows[filter].length+' عناصر';
+ buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.filter===filter)));
+ const items=rows[filter].length?rows[filter]:[{title:'لا يوجد نشاط بعد',description:'ابدأ باستكشاف الفرص والدورات، وسيظهر نشاطك هنا.',href:new URL(filter==='course'?'Academy/academy.html':filter==='event'?'Events/events.html':'Freelance/freelance.html',root).href}];
+ for(const item of items){
+ const card=document.createElement('article');card.className='activity-card';card.dataset.activity=filter;
+ const title=document.createElement('h3');title.textContent=item.title;
+ const description=document.createElement('p');description.textContent=item.description;
+ const link=document.createElement('a');link.href=item.href;link.textContent='فتح التفاصيل ←';card.append(title,description,link);
+ if(filter==='application'&&rows[filter].length){const cancel=document.createElement('button');cancel.type='button';cancel.className='text-button';cancel.textContent='سحب الطلب';cancel.addEventListener('click',()=>{app.applications=app.applications.filter(row=>!(row.id===item.id&&row.kind===item.kind));rows.application=rows.application.filter(row=>row!==item);stats[1].querySelector('strong').textContent=app.applications.length;showSection(filter);});card.append(cancel);}
+ if(filter==='event'&&rows[filter].length){const cancel=document.createElement('button');cancel.type='button';cancel.className='text-button';cancel.textContent='إلغاء التسجيل';cancel.addEventListener('click',()=>{app.registrations=app.registrations.filter(row=>row.id!==item.id);rows.event=rows.event.filter(row=>row!==item);stats[3].querySelector('strong').textContent=app.registrations.length;showSection(filter);});card.append(cancel);}
+ panel.append(card);
+ }
 }
-filterButtons.forEach(button => button.addEventListener('click', () => showSection(button.dataset.filter)));
-showSection('project');
-
+buttons.forEach(button=>button.addEventListener('click',()=>showSection(button.dataset.filter)));
+showSection(new URLSearchParams(location.search).get('tab')||'application');
 })();

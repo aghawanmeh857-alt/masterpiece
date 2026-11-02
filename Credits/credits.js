@@ -1,10 +1,11 @@
 (function () {
 // 1. قراءة الوضع من الرابط، دون تخزين.
 var theme = new URLSearchParams(location.search).get('theme');
-var themeButton = document.getElementById('themeButton');
+var themeButton = document.querySelector('.theme-toggle');
 
 function changeTheme(dark) {
   document.body.classList.toggle('dark', dark);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   themeButton.textContent = dark ? '☀ الوضع النهاري' : '☾ الوضع الليلي';
 
   // نحمل اختيار اللون معنا عند الانتقال إلى شاشة أخرى.

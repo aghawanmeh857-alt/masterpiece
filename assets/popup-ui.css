@@ -1,0 +1,87 @@
+/* Shared presentation for application, registration, publishing and detail popups. */
+html body .modal { --bs-modal-width: 640px; --bs-modal-margin: 24px; }
+html body .modal-dialog { width: auto; max-width: min(640px, calc(100vw - 32px)); margin: 24px auto; min-height: calc(100% - 48px); }
+html body .modal-content { display: flex; flex-direction: column; max-height: calc(100dvh - 48px); padding: 0; overflow: hidden; border: 1px solid var(--field-border,#cbd5e1); border-radius: 22px; background: var(--surface,#fff); color: var(--text-main,#17263b); box-shadow: 0 24px 80px #0004; }
+html body .modal-header { flex-shrink: 0; align-items: flex-start; gap: 20px; padding: 22px 26px; border-bottom: 1px solid var(--field-border,#cbd5e1); background: var(--surface,#fff); }
+html body .modal-header .eyebrow { font-size: 10px; margin-bottom: 8px !important; color: var(--accent-text,#a43e13); }
+html body .modal-header .modal-title { font-size: 20px !important; font-weight: 700; line-height: 1.7; margin: 0; }
+html body .modal .btn-close { flex-shrink: 0; width: 18px; height: 18px; margin: 0; padding: 9px; border-radius: 10px; background-color: var(--field-bg,#f8fafc); opacity: .7; }
+html[data-theme=light] body .modal .btn-close { filter: none; }
+html[data-theme=dark] body .modal .btn-close { filter: invert(1) grayscale(1); }
+html body .modal .btn-close:hover { opacity: 1; }
+html body .modal-body { min-height: 0; padding: 24px 26px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #ff783d70 transparent; }
+html body .modal-body :is(form,.field) { min-width: 0; }
+html body .modal-body .field { margin: 0 0 20px; }
+html body .modal-body label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700; line-height: 1.7; color: var(--text-main,#17263b); }
+html body .modal :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea) { min-height: 44px; padding: 11px 13px; font-family: inherit; font-size: 13px; line-height: 1.7; color: var(--text-main,#17263b); background-color: var(--field-bg,#f8fafc); border: 1px solid var(--field-border,#cbd5e1); border-radius: 10px; box-shadow: none; }
+html body .modal textarea { min-height: 100px; resize: vertical; }
+html body .modal :is(input,select,textarea):focus { border-color: #ff783d; outline: 0; box-shadow: 0 0 0 3px #ff783d18; }
+html body .modal :is(.field-hint,.form-text,.demo-note) { font-size: 11px; font-weight: 400; color: var(--text-muted,#52647b); line-height: 1.9; margin-top: 7px; }
+html body .modal :is(.apply-summary,.opportunity-summary) { padding: 12px 15px; margin: 0 0 22px; border: 1px solid var(--field-border,#cbd5e1); border-radius: 12px; background: var(--field-bg,#f8fafc); color: var(--text-muted,#52647b); font-size: 12px; line-height: 1.9; }
+html body .modal :is(.apply-summary,.opportunity-summary):empty { display: none; }
+html body .modal input[type=file]:not(.publisher-image-picker input) { width: 100%; padding: 10px; border: 1px dashed var(--field-border,#cbd5e1); border-radius: 12px; background: var(--field-bg,#f8fafc); color: var(--text-muted,#52647b); font: inherit; font-size: 12px; }
+html body .modal input[type=file]::file-selector-button { padding: 9px 13px; margin-inline-end: 12px; border: 1px solid #ff783d55; border-radius: 8px; background: #ff783d15; color: var(--accent-text,#a43e13); font-family: inherit; font-size: 12px; cursor: pointer; }
+html body .modal :is(.btn-orange,button[type=submit]) { min-height: 44px; padding: 11px 18px; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 700; }
+html body .modal-footer { flex-shrink: 0; padding: 16px 26px; gap: 10px; background: var(--field-bg,#f8fafc); border-top: 1px solid var(--field-border,#cbd5e1); }
+html body .modal-backdrop.show { opacity: .58; }
+html body .modal.fade .modal-dialog { transform: translateY(18px) scale(.985); transition: transform .28s ease-out; }
+html body .modal.show .modal-dialog { transform: none; }
+html body .card-details-dialog { border-radius: 22px; width: min(680px,calc(100% - 32px)); max-height: calc(100dvh - 48px); }
+html body .card-popup-toolbar { padding: 16px 24px; }
+html body .card-popup-close { border-radius: 10px; }
+html body .card-popup-content { padding: 24px; scrollbar-width: thin; scrollbar-color: #ff783d70 transparent; }
+html body .card-popup-content h2 { font-size: 22px; line-height: 1.7; }
+html body .card-popup-actions { padding: 16px 24px; }
+html body .card-popup-actions button { border-radius: 10px; font-size: 13px; min-height: 44px; }
+@media(max-width:600px) {
+  html body .modal-dialog { max-width: calc(100vw - 20px); margin: 10px auto; min-height: calc(100% - 20px); }
+  html body .modal-content { max-height: calc(100dvh - 20px); border-radius: 18px; }
+  html body .modal-header,html body .modal-body { padding: 18px; }
+  html body .modal-header .modal-title { font-size: 17px !important; }
+  html body .modal-footer { padding: 14px 18px; }
+  html body .card-details-dialog { max-height: calc(100dvh - 20px); border-radius: 18px; }
+  html body .card-popup-content { padding: 18px; }
+}
+@media(prefers-reduced-motion:reduce) { html body .modal.fade .modal-dialog { transition: none; transform: none; } }
+html body:is([data-section=company],[data-dashboard=admin]) dialog{border-radius:22px;max-height:calc(100dvh - 48px);scrollbar-width:thin;scrollbar-color:#ff783d70 transparent;padding:26px}
+html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading{padding-bottom:18px;margin-bottom:20px;border-bottom:1px solid var(--field-border)}
+html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading h2{font-size:20px;font-weight:700}
+html body:is([data-section=company],[data-dashboard=admin]) dialog :is(input:not([type=checkbox]):not([type=radio]),select,textarea){border-radius:10px;font-size:13px}
+html body:is([data-section=company],[data-dashboard=admin]) dialog button{border-radius:10px;font-family:inherit;font-size:13px}
+@media(max-width:600px){html body:is([data-section=company],[data-dashboard=admin]) dialog{padding:18px;border-radius:18px;max-height:calc(100dvh - 20px)}}
+/* Match the jobs popup across all public forms and detail windows. */
+html body .modal{--bs-modal-width:800px}
+html body .modal-dialog{max-width:min(800px,calc(100vw - 32px))}
+html body .modal-header{padding:24px 28px;align-items:flex-start}
+html body .modal-header .modal-title{font-size:23px!important;line-height:1.65}
+html body .modal-body{padding:24px 28px 28px}
+html body .modal-body form:has(>.field){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px}
+html body .modal-body form:has(>.field)>*{grid-column:1/-1;min-width:0}
+html body .modal-body form:has(>.field)>.field{grid-column:auto;margin:0;display:flex;flex-direction:column}
+html body .modal-body form:has(>.field)>.field:has(textarea,input[type=file]){grid-column:1/-1}
+html body .modal-body .preview-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px}
+html body .modal-body .preview-fields>.field{margin:0;display:flex;flex-direction:column}
+html body .modal-body .field>label{font-size:14px;line-height:1.7;margin-bottom:10px}
+html body .modal-body .field:has(input)>label{flex:1}
+html body .modal :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select){min-height:48px}
+html body .card-details-dialog{width:min(800px,calc(100% - 32px))}
+html body .card-popup-toolbar,html body .card-popup-actions{padding:18px 28px}
+html body .card-popup-content{padding:24px 28px}
+html body .modal .btn-close{width:20px;height:20px;padding:10px}
+@media(max-width:600px){
+html body .modal-dialog{max-width:calc(100vw - 20px)}
+html body .modal-body form:has(>.field),html body .modal-body .preview-fields{grid-template-columns:minmax(0,1fr);gap:18px}
+html body .modal-header,html body .modal-body{padding:18px}
+html body .modal-header .modal-title{font-size:18px!important}
+html body .card-popup-toolbar,html body .card-popup-actions,html body .card-popup-content{padding:18px}
+html body .modal-body .field>label{font-size:13px}
+}
+/* Anchor close controls to the top corner, independently of title width. */
+html body .modal-header{position:relative;padding-left:82px}
+html body .modal-header>div{min-width:0;width:100%}
+html body .modal-header .btn-close{position:absolute;top:18px;left:18px;right:auto;margin:0}
+html body .card-popup-toolbar{position:relative;min-height:72px;padding-left:82px}
+html body .card-popup-close{position:absolute;top:16px;left:18px;right:auto;margin:0}
+html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading{position:relative;padding-left:64px}
+html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading :is(.btn-close,[aria-label="إغلاق"]){position:absolute;top:0;left:0;right:auto;margin:0}
+@media(max-width:600px){html body .modal-header{padding-left:70px}html body .modal-header .btn-close{top:12px;left:12px}html body .card-popup-close{top:12px;left:12px}}

@@ -2,48 +2,13 @@
 (() => {
   const sharedScript = [...document.scripts].find(script => script.src.endsWith('/assets/arabic-ui.js'));
   if (sharedScript) {
-    const cartUrl = new URL('../Academy/Cart/cart.html', sharedScript.src);
-    document.querySelectorAll('.header-actions').forEach(actions => {
-      if (actions.closest('.hero-navbar')) return;
-      if (document.body.dataset.section === 'freelance') {
-        if (actions.querySelector('.project-favorites-link')) return;
-        const favorites = document.createElement('a');
-        const url = new URL('../Freelance/freelance.html', sharedScript.src);
-        url.searchParams.set('favorites', '1');
-        url.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
-        url.hash = 'project-favorites';
-        favorites.className = 'project-favorites-link';
-        favorites.href = url.href;
-        favorites.textContent = '♡ المفضلة';
-        actions.prepend(favorites);
-        return;
-      }
-      if (actions.querySelector('.shopping-cart-link')) return;
-      const link = document.createElement('a');
-      link.className = 'shopping-cart-link';
-      link.href = cartUrl.href;
-      link.setAttribute('aria-label', 'سلة المشتريات');
-      link.title = 'سلة المشتريات';
-      link.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h2l2.4 12h11.2l2-8H6"/><path d="M8 15l-1 3h12"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg><span>السلة</span>';
-      const syncCartTheme = () => {
-        const url = new URL(cartUrl.href);
-        url.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
-        link.href = url.href;
-      };
-      syncCartTheme();
-      link.addEventListener('click', syncCartTheme);
-      if (location.pathname === cartUrl.pathname) link.setAttribute('aria-current', 'page');
-      actions.prepend(link);
+    if (!/\/Auth\//i.test(location.pathname)) document.querySelectorAll('a[href*="Auth/Register/register.html"]').forEach(link => {
+      const url = new URL(link.href); url.searchParams.set('next',location.href); url.searchParams.set('service',new URLSearchParams(location.search).get('format') === 'workshop' ? 'workshops' : document.body.dataset.section || 'profile'); link.href = url.href;
     });
-    const companyUrl = new URL('../company/dashboard.html', sharedScript.src);
-    companyUrl.searchParams.set('theme', document.documentElement.dataset.theme || new URLSearchParams(location.search).get('theme') || 'light');
-    document.querySelectorAll('.account-menu-links').forEach(menu => {
-      if (menu.querySelector('[data-company-dashboard]')) return;
-      const link = document.createElement('a');
-      link.href = companyUrl.href;
-      link.dataset.companyDashboard = '';
-      link.textContent = 'لوحة الشركة';
-      menu.append(link);
+    // User navigation contains user destinations only. Company tools live in
+    // their dedicated dashboard, reached through a company sign-in.
+    document.querySelectorAll('.account-menu-links a').forEach(link => {
+      if (/\/(Admin|company)\//i.test(new URL(link.href).pathname)) link.remove();
     });
   }
   const navigation = document.querySelector('.site-navigation');
@@ -53,8 +18,11 @@
   desktop.addEventListener('change', syncNavigation);
 
   const section = document.body.dataset.section;
+  const workshopPage = section === 'academy' && new URLSearchParams(location.search).get('format') === 'workshop';
   document.querySelectorAll('.section-nav a[data-section-link]').forEach(link => {
-    if (link.dataset.sectionLink === section) link.setAttribute('aria-current', 'page');
+    const active = link.dataset.sectionLink === (workshopPage ? 'workshops' : section);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
   });
 
   document.addEventListener('click', event => {
@@ -103,5 +71,17 @@
       field.setCustomValidity('');
       delete field.dataset.arabicValidity;
     });
+  });
+  document.addEventListener('change', event => {
+    const field = event.target;
+    if (!field.matches('input[type="file"][accept]')) return;
+    const file = field.files?.[0];
+    let message = '';
+    if (file && /\.pdf|\.doc/i.test(field.accept)) {
+      if (!/\.(pdf|doc|docx)$/i.test(file.name)) message = 'اختر ملف PDF أو Word.';
+      else if (file.size > 5 * 1024 * 1024) message = 'الحد الأقصى لحجم الملف 5 ميغابايت.';
+    }
+    field.setCustomValidity(message);
+    if (message) field.reportValidity();
   });
 })();

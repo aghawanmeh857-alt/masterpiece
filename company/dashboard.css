@@ -1,5 +1,4 @@
-/* Company workspace — OFOQ navy, orange and warm neutral surfaces. */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700;800&display=swap');
+/* Company workspace — SAEI navy, orange and warm neutral surfaces. */
 :root {
   color-scheme: light;
   --page-bg: #f4f6fa; --surface: #fff; --surface-raised: #f6f8fb;
@@ -233,3 +232,5 @@ footer { display: flex; justify-content: space-between; gap: 12px; border-top: 1
   .row-actions button { min-height: 40px; padding-inline: 12px; }
 }
 
+
+.logo-frame img[src*="saei-logo.svg"]{width:100%;height:100%;left:0;top:0;object-fit:contain}

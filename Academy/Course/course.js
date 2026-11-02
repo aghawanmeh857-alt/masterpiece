@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -87,7 +71,7 @@ const courses = window.OfoqCourses;
   const get=id=>document.getElementById(id),store=OfoqLearning.create(courses),id=new URLSearchParams(location.search).get('id')||'web',course=courses.find(item=>item.id===id);
   get('year').textContent=new Date().getFullYear();
   if(!course){get('detailContent').hidden=true;get('notFound').hidden=false;get('notFound').focus();return;}
-  document.title=course.title+' — أفق';get('detailTitle').textContent=course.title;get('detailDescription').textContent=course.description;
+  document.title=course.title+' — سعي';get('detailTitle').textContent=course.title;get('detailDescription').textContent=course.description;
   get('courseInstructor').insertAdjacentHTML('beforeend',OfoqPublishers.card(OfoqPublishers.forRecord('course',course)));
   get('courseCover').src=OfoqLearning.cover(id);get('coursePrice').textContent=course.price?'$'+course.price:'مجاني';get('courseFacts').textContent=course.hours+' ساعة في المسار · '+course.syllabus.length+' دروس تفاعلية · '+(course.level==='beginner'?'مبتدئ':'متوسط');
   course.syllabus.forEach(title=>{const item=document.createElement('li');item.textContent='✓ '+title;get('learningOutcomes').append(item);});get('courseProject').textContent='مشروعك التطبيقي: '+course.project;
@@ -105,7 +89,7 @@ const courses = window.OfoqCourses;
   function render(){
     const owned=store.has(id),done=store.state.progress[id].includes(lesson),percent=store.percent(id);
     get('buyCourse').textContent=owned?'متابعة التعلّم ←':course.price?'اشترِ الآن — $'+course.price:'التحق مجانًا';get('addCart').hidden=owned||!course.price;get('addCart').textContent=store.state.cart.includes(id)?'إزالة من السلة':'أضف إلى السلة';get('wishCourse').textContent=store.state.wishlist.includes(id)?'♥ في المفضلة':'♡ أضف للمفضلة';get('wishCourse').setAttribute('aria-pressed',String(store.state.wishlist.includes(id)));
-    get('previewAccess').textContent=owned?'أنت ملتحق بهذه الدورة. تقدّمك وملاحظاتك محفوظة محليًا.':'معاينة مجانية للدرس الأول. التحق بالدورة للوصول لباقي الدروس وحفظ التقدّم.';
+    get('previewAccess').textContent=owned?'أنت ملتحق بهذه الدورة. تقدّمك وملاحظاتك متاحة خلال هذه الزيارة.':'معاينة مجانية للدرس الأول. التحق بالدورة للوصول لباقي الدروس وحفظ التقدّم.';
     get('lessonTitle').textContent=course.syllabus[lesson];get('completeLesson').disabled=!owned;get('completeLesson').textContent=done?'✓ مكتمل — إلغاء الإكمال':'تحديد الدرس كمكتمل';get('nextLesson').disabled=lesson===course.syllabus.length-1;get('lessonNotes').disabled=!owned;
     get('progressPercent').textContent=percent+'%';get('courseProgress').value=percent;get('progressSummary').textContent=(owned?store.state.progress[id].length:0)+' من '+course.syllabus.length+' دروس';get('completionBanner').hidden=percent!==100;
     get('curriculumList').replaceChildren(...course.syllabus.map((title,index)=>{const button=document.createElement('button');button.type='button';button.className='curriculum-lesson';button.textContent=(owned&&store.state.progress[id].includes(index)?'✓ ':(!owned&&index>0?'🔒 ':'▷ '))+(index+1)+'. '+title;button.setAttribute('aria-current',index===lesson?'step':'false');button.addEventListener('click',()=>selectLesson(index));return button;}));

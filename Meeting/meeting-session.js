@@ -49,7 +49,7 @@ export function initializeMeeting(win = window, doc = document, load = () => loa
   get('externalJitsi').hidden = false;
   get('meetingContext').textContent = 'شارك رابط الانضمام مع الطرف الآخر للدخول إلى نفس الغرفة.';
   if (recipient) {
-    doc.title = 'مقابلة مع ' + recipient.name + ' — أفق';
+    doc.title = 'مقابلة مع ' + recipient.name + ' — سعي';
     get('meetingTitle').textContent = 'مقابلة مع ' + recipient.name;
     get('candidateName').textContent = recipient.name;
     get('projectName').textContent = 'مقابلة من المحادثة';

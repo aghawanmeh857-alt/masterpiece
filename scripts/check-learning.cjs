@@ -58,6 +58,7 @@ function fixture(id = 'react', memory = new Map(), blocked = false) {
     setTimeout() { return 1; }, clearTimeout() {}
   };
   sandbox.window = sandbox;
+  sandbox.OfoqFrontend = {memory: sandbox.localStorage};
   const context = vm.createContext(sandbox);
   vm.runInContext(librarySource, context); vm.runInContext(contentSource, context);
   return {context, elements, body, memory, frames, get: id => elements.get(id),
@@ -143,12 +144,13 @@ catalogFixture.context.location.assign = () => {};
 vm.runInContext(catalogSource.slice(catalogEnd), catalogFixture.context);
 assert.equal(catalogFixture.get('courseList').children.length, 6);
 const reactCard = catalogFixture.get('courseList').children[3];
-reactCard.children[1].children.at(-1).children[1].click();
+const cardAction = (card, name) => card.children.find(child => child.className === 'course-actions').children.find(child => child.className.split(' ').includes(name));
+cardAction(reactCard, 'learn-wish').click();
 assert.equal(catalogFixture.get('wishCount').textContent, 1);
 assert.equal(catalogFixture.get('featuredWishCount').textContent, 1);
 tabs[2].click();
 assert.equal(catalogFixture.get('courseList').children.length, 1, 'Wishlist filters catalog');
-catalogFixture.get('courseList').children[0].children[1].children.at(-1).children[2].click();
+cardAction(catalogFixture.get('courseList').children[0], 'course-add-cart').click();
 assert.equal(catalogFixture.get('cartCount').textContent, 1);
 assert(catalogHtml.includes('id="openCart" href="Cart/cart.html"'), 'Catalog links to the full cart page');
 tabs[0].click();

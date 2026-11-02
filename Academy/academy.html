@@ -1,14 +1,16 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+  <script src="../assets/frontend-runtime.js"></script>
+  <script src="../assets/platform-data.js"></script>
     <meta charset="utf-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b1526">
     <title>
-      الأكاديمية — أفق
+      الأكاديمية — سعي
     </title>
-    <link rel="icon" type="image/png" href="../assets/branding/ofoq-logo.png?v=ofoq-11">
+    <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
     
     
@@ -19,24 +21,15 @@
   <script defer src="../assets/arabic-ui.js"></script>
 
   <link rel="stylesheet" href="learning.css">
+  <script defer src="../assets/demo-auth.js"></script>
+<link rel="stylesheet" href="../assets/cards.css">
+<link rel="stylesheet" href="../assets/fonts.css">
+  <link rel="stylesheet" href="../assets/popup-ui.css">
+  <link rel="stylesheet" href="../assets/shared-navbar.css">
 </head>
   <body data-section="academy">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-    <header class="site-header">
-  <div class="container-xl header-inner">
-    <a href="../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
-      <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
-    </a>
-    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
-      <a data-section-link="freelance" href="../Freelance/freelance.html">العمل الحر</a>
-      <a data-section-link="academy" href="academy.html">الأكاديمية</a>
-      <a data-section-link="internships" href="../Internships/internships.html">فرص التدريب</a>
-      <a data-section-link="jobs" href="../Jobs/jobs.html">الوظائف</a>
-      <a data-section-link="events" href="../Events/events.html">الفعاليات</a>
-    </nav></details>
-    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Auth/Login/login.html">تسجيل الدخول</a><a href="../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Account/Profile/profile.html">الملف الشخصي</a><a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Account/Messages/messages.html">الرسائل</a><a href="../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
-  </div>
-</header>
+    <script src="../assets/shared-navbar.js" data-mode="site"></script>
     <main id="mainContent" tabindex="-1" class="container-xl page-content">
       <div class="page-heading">
         <div>
@@ -101,8 +94,8 @@
             </span>
           </a>
           <div class="featured-shortcuts" role="group" aria-label="السلة والمفضلة">
-            <a id="academyCartButton" class="academy-cart-button" href="Cart/cart.html" aria-label="فتح سلة مشتريات الأكاديمية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg><span>سلة المشتريات</span><span id="academyCartCount" class="academy-cart-count">0</span></a>
-            <button id="featuredWishlist" class="academy-favorite-button" type="button" aria-label="عرض الدورات المفضلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>المفضلة</span><span id="featuredWishCount" class="academy-cart-count">0</span></button>
+            <a hidden id="academyCartButton" class="academy-cart-button" href="Cart/cart.html" aria-label="فتح سلة مشتريات الأكاديمية"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3h2l2.4 11.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="21" r="1"/><circle cx="19" cy="21" r="1"/></svg><span>سلة المشتريات</span><span id="academyCartCount" class="academy-cart-count">0</span></a>
+            <button hidden id="featuredWishlist" class="academy-favorite-button" type="button" aria-label="عرض الدورات المفضلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg><span>المفضلة</span><span id="featuredWishCount" class="academy-cart-count">0</span></button>
           </div>
         </div>
         <div class="learning-art" aria-hidden="true">
@@ -174,8 +167,8 @@
           </span>
         </div>
       </div>
-      <nav class="learning-tabs" aria-label="مكتبة التعلم"><button type="button" data-library="overview" aria-pressed="false">مساحتي</button><button type="button" data-library="all" aria-pressed="true">اكتشف الدورات</button><button type="button" data-library="enrolled" aria-pressed="false">تعلّمي <span id="learningCount">0</span></button><button type="button" data-library="wishlist" aria-pressed="false">المفضلة <span id="wishCount">0</span></button><a id="openCart" href="Cart/cart.html">السلة <span id="cartCount">0</span></a></nav><p class="learning-demo">تجربة تعليمية محلية: شراء تجريبي بدون خصم، ودروس تفاعلية قصيرة مع حفظ تقدّمك على هذا المتصفح.</p><p id="storageNotice" class="learning-demo" role="status" hidden></p>
-      <section id="academyOverview" class="academy-overview" aria-labelledby="overviewTitle" hidden><div class="overview-heading"><div><p class="eyebrow">أفق / مساحتك التعليمية</p><h2 id="overviewTitle">كل تعلّمك في مكان واحد.</h2><p>تابع من حيث توقّفت، وراجع مفضّلتك وسلة دوراتك.</p></div></div><div id="overviewMetrics" class="overview-metrics"></div><div class="overview-layout"><section class="overview-learning"><h3>واصل رحلتك</h3><div id="overviewCourses" class="course-grid"></div><div id="overviewEmpty" class="overview-empty" hidden><h3>مهارتك القادمة تبدأ بخطوة</h3><p>التحق بدورة لتظهر هنا نسبة إنجازك وآخر درس وصلت له.</p><button id="overviewDiscover" type="button" class="learn-primary">اكتشف الدورات ←</button></div></section><aside class="overview-sidebar"><section class="overview-box"><h3>سلتك</h3><div id="overviewCartItems"></div><div class="overview-cart-total"><span>الإجمالي</span><strong id="overviewCartTotal"></strong></div><a class="learn-primary" href="Cart/cart.html">عرض السلة وإتمام الشراء ←</a></section><section class="overview-box"><h3>المفضلة</h3><div id="overviewWishlist"></div><button id="overviewViewWishlist" type="button" class="learn-secondary">عرض المفضلة كاملة ←</button></section></aside></div></section>
+      <nav class="learning-tabs" aria-label="مكتبة التعلم"><button type="button" data-library="overview" aria-pressed="false">مساحتي</button><button type="button" data-library="all" aria-pressed="true">اكتشف الدورات</button><button type="button" data-library="enrolled" aria-pressed="false">تعلّمي <span id="learningCount">0</span></button><button type="button" data-library="wishlist" aria-pressed="false">المفضلة <span id="wishCount">0</span></button><a id="openCart" href="Cart/cart.html">السلة <span id="cartCount">0</span></a></nav><p class="learning-demo">تجربة تعليمية محلية: شراء تجريبي بدون خصم، ودروس تفاعلية قصيرة مع متابعة تقدّمك خلال هذه الزيارة فقط.</p><p id="storageNotice" class="learning-demo" role="status" hidden></p>
+      <section id="academyOverview" class="academy-overview" aria-labelledby="overviewTitle" hidden><div class="overview-heading"><div><p class="eyebrow">سعي / مساحتك التعليمية</p><h2 id="overviewTitle">كل تعلّمك في مكان واحد.</h2><p>تابع من حيث توقّفت، وراجع مفضّلتك وسلة دوراتك.</p></div></div><div id="overviewMetrics" class="overview-metrics"></div><div class="overview-layout"><section class="overview-learning"><h3>واصل رحلتك</h3><div id="overviewCourses" class="course-grid"></div><div id="overviewEmpty" class="overview-empty" hidden><h3>مهارتك القادمة تبدأ بخطوة</h3><p>التحق بدورة لتظهر هنا نسبة إنجازك وآخر درس وصلت له.</p><button id="overviewDiscover" type="button" class="learn-primary">اكتشف الدورات ←</button></div></section><aside class="overview-sidebar"><section class="overview-box"><h3>سلتك</h3><div id="overviewCartItems"></div><div class="overview-cart-total"><span>الإجمالي</span><strong id="overviewCartTotal"></strong></div><a class="learn-primary" href="Cart/cart.html">عرض السلة وإتمام الشراء ←</a></section><section class="overview-box"><h3>المفضلة</h3><div id="overviewWishlist"></div><button id="overviewViewWishlist" type="button" class="learn-secondary">عرض المفضلة كاملة ←</button></section></aside></div></section>
       <div class="workspace" id="catalogWorkspace">
         <aside class="filter-panel panel" aria-labelledby="filterTitle">
   <div class="filter-heading">
@@ -321,7 +314,7 @@
       </div>
     </main>
     <footer class="page-footer container-xl">
-  <span>© OFOQ <span id="year"></span></span>
+  <span>© SAEI <span id="year"></span></span>
   <a data-room-link href="../hero/userHero.html#academy">العودة إلى قسم <span data-room-name>الأكاديمية</span>  <span aria-hidden="true">↗</span></a>
 </footer>
 
@@ -332,5 +325,6 @@
   <script src="learning.js"></script>
   <script src="lesson-content.js"></script>
   <script src="academy.js"></script>
+<script type="module" src="../assets/card-details.js"></script>
 </body>
 </html>

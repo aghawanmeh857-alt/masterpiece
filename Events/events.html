@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+  <script src="../assets/frontend-runtime.js"></script>
+  <script src="../assets/platform-data.js"></script>
   <meta charset="utf-8">
     
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1526">
-  <title>الفعاليات — أفق</title>
-  <link rel="icon" type="image/png" href="../assets/branding/ofoq-logo.png?v=ofoq-11">
+  <title>الفعاليات — سعي</title>
+  <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
   
   
@@ -18,25 +20,16 @@
   <script defer src="../assets/arabic-ui.js"></script>
   <link rel="stylesheet" href="../assets/payment.css">
   <script defer src="../assets/payment.js"></script>
+  <script defer src="../assets/demo-auth.js"></script>
+<link rel="stylesheet" href="../assets/cards.css">
+<link rel="stylesheet" href="../assets/fonts.css">
+  <link rel="stylesheet" href="../assets/popup-ui.css">
+  <link rel="stylesheet" href="../assets/shared-navbar.css">
 </head>
 <body data-section="events" class="opportunity-page">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
   <!-- المكونات المشتركة -->
-  <header class="site-header">
-  <div class="container-xl header-inner">
-    <a href="../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
-      <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
-    </a>
-    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
-      <a data-section-link="freelance" href="../Freelance/freelance.html">العمل الحر</a>
-      <a data-section-link="academy" href="../Academy/academy.html">الأكاديمية</a>
-      <a data-section-link="internships" href="../Internships/internships.html">فرص التدريب</a>
-      <a data-section-link="jobs" href="../Jobs/jobs.html">الوظائف</a>
-      <a data-section-link="events" href="events.html">الفعاليات</a>
-    </nav></details>
-    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Auth/Login/login.html">تسجيل الدخول</a><a href="../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Account/Profile/profile.html">الملف الشخصي</a><a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Account/Messages/messages.html">الرسائل</a><a href="../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
-  </div>
-</header>
+  <script src="../assets/shared-navbar.js" data-mode="site"></script>
   <main id="mainContent" tabindex="-1" class="container-xl page-content">
     <div class="page-heading">
       <div>
@@ -51,7 +44,7 @@
         </ol>
       </nav>
     </div>
-    <section class="opportunity-intro" aria-labelledby="opportunityIntroTitle"><div class="opportunity-intro-copy"><p class="eyebrow">أفق / الفعاليات</p><h2 id="opportunityIntroTitle">لقاء واحد.<br>أفكار وفرص جديدة.</h2><p>ورش عمل ولقاءات تجمعك بأشخاص يشاركونك الشغف والتعلّم والتجربة.</p><div class="opportunity-shortcuts"><a class="btn btn-orange" href="#opportunityResults">استكشف الفعاليات ↓</a></div></div><img class="opportunity-intro-image" src="../assets/project-covers/mobile.svg" width="800" height="450" alt="" aria-hidden="true"></section>
+    <section class="opportunity-intro" aria-labelledby="opportunityIntroTitle"><div class="opportunity-intro-copy"><p class="eyebrow">سعي / الفعاليات</p><h2 id="opportunityIntroTitle">لقاء واحد.<br>أفكار وفرص جديدة.</h2><p>ورش عمل ولقاءات تجمعك بأشخاص يشاركونك الشغف والتعلّم والتجربة.</p><div class="opportunity-shortcuts"><a class="btn btn-orange" href="#opportunityResults">استكشف الفعاليات ↓</a></div></div><img class="opportunity-intro-image" src="../assets/project-covers/mobile.svg" width="800" height="450" alt="" aria-hidden="true"></section>
     <div class="workspace">
       <aside class="filter-panel panel" aria-labelledby="filterTitle">
         <form autocomplete="off" id="searchForm" class="opportunity-search"><label for="searchQuery">بحث</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="searchQuery" class="form-control" type="search" placeholder="ابحث بالعنوان أو الجهة أو المهارة…"></div></form>
@@ -118,12 +111,12 @@
           <p>جرّب بحثًا آخر أو امسح الفلاتر.</p>
           <button id="resetEmpty" class="btn btn-orange" type="button">مسح البحث والفلاتر</button>
         </div>
-        <p class="demo-note">نسخة تجريبية. الجهات والفعاليات والمواعيد والأسعار أمثلة توضيحية. لا تُحفظ أو تُرسل طلبات ولا يجري تسجيل أو دفع.</p>
+        <p class="demo-note">نسخة تجريبية. الجهات والفعاليات والمواعيد والأسعار أمثلة توضيحية. يمكنك التسجيل خلال التجربة ومتابعة الفعاليات من لوحة حسابك، دون دفع فعلي.</p>
       </section>
     </div>
   </main>
   <footer class="page-footer container-xl">
-  <span>© OFOQ <span id="year"></span></span>
+  <span>© SAEI <span id="year"></span></span>
   <a data-room-link href="../hero/userHero.html#events">العودة إلى قسم <span data-room-name>الفعاليات</span>  <span aria-hidden="true">↗</span></a>
 </footer>
 
@@ -132,7 +125,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content panel">
         <div class="modal-header">
-          <div><p class="eyebrow mb-2">أفق / الفعاليات</p><h2 id="detailTitle" class="modal-title fs-4"></h2></div>
+          <div><p class="eyebrow mb-2">سعي / الفعاليات</p><h2 id="detailTitle" class="modal-title fs-4"></h2></div>
           <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
         <div class="modal-body">
@@ -151,7 +144,7 @@
               </div>
               <div class="field"><label for="visitorMessage">هل ترغب بإضافة ملاحظة؟ (اختياري)</label><textarea id="visitorMessage" class="form-control" rows="3" maxlength="1500" ></textarea></div>
               <p class="demo-note">هذه معاينة فقط. تُمسح بياناتك عند إغلاق النافذة. لا يُرسل أي طلب ولا تُخصم أي مبالغ.</p>
-              <button class="btn btn-orange" type="submit">معاينة التسجيل بالفعالية</button>
+              <button class="btn btn-orange" type="submit">التسجيل في الفعالية</button>
             </form>
           </div>
           <div id="previewSuccess" class="application-success" role="status" hidden>
@@ -169,5 +162,6 @@
   
   
   <script src="events.js"></script>
+<script type="module" src="../assets/card-details.js"></script>
 </body>
 </html>

@@ -6,13 +6,31 @@
   let selected = new Set(store.state.cart);
   const checkboxes = new Map();
   const trainingSection = get('trainingCart');
+  const sharedSection = get('sharedCart');
+  function renderSharedCart() {
+    const app=window.OfoqFrontend;
+    app.cartRecords=(app.cartRecords||[]).filter(item=>item.kind!=='projects'&&item.kind!=='jobs');
+    const items=app.cartRecords;
+    sharedSection.hidden=!items.length;sharedSection.replaceChildren();
+    if(!items.length)return;
+    sharedSection.append(node('h2','الفعاليات في سلتك'),node('p','تابع تفاصيل الفعاليات والتسجيل فيها من هنا. لا تدخل هذه العناصر في إجمالي شراء الدورات.','training-cart-description'));
+    const labels={projects:'مشروع',jobs:'وظيفة',events:'فعالية'};
+    for(const item of items) {
+      const row=node('article',undefined,'favorite-row'),info=node('div');info.append(node('small',labels[item.kind]||'فرصة'),node('h3',item.title));
+      const controls=node('div',undefined,'favorite-controls'),link=node('a','عرض التفاصيل ←','learn-primary');
+      const url=new URL(item.href,location.href);url.searchParams.set('theme',document.documentElement.dataset.theme||'light');link.href=url.href;
+      const remove=action('إزالة من السلة',()=>{app.cartRecords=app.cartRecords.filter(record=>!(record.kind===item.kind&&String(record.id)===String(item.id)));render();get('cartStatus').textContent='أُزيلت «'+item.title+'» من السلة.';});
+      controls.append(link,remove);row.append(info,controls);sharedSection.append(row);
+    }
+    get('emptyCart').hidden=true;
+  }
   function renderTrainingCart() {
     let items = [];
-    try { const value = JSON.parse(localStorage.getItem('ofoq-internship-cart-v1') || '[]'); if (Array.isArray(value)) items = value.filter(item => item && typeof item.id === 'string' && typeof item.title === 'string'); } catch {}
+    try { const value = JSON.parse(window.OfoqFrontend.memory.getItem('ofoq-internship-cart-v1') || '[]'); if (Array.isArray(value)) items = value.filter(item => item && typeof item.id === 'string' && typeof item.title === 'string'); } catch {}
     trainingSection.hidden = !items.length;
     const heading = node('div', undefined, 'training-cart-heading');
     const headingCopy = node('div');
-    headingCopy.append(node('p', 'أفق / خطوتك المهنية القادمة', 'eyebrow'), node('h2', 'فرص التدريب في سلتك'));
+    headingCopy.append(node('p', 'سعي / خطوتك المهنية القادمة', 'eyebrow'), node('h2', 'فرص التدريب في سلتك'));
     heading.append(headingCopy, node('span', items.length + ' فرص محفوظة', 'training-cart-count'));
     trainingSection.replaceChildren(heading, node('p', 'راجع فرصك المفضلة وتابع تفاصيل التقديم. هذه الفرص لا تدخل في إجمالي شراء الدورات.', 'training-cart-description'));
     const list = node('div', undefined, 'training-cart-list');
@@ -38,7 +56,7 @@
       const details = node('a', 'عرض الفرصة ↗', 'learn-primary');
       details.href = url.href;
       const remove = action('إزالة من السلة', () => {
-        try { localStorage.setItem('ofoq-internship-cart-v1', JSON.stringify(items.filter(entry => entry.id !== item.id))); }
+        try { window.OfoqFrontend.memory.setItem('ofoq-internship-cart-v1', JSON.stringify(items.filter(entry => entry.id !== item.id))); }
         catch { get('cartStatus').textContent = 'تعذّرت إزالة الفرصة. حاول مجددًا.'; return; }
         render();
         get('cartStatus').textContent = 'أُزيلت «' + item.title + '» من السلة.';
@@ -156,6 +174,10 @@
     get('cartItems').replaceChildren(...rows);
     summary();
     renderTrainingCart();
+    renderSharedCart();
+    let trainingCount=0;try{trainingCount=JSON.parse(window.OfoqFrontend.memory.getItem("ofoq-internship-cart-v1")||"[]").length;}catch{}
+    const totalItems=store.state.cart.length+trainingCount+(window.OfoqFrontend.cartRecords||[]).length;
+    get("cartDescription").textContent=totalItems+" عناصر في سلتك المشتركة من أقسام المنصة.";
   }
 
   get('selectAll').addEventListener('change', () => {

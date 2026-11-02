@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -154,12 +138,12 @@ const project=id===null?projects[0]:projects.find(p=>String(p.id)===id);
 const projectSelect=$('ownerProject');
 projects.forEach(item=>{const option=el('option',item.title);option.value=item.id;projectSelect.append(option);});
 projectSelect.value=project?String(project.id):'';
-projectSelect.addEventListener('change',()=>{location.href=window.siteThemeUrl('./owner.html?id='+encodeURIComponent(projectSelect.value));});
+projectSelect.addEventListener('change',()=>{window.OfoqFrontend.navigate(window.siteThemeUrl('./owner.html?id='+encodeURIComponent(projectSelect.value)));});
 $('ownerProjectTitle').textContent=project?project.title:'المنشور غير موجود';
 $('projectApplicantsPanel').hidden=!project;
 $('year').textContent=new Date().getFullYear();
 if(project){
- const model=createApplicants(project);let selected=null;
+ const model=(window.OfoqFrontend.ownerWorkspaces ||= {})[project.id] ||= createApplicants(project);let selected=null;
  function notice(text){$('applicantStatus').textContent=text;}
  function button(text,action,record,cls='btn btn-small-outline'){const b=el('button',text,cls);b.type='button';b.dataset.applicant=record.id;b.dataset.action=action;return b;}
  function render(){
@@ -183,7 +167,8 @@ if(project){
  document.addEventListener('click',async event=>{
   const b=event.target.closest('button');if(!b)return;if(b.dataset.close)$ (b.dataset.close).close();if(!b.dataset.applicant)return;
   const r=model.records.find(item=>item.id===b.dataset.applicant);selected=r.id;
-  if(statuses[b.dataset.action]) notice('هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.');
+  if(statuses[b.dataset.action]) { r.status=b.dataset.action;render();notice('تم تحديث حالة الطلب: '+statuses[r.status]); }
+  if(b.dataset.action==='copy' && r.meeting) { try {await navigator.clipboard.writeText(r.meeting.page);notice('تم نسخ رابط المقابلة.');} catch {notice('تعذّر النسخ؛ يمكنك فتح المقابلة ونسخ الرابط.');} }
   if(b.dataset.action==='profile'){$('candidateProfileName').textContent=r.name;$('candidateProfileBio').textContent=r.specialty+' · '+r.experience+' · '+r.skills.join('، ');$('candidatePortfolio').replaceChildren(...['نموذج واجهة تطبيق','تصور موقع متجاوب','لوحة متابعة'].map(title=>el('div',title,'portfolio-sample')));$('candidateProfile').showModal();}
   if(b.dataset.action==='message'){$('messageRecipient').textContent='مراسلة '+r.name;$('privateMessageForm').reset();$('privateMessageStatus').textContent='';renderMessages();$('privateMessageDialog').showModal();}
   if(b.dataset.action==='meeting'){const form=$('meetingForm');form.reset();$('meetingError').textContent='';$('meetingCandidate').textContent='مقابلة '+r.name;for(const key of ['provider','date','url'])form.elements.namedItem(key).value=(key==='date'&&r.meeting?localDateTime(r.meeting.date):r.meeting?.[key])|| (key==='provider'?'jitsi':'');providerFields();$('meetingDialog').showModal();}
@@ -191,6 +176,30 @@ if(project){
  function providerFields(){const zoom=$('meetingForm').elements.provider.value==='zoom';$('zoomField').hidden=!zoom;$('meetingForm').elements.url.required=zoom;}
  $('meetingForm').elements.provider.addEventListener('change',providerFields);
  $('meetingForm').addEventListener('input',()=>$('meetingError').textContent='');
+ $('privateMessageForm').addEventListener('submit', event => {
+  event.preventDefault(); const field = $('privateMessageText'); field.value = field.value.trim();
+  field.setCustomValidity(field.value ? '' : 'اكتب رسالة أولًا.');
+  if (!event.currentTarget.reportValidity()) return;
+  model.records.find(item => item.id === selected).messages.push(field.value);
+  field.value = ''; renderMessages(); $('privateMessageStatus').textContent = 'أُضيفت الرسالة خلال هذه الزيارة.';
+ });
+ $('privateMessageText').addEventListener('input', event => event.target.setCustomValidity(''));
+ $('meetingForm').addEventListener('submit', event => {
+  event.preventDefault(); const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  const when = new Date(form.elements.date.value);
+  if (!Number.isFinite(when.getTime()) || when <= new Date()) { $('meetingError').textContent = 'اختر موعدًا في المستقبل.'; return; }
+  const record = model.records.find(item => item.id === selected), provider = form.elements.provider.value;
+  const target = new URL('../../Meeting/meeting.html', location.href);
+  target.searchParams.set('room', 'OfoqInterview-' + crypto.randomUUID().replaceAll('-', ''));
+  let page = target.href;
+  if (provider === 'zoom') {
+   try { const url = new URL(form.elements.url.value); if (url.protocol !== 'https:' || !/(^|\.)zoom\.us$/.test(url.hostname)) throw Error(); page = url.href; }
+   catch { $('meetingError').textContent = 'أدخل رابط HTTPS صالحًا من Zoom.'; return; }
+  }
+  record.meeting = {provider, date: when.toISOString(), url: form.elements.url.value, page};
+  $('meetingDialog').close(); render(); notice('تم تحديد موعد المقابلة خلال هذه الزيارة.');
+ });
  render();
 }
 

@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'applicationForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -137,6 +121,8 @@ const projects = [
 ];
 
 
+if (window.OfoqFrontend?.contentFor) projects.splice(0, projects.length, ...window.OfoqFrontend.contentFor('projects',projects));
+
 (function () {
 Promise.resolve().then(() => {
   if (!window.componentsReady || typeof window.componentsReady.then !== 'function') {
@@ -153,7 +139,7 @@ Promise.resolve().then(() => {
   let savedProjects = new Set();
   function readFavorites() {
     try {
-      const stored = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+      const stored = JSON.parse(window.OfoqFrontend.memory.getItem(favoritesKey) || '[]');
       savedProjects = new Set(Array.isArray(stored) ? stored.filter(id => projects.some(project => project.id === id)) : []);
     } catch { savedProjects = new Set(); }
   }
@@ -246,6 +232,7 @@ Promise.resolve().then(() => {
     const article = document.createElement("article");
     article.className = "project-card";
     article.dataset.project = project.id;
+    article.ofoqDetails = project;
 
     const cover = document.createElement('a');
     cover.className = 'project-cover';
@@ -271,8 +258,15 @@ Promise.resolve().then(() => {
 
     const category = document.createElement('p');
     category.className = 'project-category';
-    category.textContent = {development: 'برمجة وتطوير', design: 'تصميم', marketing: 'تسويق رقمي'}[project.category] + ' / ' + project.skills.join('، ');
+    category.textContent = ({development: 'برمجة وتطوير', design: 'تصميم', marketing: 'تسويق رقمي'}[project.category] || 'خدمات مهنية') + ' / ' + project.skills.join('، ');
     details.append(title, category);
+    const description = document.createElement('p');
+    description.className = 'project-summary';
+    description.textContent = project.description;
+    const skills = document.createElement('div');
+    skills.className = 'project-skill-tags';
+    for (const skill of project.skills) { const tag = document.createElement('span'); tag.textContent = skill; skills.append(tag); }
+    details.append(description, skills);
     const owner = document.createElement('a');
     owner.className = 'project-owner'; owner.href = window.OfoqPublishers.url('Profile', publisher.id);
     owner.textContent = publisher.name;
@@ -320,7 +314,7 @@ Promise.resolve().then(() => {
       else savedProjects.add(project.id);
       const nowSaved = savedProjects.has(project.id);
       try {
-        localStorage.setItem(favoritesKey, JSON.stringify([...savedProjects]));
+        window.OfoqFrontend.memory.setItem(favoritesKey, JSON.stringify([...savedProjects]));
         $('favoritesStatus').textContent = nowSaved ? 'أُضيف المشروع إلى المفضلة.' : 'أُزيل المشروع من المفضلة.';
       } catch {
         $('favoritesStatus').textContent = 'تم تحديث المفضلة لهذه الجلسة؛ تعذّر حفظها في المتصفح.';
@@ -501,6 +495,7 @@ Promise.resolve().then(() => {
   addEventListener('pageshow', () => { readFavorites(); render(); });
 
   function openApplication(project) {
+    window.OfoqFrontend.activeApplication = { kind: 'project', id: project.id, title: project.title, href: new URL('Project/project.html?id=' + project.id, location.href).href };
     $("applicationForm").reset();
     $("applicationForm").hidden = false;
     $("applicationSuccess").hidden = true;
@@ -539,6 +534,7 @@ Promise.resolve().then(() => {
     $("applicationSuccess").hidden = true;
   });
 
+  addEventListener('ofoq:projects-changed',()=>{projects.splice(0,projects.length,...window.OfoqFrontend.contentFor('projects',projects));render();});
   $("year").textContent = new Date().getFullYear();
 
   render();

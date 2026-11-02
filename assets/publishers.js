@@ -10,7 +10,7 @@
     ['career', 'مجتمع المسار المهني', 'مجتمع للتعلّم والتطوير المهني', 'الإرشاد, بناء المسار المهني, التواصل', 'green'],
     ['orange', 'أورنج كولكتيف', 'فريق تسويق وصناعة محتوى', 'التسويق الرقمي, كتابة المحتوى, التصميم', 'orange'],
     ['cloud', 'كلاود وركس', 'فريق تطوير وخدمات سحابية', 'تطوير المواقع, الخدمات السحابية, JavaScript', 'blue'],
-    ['ofoq', 'مجتمع أفق', 'مجتمع يجمع أصحاب الأفكار والمستقلين', 'التواصل, العمل الجماعي, تطوير الأفكار', 'orange']
+    ['ofoq', 'مجتمع سعي', 'مجتمع يجمع أصحاب الأفكار والمستقلين', 'التواصل, العمل الجماعي, تطوير الأفكار', 'orange']
   ];
   const accounts = rows.map(([id, name, role, skills, portrait]) => ({
     id, name, role, skills,
@@ -26,8 +26,8 @@
     return result.href;
   };
   const forRecord = (kind, record) => {
-    if (kind === 'project') return get(['bright', 'north', 'cloud', 'orange'][Number(record.id) - 1]);
-    return accounts.find(account => account.name === (record.instructor || record.company));
+    if (kind === 'project') return get(['bright', 'north', 'cloud', 'orange'][Number(record.id) - 1]) || get('ofoq');
+    return accounts.find(account => account.name === (record.instructor || record.company)) || get('bright');
   };
   // Card content comes only from the fixed account directory above.
   const card = account => account ? `<div class="publisher-card" data-publisher="${account.id}">

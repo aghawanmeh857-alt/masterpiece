@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'authForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -86,6 +70,12 @@ const form = document.getElementById('authForm');
 const password = document.getElementById('password');
 const confirmation = document.getElementById('confirmPassword');
 const fullName = document.getElementById('fullName');
+const serviceType = document.getElementById('serviceType');
+if (new URLSearchParams(location.search).get('account') === 'company') document.getElementById('accountType').value = 'company';
+const requestedService = new URLSearchParams(location.search).get('service');
+if ([...serviceType.options].some(option => option.value === requestedService)) serviceType.value = requestedService;
+let serviceChanged = false;
+serviceType.addEventListener('change', () => { serviceChanged = true; });
 if (fullName) fullName.addEventListener('input', () => fullName.setCustomValidity(''));
 
 function checkPasswords() {
@@ -118,6 +108,16 @@ form.addEventListener('submit', event => {
   if (!form.reportValidity()) return;
 
   const companyAccount = document.getElementById("accountType").value === "company";
+  const services = {freelance:'Freelance/freelance.html',jobs:'Jobs/jobs.html',internships:'Internships/internships.html',academy:'Academy/academy.html',workshops:'Academy/academy.html?format=workshop',events:'Events/events.html',profile:'Account/Profile/profile.html'};
+  let nextPage = new URL('../../' + services[serviceType.value], location.href).href;
+  const requestedNext = new URLSearchParams(location.search).get('next');
+  if (requestedNext && !serviceChanged) {
+    try { const url = new URL(requestedNext,location.href); const root = new URL('../../',location.href); if(url.origin===root.origin && url.pathname.startsWith(root.pathname) && url.pathname.endsWith('.html') && !/\/(Auth|Admin|company)\//i.test(url.pathname)) nextPage=url.href; } catch {}
+  }
+  window.OfoqFrontend.user = { signedIn: true, role: companyAccount ? 'company' : 'member' };
+  window.OfoqFrontend.memory.setItem('ofoq-demo-signed-in', 'true');
+  window.OfoqFrontend.profile.name = fullName.value.trim();
+  window.OfoqFrontend.profile.email = form.querySelector('input[type="email"]').value.trim();
   // Clear passwords immediately after previewing the form.
   form.reset();
   checkPasswords();
@@ -129,8 +129,8 @@ form.addEventListener('submit', event => {
   form.hidden = true;
   const success = document.getElementById('authSuccess');
   const destination = success.querySelector("a");
-  destination.href = window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : "../../Freelance/freelance.html");
-  destination.textContent = companyAccount ? "افتح لوحة الشركة ←" : "استكشف العمل الحر ←";
+  destination.href = window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : nextPage);
+  destination.textContent = companyAccount ? "افتح لوحة الشركة ←" : "أكمل إلى الخدمة التي اخترتها ←";
   success.hidden = false;
   success.focus();
 });

@@ -67,7 +67,7 @@
   const review = document.createElement('section');
   review.className = 'application-review'; review.hidden = true; review.tabIndex = -1;
   review.setAttribute('aria-label', 'مراجعة طلب التقديم');
-  review.innerHTML = '<h3>راجع طلبك</h3><dl></dl><p class="demo-note">هذه تجربة توضيحية؛ التأكيد لا يرسل طلبًا فعليًا ولا يرفع ملفك.</p><div class="application-review-actions"><button type="button" class="btn btn-orange" data-confirm>تأكيد المعاينة</button><button type="button" class="text-button" data-edit>تعديل المعلومات</button></div>';
+  review.innerHTML = '<h3>راجع طلبك</h3><dl></dl><p class="demo-note">سيظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا يُرسل إلى جهة خارجية.</p><div class="application-review-actions"><button type="button" class="btn btn-orange" data-confirm>تأكيد التقديم</button><button type="button" class="text-button" data-edit>تعديل المعلومات</button></div>';
   form.after(review);
   const submit = form.querySelector('button[type="submit"]');
   submit.textContent = 'مراجعة الطلب ←';
@@ -84,8 +84,18 @@
   }, true);
   review.querySelector('[data-edit]').addEventListener('click', () => { review.hidden = true; form.hidden = false; name.focus(); });
   review.querySelector('[data-confirm]').addEventListener('click', () => {
+    const app = window.OfoqFrontend;
+    const selected = form.id === 'applicationForm' ? app.activeApplication : { kind: 'project', id: new URLSearchParams(location.search).get('id'), title: document.getElementById('detailTitle').textContent, href: location.href };
+    if (!selected?.id) return;
+    app.apply(selected.kind, selected.id, selected.title, selected.href);
     form.reset(); form.hidden = true;
     const success = document.querySelector('#applicationSuccess, #previewSuccess');
+    review.hidden = true;
+    success.replaceChildren();
+    const message = document.createElement('p'); message.textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
+    const link = document.createElement('a'); link.className = 'btn btn-orange'; link.textContent = 'متابعة طلباتي ←';
+    link.href = new URL('Account/Dashboard/dashboard.html?tab=application', new URL('../', [...document.scripts].find(script => script.src.endsWith('/assets/application-form.js')).src)).href;
+    success.append(message, link);
     success.hidden = false; success.tabIndex = -1; success.focus();
   });
   form.addEventListener('reset', () => {

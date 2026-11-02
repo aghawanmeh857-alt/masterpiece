@@ -1,0 +1,193 @@
+/* One card system for projects, jobs, internships, events and learning. */
+:root{--card-radius:14px;--card-padding:14px;--card-gap:28px;--card-shadow:0 4px 18px rgba(var(--border-rgb,20,38,61),.06);--card-stroke:var(--field-border,#d2dbe7);--card-surface:var(--surface,#fff);--card-footer:var(--surface-raised,#f5f7fb)}
+html body[data-section] :is(.project-card,.listing-card,.course-card){display:flex;flex-direction:column;align-items:stretch;gap:0;min-width:0;height:100%;padding:0;border:1px solid var(--card-stroke);border-radius:var(--card-radius);background:var(--card-surface);box-shadow:var(--card-shadow);overflow:hidden;transition:border-color .18s,box-shadow .18s}
+html body[data-section] :is(.project-card,.listing-card,.course-card):hover{border-color:#ff783d80;transform:none}
+html body[data-section] :is(.project-card,.listing-card,.course-card):focus-within{border-color:#ff783d}
+html body[data-section] :is(#projectList.project-list,#itemList.listing-list,#courseList.course-grid){display:grid;grid-template-columns:repeat(auto-fill,min(100%,300px));justify-content:start;gap:var(--card-gap);align-items:stretch}
+html body[data-section] :is(.project-card .project-cover,.listing-card .opportunity-cover,.course-card .course-cover){display:block;position:relative;aspect-ratio:2.1/1;min-height:0;height:auto;margin:0;padding:0;border:0;border-bottom:1px solid var(--card-stroke);border-radius:0;background:var(--card-footer);overflow:hidden}
+html body[data-section] :is(.project-cover,.opportunity-cover,.course-cover)>img:first-child{display:block;width:100%;height:100%;object-fit:cover}
+html body[data-section] .opportunity-media{border:0}
+html body[data-section] .project-cover .cover-avatar{width:32px;height:32px;bottom:10px;inset-inline-end:10px;border:2px solid white;border-radius:50%}
+html body[data-section] :is(.project-details,.listing-details,.course-body){min-width:0;padding:var(--card-padding);text-align:start}
+html body[data-section] :is(.project-details,.listing-details,.course-body)>h2{font-size:14px;font-weight:800;line-height:1.7;margin:0 0 8px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+html body[data-section] :is(.project-details,.listing-details,.course-body)>h2 a{color:var(--text-main,#14263d);text-decoration:none}
+html body[data-section] :is(.project-details,.listing-details,.course-body)>h2 a:hover{color:var(--accent-text,#b74110)}
+html body[data-section] :is(.project-details .project-category,.listing-card .listing-category,.course-card .learning-badge){font-size:10px;line-height:1.7;color:var(--accent-text,#b74110);margin:0 0 6px}
+html body[data-section] :is(.project-details .project-summary,.listing-card .listing-description){font-size:12px;line-height:1.8;margin:10px 0;color:var(--text-muted,#526681);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+html body[data-section] :is(.project-skill-tags,.listing-tags){display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+html body[data-section] :is(.project-skill-tags,.listing-tags)>span{font-size:10px;line-height:1.7;padding:3px 6px;border-radius:6px;background:#ff783d12;color:var(--accent-text,#b74110)}
+html body[data-section] :is(.project-details .project-scope,.listing-card .listing-date){font-size:10px;line-height:1.8;margin:10px 0 0;padding-top:10px;border-top:1px solid var(--card-stroke);color:var(--text-muted,#526681)}
+html body[data-section] :is(.project-owner,.course-instructor,.listing-card .publisher-card){display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px;margin:10px 0;border:1px solid var(--card-stroke);border-radius:8px;background:var(--card-footer);font-size:11px;color:var(--text-muted,#526681);text-decoration:none}
+html body[data-section] .listing-card .publisher-avatar{width:30px;height:30px;flex-basis:30px}
+html body[data-section] .listing-card .listing-details .publisher-card{gap:8px;padding:8px;margin:10px 0;border:1px solid var(--card-stroke);border-radius:8px;background:var(--card-footer)}
+html body[data-section] .listing-card .publisher-account strong{font-size:11px}
+html body[data-section] .listing-card .publisher-message{font-size:10px;min-height:30px;padding:4px 8px;border-radius:8px}
+html body[data-section] :is(.project-card .project-offer,.listing-card .listing-offer){display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0;margin-top:auto;padding:12px var(--card-padding);border:0;border-top:1px solid var(--card-stroke);background:var(--card-footer);text-align:start}
+html body[data-section] :is(.project-card .project-price,.listing-card .listing-offer>strong,.course-card .course-price){grid-column:1/-1;font-size:16px;font-weight:800;line-height:1.6;letter-spacing:0;margin:0;color:var(--text-main,#14263d)}
+html body[data-section] .project-card .project-duration{font-size:11px;margin:0}
+html body[data-section] :is(.project-offer,.listing-offer)>.btn{grid-column:1/-1;width:100%}
+html body[data-section] :is(.project-offer,.listing-offer)>.details-link{grid-column:1/-1;font-size:11px;margin:0}
+html body[data-section] .course-card .course-body{display:flex;flex:1;flex-direction:column;gap:7px;padding-bottom:0}
+html body[data-section] .course-card .course-meta{font-size:11px;line-height:1.7;margin:0;color:var(--text-muted,#526681)}
+html body[data-section] .course-card .course-price{padding-bottom:8px}
+html body[data-section] .course-card .course-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin: auto calc(-1 * var(--card-padding)) 0;padding:12px var(--card-padding);border-top:1px solid var(--card-stroke);background:var(--card-footer)}
+html body[data-section] :is(.project-card,.listing-card,.course-card) :is(.btn-orange,.learn-primary){min-height:36px;padding:7px 10px;border:1px solid #ff783d;border-radius:8px;background:#ff783d;color:#14263d;font-size:11px;font-weight:800;white-space:normal}
+html body[data-section] :is(.project-card,.listing-card,.course-card) :is(.btn-orange,.learn-primary):hover{background:#ff986b;border-color:#ff986b}
+html body[data-section] .course-actions .course-add-cart{width:100%;flex-basis:100%;min-height:36px;padding:7px 10px;font-size:11px;border-radius:8px}
+html body[data-section] :is(.project-favorite-button,.course-actions .learn-wish,.save-internship){min-height:36px;border:1px solid var(--card-stroke);border-radius:8px;background:var(--card-surface);color:var(--text-main,#14263d)}
+html body[data-section] .project-favorite-button{min-width:0;max-width:100%;padding:5px 7px;font-size:10px;white-space:normal}
+html body[data-section] .course-actions .learn-wish{width:36px;min-width:36px;height:36px;padding:3px 7px;font-size:19px}
+html body[data-section] .save-internship{width:36px;height:36px}
+html body[data-section] :is(.project-favorite-button,.learn-wish,.save-internship)[aria-pressed=true]{color:var(--accent-text,#b74110);border-color:#ff783d}
+html body[data-section] :is(.profile-activity-card,.portfolio-card,.idea-card,.activity-card,.stat-card){min-width:0;padding:var(--card-padding);border:1px solid var(--card-stroke);border-radius:var(--card-radius);background:var(--card-surface);box-shadow:var(--card-shadow);overflow-wrap:anywhere}
+html body[data-section] .activity-card{margin-top:var(--card-gap)}
+html body[data-section] :is(.profile-activity-card,.portfolio-card,.idea-card,.activity-card) h3{font-size:14px;line-height:1.8}
+html body[data-section] :is(.project-card,.listing-card,.course-card)[hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){html body[data-section] :is(.project-card,.listing-card,.course-card){transition:none}}
+
+/* Shared content order and footer geometry, including legacy section layouts. */
+html body[data-section] :is(.project-details,.listing-details,.course-body){display:flex;flex:1;flex-direction:column;gap:0;align-items:stretch}
+html body[data-section] :is(.project-details,.listing-details,.course-body)>h2{order:0;min-block-size:3.4em}
+html body[data-section] :is(.project-category,.listing-category,.course-card .learning-badge){order:1;align-self:flex-start;min-block-size:1.7em;padding:0;background:transparent;border:0;border-radius:0}
+html body[data-section] :is(.project-summary,.listing-description,.course-summary){order:2;min-block-size:3.6em;font-size:12px;line-height:1.8;margin:10px 0;color:var(--text-muted,#526681);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+html body[data-section] :is(.project-skill-tags,.listing-tags){order:3;min-block-size:27px}
+html body[data-section] :is(.project-owner,.listing-details .publisher-card,.course-instructor){order:4;min-block-size:40px}
+html body[data-section] :is(.project-scope,.listing-date,.course-meta){order:5}
+html body[data-section] .course-card .course-body{gap:0;padding:var(--card-padding)}
+html body[data-section] .course-card .course-meta{padding-top:10px;border-top:1px solid var(--card-stroke);margin:10px 0 0;font-size:10px;line-height:1.8}
+html body[data-section] .course-body :is(progress,small){order:6;margin-top:8px}
+html body[data-section] .course-card>.course-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0;margin-top:auto;padding:12px var(--card-padding);border-top:1px solid var(--card-stroke);background:var(--card-footer)}
+html body[data-section] .course-actions>.course-price{flex:0 0 100%;padding:0;margin:0;font-size:16px;line-height:1.6}
+html body[data-section] .course-actions>.learn-primary{flex:1;display:flex;align-items:center;justify-content:center}
+html body[data-section] :is(.project-offer,.listing-offer)>.btn{display:flex;align-items:center;justify-content:center;min-height:36px;padding:7px 10px}
+html body[data-section] :is(.project-offer,.listing-offer)>.details-link{display:block;min-height:0;padding:0;border:0;border-radius:0;box-shadow:none;text-align:start;color:var(--accent-text,#b74110);line-height:1.8}
+html body[data-section] :is(.project-cover,.opportunity-cover,.course-cover)>img:first-child{transition:transform .2s}
+html body[data-section] :is(.project-cover,.opportunity-cover,.course-cover):hover>img:first-child{transform:scale(1.025)}
+html body[data-section] :is(.project-card,.listing-card,.course-card) :is(a,button):focus-visible{outline:2px solid #ff783d;outline-offset:-3px}
+
+/* Account, overview and navigation cards share the same frame and type scale. */
+html body[data-section] :is(.account-panel,.panel:not(.featured-path):not(.opportunity-intro),.stat,.profile-activity-empty,.more-sections-grid>a){min-width:0;border:1px solid var(--card-stroke);border-radius:var(--card-radius);background:var(--card-surface);box-shadow:var(--card-shadow);color:var(--text-main,#14263d)}
+html body[data-section] :is(.stat,.more-sections-grid>a){padding:var(--card-padding)}
+html body[data-section] .more-sections-grid>a{display:flex;flex-direction:column;gap:10px;text-decoration:none}
+html body[data-section] .more-sections-grid>a>strong{font-size:14px;line-height:1.8}
+html body[data-section] .more-sections-grid>a>:is(span,small){font-size:11px;line-height:1.8;color:var(--text-muted,#526681)}
+html body[data-section] :is(.portfolio-card,.profile-activity-card,.idea-card,.activity-card)>p{font-size:12px;line-height:1.8;color:var(--text-muted,#526681)}
+@media(max-width:520px){:root{--card-padding:12px;--card-gap:20px}}
+@media(prefers-reduced-motion:reduce){html body[data-section] :is(.project-cover,.opportunity-cover,.course-cover)>img:first-child{transition:none;transform:none}}
+
+/* Cards wrap according to the space available in their own content column. */
+html body[data-section] :is(.portfolio-grid,.profile-activity-list,.more-sections-grid){display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--card-gap);align-items:stretch}
+
+/* Keep filter controls comfortably inside the shared panel frame. */
+html body[data-section] .filter-panel.panel{min-width:0;padding:20px}
+html body[data-section] .filter-panel .filter-heading{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-bottom:20px}
+html body[data-section] .filter-panel .filter-heading h2{min-width:0;margin:0;font-size:17px;line-height:1.8;overflow-wrap:anywhere}
+html body[data-section] .filter-panel .filter-heading button{flex-shrink:0}
+html body[data-section] .filter-panel .opportunity-search{min-width:0;margin-bottom:24px}
+html body[data-section] .filter-panel .search-field{display:flex;align-items:center;min-width:0;width:100%;overflow:hidden}
+html body[data-section] .filter-panel .search-field input{flex:1;width:0;min-width:0;font-size:13px;padding-inline:10px}
+html body[data-section] .filter-panel .search-field svg{flex:0 0 18px;width:18px;height:18px;margin-inline-start:12px}
+html body[data-section] .filter-panel .field{min-width:0;margin-bottom:20px}
+html body[data-section] .filter-panel .field label{display:block;margin-bottom:8px;font-size:14px}
+html body[data-section] .filter-panel .field :is(select,input){width:100%;min-width:0;max-width:100%;font-size:14px}
+html body[data-section] .filter-panel .filter-footnote{margin:8px 0 0;line-height:1.8}
+@media(max-width:520px){html body[data-section] .filter-panel.panel{padding:16px}}
+
+/* Discovery shows only the cover and title; full content lives in the dialog. */
+html body[data-section] .card-preview :is(.project-details,.listing-details,.course-body){flex:1;padding:14px}
+html body[data-section] :is(.project-card,.listing-card,.course-card).card-preview{width:100%;height:390px;min-height:390px}
+html body[data-section] .card-preview :is(.project-cover,.opportunity-media,.course-cover){flex-shrink:0}
+html body[data-section] .card-preview :is(.project-details,.listing-details,.course-body)>:not(h2):not(.card-preview-summary){display:none!important}
+html body[data-section] .card-preview-summary{display:flex;flex-direction:column;gap:7px;margin-top:10px;padding:10px 12px;border:1px solid var(--card-stroke);border-radius:9px;background:var(--field-bg,var(--card-footer));order:1}
+html body[data-section] .card-preview-summary>div{min-width:0;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
+html body[data-section] .card-preview-summary small{order:0;flex-shrink:0;margin:0;font-size:10px;font-weight:400;line-height:1.6;color:var(--text-muted,#526681)}
+html body[data-section] .card-preview-summary span{order:1;display:block;min-width:0;font-size:12px;line-height:1.6;font-weight:500;color:var(--text-main,#17263b);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;text-align:end;unicode-bidi:plaintext}
+html body[data-section] .card-preview :is(.project-details,.listing-details,.course-body)>h2{min-block-size:3.6em;margin:0;font-size:14px;line-height:1.8}
+html body[data-section] .card-preview :is(.project-offer,.listing-offer,.course-actions){display:none!important}
+html body[data-section] .card-preview .opportunity-event-date,html body[data-section] .card-preview .opportunity-badge{display:none}
+html body[data-section] .card-preview-actions{display:flex;flex-shrink:0;align-items:center;gap:8px;margin-top:auto;padding:12px 14px;border-top:1px solid var(--card-stroke);background:var(--card-footer)}
+html body[data-section] .card-preview-open{flex:1;min-width:0;min-height:38px;padding:8px 12px;border:1px solid #ff783d;border-radius:8px;background:#ff783d;color:#14263d;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+html body[data-section] .card-preview-actions :is(.learn-wish,.project-favorite-button){flex-shrink:0;min-height:38px;height:38px;padding:6px 10px}
+html body[data-section] .card-details-dialog{width:min(720px,calc(100% - 28px));max-height:90vh;max-height:90dvh;padding:0;border:1px solid var(--card-stroke);border-radius:16px;background:var(--card-surface);color:var(--text-main,#17263b);box-shadow:0 24px 80px #0004;overflow:hidden;direction:rtl}
+html body[data-section] .card-details-dialog[open]{display:flex;flex-direction:column}
+.card-details-dialog::backdrop{background:#0b1526aa;backdrop-filter:blur(4px)}
+.card-popup-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-bottom:1px solid var(--card-stroke);font-size:12px;color:var(--text-muted,#526681)}
+.card-popup-close{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--card-stroke);border-radius:8px;background:var(--card-footer);color:var(--text-main);font-size:24px;cursor:pointer}
+.card-popup-content{overflow-y:auto;overscroll-behavior:contain;min-height:0;padding:20px;line-height:1.9}
+.card-popup-cover{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:20px}
+.card-popup-content h2{font-size:22px;line-height:1.7;margin:0 0 20px;font-weight:800}
+.card-popup-content section{padding:16px 0;border-top:1px solid var(--card-stroke)}
+.card-popup-content h3{font-size:15px;font-weight:800;margin:0 0 10px}
+.card-popup-content ul{padding-inline-start:20px;margin:0;color:var(--text-muted,#526681);font-size:14px;overflow-wrap:anywhere}
+.card-popup-content li{margin:6px 0;white-space:pre-wrap}
+.card-popup-actions{display:flex;flex-wrap:wrap;gap:10px;padding:14px 20px;border-top:1px solid var(--card-stroke);background:var(--card-footer)}
+.card-popup-actions button{flex:1;min-height:42px;border:1px solid var(--card-stroke);border-radius:8px;padding:10px 14px;background:var(--card-surface);color:var(--text-main);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.card-popup-actions .card-popup-primary{background:#ff783d;border-color:#ff783d;color:#14263d}
+.card-popup-actions button[hidden]{display:none}
+.card-popup-actions button:disabled{opacity:.6;cursor:wait}
+.card-popup-status{margin:0;padding:0 20px;background:var(--card-footer);font-size:12px;line-height:1.8;color:var(--text-muted)}
+.card-popup-status:not(:empty){padding-bottom:12px}
+.card-details-dialog :is(button,a):focus-visible{outline:2px solid #ff783d;outline-offset:2px}
+@media(max-width:520px){.card-popup-content{padding:16px}.card-popup-content h2{font-size:18px}.card-popup-actions{padding:12px 16px}.card-popup-actions button{flex-basis:100%}}
+.publisher-fields{min-width:0;margin:20px 0;padding:16px;border:1px solid var(--card-stroke);border-radius:12px;background:var(--card-footer)}
+.publisher-fields legend{float:none;width:auto;padding-inline:6px;font-size:15px;font-weight:800}
+.publisher-fields>label,.publisher-fields fieldset>label{display:block;margin:12px 0;font-size:13px}
+.publisher-fields :is(input:not([type=checkbox]),textarea,select){display:block;width:100%;min-width:0;padding:10px;margin-top:6px;border:1px solid var(--card-stroke);border-radius:8px;background:var(--card-surface);color:var(--text-main);font:inherit}
+.publisher-fields :is(.publisher-current-file,.publisher-file-note){font-size:12px;line-height:1.8;color:var(--text-muted);overflow-wrap:anywhere}
+.publisher-fields .publisher-error{font-size:12px;color:#c34221}
+.publisher-fields [hidden]{display:none!important}
+.publisher-fields [data-publisher-kind]{border:0;margin:0;padding:0}
+.publisher-image-field{padding:18px;margin-bottom:22px;border:1px solid var(--card-stroke);border-radius:12px;background:var(--card-surface)}
+.publisher-image-field>strong{display:block;font-size:14px;margin-bottom:12px}
+.publisher-fields .publisher-image-picker{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:145px;padding:20px;margin:0;border:1px dashed var(--card-stroke);border-radius:10px;background:var(--card-footer);text-align:center;overflow:hidden;cursor:pointer}
+.publisher-image-picker>span{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#ff783d15;color:var(--accent-text);font-size:24px}
+.publisher-image-picker>b{font-size:13px}.publisher-image-picker>small{font-size:10px;color:var(--text-muted)}
+.publisher-fields .publisher-image-picker input[type=file]{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer}
+.publisher-image-picker:focus-within,.publisher-image-picker:hover{outline:2px solid #ff783d;outline-offset:2px}
+.publisher-image-preview{margin-top:12px;border-radius:10px;overflow:hidden;background:var(--card-footer)}
+.publisher-image-preview img{display:block;width:100%;max-height:190px;object-fit:contain}
+.publisher-fields .publisher-image-remove{display:flex;align-items:center;gap:8px;font-size:12px}
+.publisher-fields .publisher-image-remove input{width:auto;margin:0}
+.publisher-fields .publisher-image-field{padding:20px;border-radius:14px;box-shadow:0 3px 12px #00000003}
+.publisher-image-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
+.publisher-image-heading strong{font-size:14px;font-weight:700;color:var(--text-main)}
+.publisher-image-heading p{font-size:11px;color:var(--text-muted);line-height:1.7;margin:5px 0 0}
+.publisher-image-heading>small{padding:4px 8px;border:1px solid var(--card-stroke);border-radius:6px;font-size:10px;color:var(--text-muted);background:var(--card-footer)}
+.publisher-fields .publisher-image-field .publisher-image-picker{display:grid;grid-template-columns:48px minmax(0,1fr) auto;grid-template-rows:auto auto;gap:5px 14px;min-height:116px;padding:22px 18px;border:1px dashed var(--card-stroke);border-radius:12px;background:linear-gradient(120deg,#ff783d06,transparent),var(--card-footer);text-align:start;align-content:center}
+.publisher-image-picker .publisher-image-symbol{grid-column:1;grid-row:1/3;display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:var(--card-surface);border:1px solid var(--card-stroke);color:var(--accent-text)}
+.publisher-image-symbol svg{width:25px;height:25px}
+.publisher-image-picker>b{grid-column:2;grid-row:1;font-size:12px;line-height:1.8}
+.publisher-image-picker>small{grid-column:2;grid-row:2;font-size:10px;line-height:1.8}
+.publisher-image-picker .publisher-image-action{grid-column:3;grid-row:1/3;display:flex;align-items:center;justify-content:center;width:auto;height:auto;min-height:36px;padding:8px 14px;border:1px solid #ff783d;border-radius:8px;background:#ff783d;color:#14263d;font-size:11px;font-weight:700;white-space:nowrap}
+.publisher-fields .publisher-image-field .publisher-image-preview{margin-top:16px;padding:8px;border:1px solid var(--card-stroke);border-radius:12px;background:var(--card-footer)}
+.publisher-image-preview img{max-height:220px;border-radius:7px}
+.publisher-fields .publisher-image-field .publisher-current-image{margin:10px 0 0;font-size:11px;overflow-wrap:anywhere}
+.publisher-fields .publisher-image-remove{margin:12px 0 0;padding-top:12px;border-top:1px solid var(--card-stroke);color:var(--text-muted)}
+@media(max-width:600px){.publisher-fields .publisher-image-field{padding:16px}.publisher-fields .publisher-image-field .publisher-image-picker{grid-template-columns:40px minmax(0,1fr);padding:18px 14px;gap:8px 12px}.publisher-image-picker .publisher-image-symbol{width:40px;height:40px}.publisher-image-picker .publisher-image-action{grid-column:1/-1;grid-row:3;margin-top:8px}.publisher-image-picker>b{font-size:11px}}
+.favorites-filters{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0}.favorites-filters button{padding:10px 16px;border:1px solid var(--field-border);border-radius:10px;background:var(--surface);color:var(--text-main);font:inherit;font-size:13px}.favorites-filters button[aria-pressed=true]{border-color:#ff783d;background:#ff783d15;color:var(--accent-text)}.favorites-list{display:grid;gap:18px}.favorite-row{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px;background:var(--surface);border:1px solid var(--field-border);border-radius:16px}.favorite-row h2{font-size:18px;line-height:1.7;margin:8px 0}.favorite-row small{color:var(--accent-text)}.favorite-controls{display:flex;gap:10px;flex-shrink:0}.favorite-controls a,.favorite-controls button{font-size:12px;white-space:nowrap}@media(max-width:650px){.favorite-row{flex-direction:column;align-items:stretch;padding:20px}.favorite-controls>*{flex:1;text-align:center}}
+#project-favorites[hidden],#featuredWishlist[hidden],#academyCartButton[hidden],#savedShortcut[hidden]{display:none!important}
+/* One consistent action row across projects, learning and opportunities. */
+html body[data-section] .card-preview-actions{display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;align-items:center;gap:8px}
+html body[data-section] .card-preview-actions .card-preview-open{width:100%;min-height:42px;font-size:12px;padding:10px 8px}
+html body[data-section] .card-preview-actions :is(.shared-card-cart,.shared-card-favorite){display:grid;place-items:center;width:42px;height:42px;min-height:42px;min-width:0;padding:0!important;margin:0;border:1px solid var(--field-border,#cbd5e1);border-radius:9px;background:var(--surface,#fff);color:var(--text-main,#17263b);cursor:pointer;font-family:inherit;font-size:23px;line-height:1}
+html body[data-section] .card-preview-actions :is(.shared-card-cart,.shared-card-favorite)[aria-pressed=true]{color:var(--accent-text,#a43e13);background:#ff783d15;border-color:#ff783d70}
+html body[data-section] .card-preview-actions :is(.shared-card-cart,.shared-card-favorite):hover{border-color:#ff783d}
+html body[data-section] .card-preview-actions button:focus-visible{outline:2px solid #ff783d;outline-offset:3px}
+html body[data-section] .card-preview-actions button:disabled{opacity:.5;cursor:default}
+.shared-cart-section{margin:32px 0;display:grid;gap:16px}.shared-cart-section[hidden]{display:none}.shared-cart-section>h2{font-size:22px}
+/* Final shared card geometry: media, summary and a reserved action row. */
+html body[data-section] :is(.project-card,.listing-card,.course-card).card-preview{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:142px minmax(0,1fr) 66px!important;align-items:stretch;gap:0!important;width:100%;height:410px;min-height:410px;padding:0;overflow:hidden}
+html body[data-section] .card-preview>:is(.project-cover,.opportunity-media,.course-cover){grid-column:1;grid-row:1;position:relative;aspect-ratio:auto!important;height:142px!important;min-height:0!important;width:100%;margin:0!important;overflow:hidden}
+html body[data-section] .card-preview .opportunity-media .opportunity-cover{display:block;position:relative;width:100%;height:100%!important;aspect-ratio:auto!important;margin:0}
+html body[data-section] .card-preview :is(.project-cover,.opportunity-cover,.course-cover)>img:first-child{width:100%;height:100%;object-fit:cover}
+html body[data-section] .card-preview>:is(.project-details,.listing-details,.course-body){grid-column:1!important;grid-row:2!important;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;min-height:0!important;min-width:0;padding:14px!important;gap:10px!important;margin:0!important}
+html body[data-section] .card-preview :is(.project-details,.listing-details,.course-body)>h2{height:50px;min-height:50px;min-block-size:50px;max-height:50px;flex-shrink:0;font-size:14px;line-height:1.8;margin:0!important;padding:0;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+html body[data-section] .card-preview-summary{flex-shrink:0;min-height:88px;margin:0!important;padding:10px 12px;gap:7px}
+html body[data-section] .card-preview>.card-preview-actions{grid-column:1!important;grid-row:3!important;position:relative;display:grid!important;grid-template-columns:minmax(0,1fr) 42px 42px;gap:8px;align-items:center;min-height:66px;height:66px;box-sizing:border-box;margin:0!important;padding:11px 14px!important;overflow:visible}
+html body[data-section] .card-preview-actions :is(.shared-card-cart,.shared-card-favorite){position:static!important;inset:auto!important;float:none;transform:none!important;opacity:1!important;visibility:visible!important;display:grid!important;align-self:center;justify-self:center;grid-column:auto;grid-row:auto;flex:none;box-shadow:none;width:42px;height:42px}
+html body[data-section] .card-preview-actions .card-preview-open{position:static;grid-column:1;grid-row:1;height:42px;min-height:42px;margin:0}
+html body[data-section] .card-preview-actions .shared-card-cart{grid-column:2;grid-row:1}
+html body[data-section] .card-preview-actions .shared-card-favorite{grid-column:3;grid-row:1}
+/* Projects and jobs expose details and favorites only. */
+html body[data-section] .card-preview>.card-preview-actions.card-actions-no-cart{grid-template-columns:minmax(0,1fr) 42px}
+html body[data-section] .card-preview-actions.card-actions-no-cart .shared-card-favorite{grid-column:2!important;grid-row:1!important}

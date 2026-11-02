@@ -1,0 +1,12 @@
+
+:root{
+  --font-site:'Tajawal',Tahoma,system-ui,sans-serif;
+  --font-heading:var(--font-site);
+  --font-body:var(--font-site);
+  --profile-heading-font:var(--font-site);
+  --profile-body-font:var(--font-site);
+}
+html body{font-family:var(--font-site);font-weight:400}
+html body :is(h1,h2,h3,h4,h5,h6,button,input,select,textarea,summary,dialog){font-family:var(--font-site)}
+html body :is(h1,h2,h3,h4,h5,h6,button,.btn){font-weight:700}
+html body :is(input,select,textarea,label,nav){font-weight:500}

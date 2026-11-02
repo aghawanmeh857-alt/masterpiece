@@ -8,7 +8,7 @@
   border-radius: 22px;
   color: var(--text-main);
   background: var(--surface);
-  font-family: 'Noto Sans Arabic', Tahoma, sans-serif;
+  font-family:'Tajawal',Tahoma,system-ui,sans-serif;
   box-shadow: 0 24px 90px #0005;
 }
 .payment-dialog::backdrop { background: #071222b0; backdrop-filter: blur(5px); }

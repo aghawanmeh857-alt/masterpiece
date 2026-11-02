@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -100,6 +84,7 @@ if (profileForm) {
     bio: 'أحوّل الأفكار إلى تجارب رقمية واضحة وسهلة. أستمتع ببناء المواقع والعمل مع أشخاص يهتمون بجودة التصميم.',
     skills: 'تصميم الواجهات, Figma, HTML, CSS, JavaScript'
   };
+  profile = { ...profile, ...window.OfoqFrontend.profile };
 
   const requestedUser = new URLSearchParams(location.search).get('user');
   const publisher = window.OfoqPublishers.get(requestedUser);
@@ -119,13 +104,13 @@ if (profileForm) {
       return;
     }
     profile = { ...publisher };
-    document.title = publisher.name + ' — أفق';
+    document.title = publisher.name + ' — سعي';
     const message = document.createElement('a');
     message.className = 'btn btn-orange';
     message.href = window.OfoqPublishers.url('Messages', publisher.id);
     message.textContent = 'مراسلة ↗';
     editButton.after(message);
-    document.querySelector('.availability').textContent = 'ناشر على أفق';
+    document.querySelector('.availability').textContent = 'ناشر على سعي';
   }
 
   function showProfile() {
@@ -133,6 +118,7 @@ if (profileForm) {
     document.getElementById('profileRole').textContent = profile.role;
     document.getElementById('profileLocation').textContent = profile.location;
     document.getElementById('profileBio').textContent = profile.bio;
+    if (!publisher) document.querySelector('.availability').textContent = window.OfoqFrontend.settings.availability;
     const avatar = document.getElementById('profileAvatar');
     if (publisher) {
       const image = document.createElement('img');
@@ -174,6 +160,16 @@ if (profileForm) {
   });
 
   cancelButton.addEventListener('click', closeEditor);
+  profileForm.addEventListener('submit', event => {
+    event.preventDefault();
+    profileForm.querySelectorAll('[required]').forEach(input => input.setCustomValidity(input.value.trim() ? '' : 'يرجى تعبئة هذا الحقل.'));
+    document.getElementById('editName').setCustomValidity(document.getElementById('editName').value.trim().length >= 2 ? '' : 'اكتب اسمًا من حرفين على الأقل.');
+    if (!profileForm.reportValidity()) return;
+    for (const [key, id] of Object.entries({name: 'editName', role: 'editRole', location: 'editLocation', bio: 'editBio', skills: 'editSkills'})) profile[key] = document.getElementById(id).value.trim();
+    Object.assign(window.OfoqFrontend.profile, profile);
+    showProfile(); closeEditor();
+    status.textContent = 'تم تحديث ملفك خلال هذه الزيارة.';
+  });
   profileForm.addEventListener('input', event => {
     event.target.setCustomValidity('');
   });

@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -88,19 +72,38 @@ const courses = window.OfoqCourses;
   const get = id => document.getElementById(id);
   const labels = {development:'التطوير',design:'التصميم',marketing:'التسويق',career:'المهارات المهنية',beginner:'مبتدئ',intermediate:'متوسط',path:'مسار تعلّم',workshop:'ورشة'};
   const requestedLibrary = new URLSearchParams(location.search).get('library');
+  const workshopMode = new URLSearchParams(location.search).get('format') === 'workshop';
+  if (workshopMode) {
+    get('format').value = 'workshop';
+    document.title = 'الورش التدريبية — سعي';
+    document.body.dataset.page = 'workshops';
+    document.querySelector('.page-heading h1, main h1').innerHTML = 'ورش تدريبية.<br><em>تعلّم بالتطبيق.</em>';
+    document.querySelector('.page-heading .eyebrow').textContent = 'الورش التدريبية / مهارات عملية';
+    document.querySelector('.page-heading .intro').textContent = 'ورش تطبيقية لتطوير مهاراتك، مع تفاصيل واضحة للمحتوى والمدة وطريقة المشاركة.';
+    document.querySelector('.breadcrumb-item.active').textContent = 'الورش التدريبية';
+    get('trainingCoursesTitle').textContent = 'الورش التدريبية المتاحة';
+    document.querySelector('.featured-copy .eyebrow').textContent = 'التعلّم بالممارسة';
+    get('featuredTitle').innerHTML = 'طوّر مهاراتك.<br>بالتجربة والتطبيق.';
+    document.querySelector('.featured-copy > p:not(.eyebrow)').textContent = 'استكشف الورش المتاحة، واقرأ محاورها ومتطلباتها قبل الالتحاق.';
+    document.querySelector('.featured-meta').replaceChildren(...['ورش تطبيقية','مهارات متنوعة','تعلّم عملي'].map(text=>{const span=document.createElement('span');span.textContent=text;return span;}));
+    get('featuredCourse').textContent = 'استكشف الورش التدريبية ↓';
+    get('searchQuery').placeholder = 'ابحث عن ورشة أو مهارة…';
+    get('format').disabled = true;
+    document.querySelector('[data-section-link="workshops"]')?.setAttribute('aria-current', 'page');
+  }
   let library = ['overview', 'enrolled', 'wishlist'].includes(requestedLibrary) ? requestedLibrary : 'all';
   function node(tag,text,className) { const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element; }
   function button(text,action,className='learn-primary') { const element=node('button',text,className);element.type='button';element.addEventListener('click',action);return element; }
   function card(course) {
     const owned=store.has(course.id), article=node('article',undefined,'course-card'),cover=node('a',undefined,'course-cover');
-    article.dataset.course=course.id;cover.href=OfoqLearning.url(course.id);cover.setAttribute('aria-label','تفاصيل '+course.title);
+    article.ofoqDetails=course;article.dataset.course=course.id;cover.href=OfoqLearning.url(course.id);cover.setAttribute('aria-label','تفاصيل '+course.title);
     const image=node('img');image.src=OfoqLearning.cover(course.id);image.alt='';image.width=800;image.height=450;image.loading='lazy';cover.append(image);
     const body=node('div',undefined,'course-body'),title=node('h2'),link=node('a',course.title);link.href=cover.href;title.append(link);
     const owner=node('a',course.instructor,'course-instructor');owner.href=OfoqPublishers.url('Profile',OfoqPublishers.forRecord('course',course).id);
     const badge=node('span',course.price?'تعلّم عملي':'دورة مجانية','learning-badge');
     const meta=node('p',course.hours+' ساعة · '+course.syllabus.length+' دروس تفاعلية · '+labels[course.level],'course-meta');
     const price=node('strong',course.price?'$'+course.price:'مجاني','course-price');
-    const actions=node('div',undefined,'course-actions');
+    const actions=node('div',undefined,'course-actions');actions.append(price);
     actions.append(button(owned?'متابعة التعلّم ←':course.price?'اشترِ الآن':'التحق مجانًا',()=>{
       if(owned)location.assign(cover.href);else if(course.price)store.checkout([course.id],()=>location.assign(cover.href));else{store.enroll([course.id]);location.assign(cover.href);}
     }));
@@ -116,9 +119,10 @@ const courses = window.OfoqCourses;
       cartButton.setAttribute('aria-pressed', String(inCart));
       actions.append(cartButton);
     }
-    body.append(badge,title,owner,meta,price);
+    const summary=node('p',course.description,'course-summary');
+    body.append(title,badge,summary,owner,meta);
     if(owned){const progress=node('progress');progress.max=100;progress.value=store.percent(course.id);progress.setAttribute('aria-label','تقدّمك في '+course.title);body.append(progress,node('small',store.percent(course.id)+'% مكتمل'));}
-    body.append(actions);article.append(cover,body);return article;
+    article.append(cover,body,actions);return article;
   }
   function renderOverview() {
     const enrolled = courses.filter(course => store.has(course.id));
@@ -159,13 +163,13 @@ const courses = window.OfoqCourses;
     get('academyOverview').hidden = library !== 'overview';
     get('catalogWorkspace').hidden = library === 'overview';
     if (library === 'overview') renderOverview();
-    const query=get('searchQuery').value.trim().toLowerCase(),category=get('category').value,level=get('level').value,format=get('format').value,price=get('price').value;
+    const query=get('searchQuery').value.trim().toLowerCase(),category=get('category').value,level=get('level').value,format=workshopMode ? 'workshop' : get('format').value,price=get('price').value;
     const items=courses.filter(course=>{
       if(library==='enrolled'&&!store.has(course.id))return false;if(library==='wishlist'&&!store.state.wishlist.includes(course.id))return false;
       return (!query||[course.title,course.description,course.instructor,...course.syllabus].join(' ').toLowerCase().includes(query))&&(!category||course.category===category)&&(!level||course.level===level)&&(!format||course.format===format)&&(price!=='free'||course.price===0)&&(price!=='paid'||course.price>0);
     });
     if(get('sortBy').value==='duration')items.sort((a,b)=>a.hours-b.hours);if(get('sortBy').value==='price')items.sort((a,b)=>a.price-b.price);
-    get('courseList').replaceChildren(...items.map(card));get('emptyState').hidden=items.length>0;get('resultCount').textContent=items.length+' دورات';
+    get('courseList').replaceChildren(...items.map(card));get('emptyState').hidden=items.length>0;get('resultCount').textContent=items.length+(workshopMode?' ورش تدريبية':' دورات');
     get('learningCount').textContent=store.state.enrolled.length;get('wishCount').textContent=store.state.wishlist.length;get('cartCount').textContent=store.state.cart.length;
     get('academyCartCount').textContent = store.state.cart.length;
     get('featuredWishCount').textContent = store.state.wishlist.length;

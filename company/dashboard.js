@@ -6,7 +6,7 @@
   function createWorkspace() {
     let serial = 20;
     const content = [
-      { id: 'e1', type: 'event', title: 'من الفكرة إلى منتجك الأول', category: 'التطوير', status: 'published', description: 'ورشة عملية لتحويل فكرة منتج إلى نموذج أولي قابل للتجربة.', eventDate: '2026-11-14T17:00', capacity: 30, venue: 'مساحة أفق · عمّان', price: 15 },
+      { id: 'e1', type: 'event', title: 'من الفكرة إلى منتجك الأول', category: 'التطوير', status: 'published', description: 'ورشة عملية لتحويل فكرة منتج إلى نموذج أولي قابل للتجربة.', eventDate: '2026-11-14T17:00', capacity: 30, venue: 'مساحة سعي · عمّان', price: 15 },
       { id: 'c1', type: 'course', title: 'أساسيات تطوير الواجهات', category: 'التطوير', status: 'published', description: 'تعلّم بناء صفحات ويب متجاوبة من خلال تطبيقات عملية.', instructor: 'عمر خليل', hours: 12, capacity: 25, level: 'مبتدئ', syllabus: 'بنية صفحات HTML\nالتنسيق باستخدام CSS\nمقدمة إلى JavaScript', video: '', price: 0 },
       { id: 'e2', type: 'event', title: 'لقاء المصممين وصنّاع الأفكار', category: 'التصميم', status: 'draft', description: 'لقاء لمشاركة المشاريع والأفكار وبناء علاقات مهنية جديدة.', eventDate: '2026-11-21T18:00', capacity: 40, venue: 'عبر الإنترنت', price: 0 },
       { id: 'c2', type: 'course', title: 'تصميم واجهات وتجربة المستخدم', category: 'التصميم', status: 'paused', description: 'درس تطبيقي لفهم المستخدم وتصميم واجهات واضحة باستخدام Figma.', instructor: 'لينا حداد', hours: 8, capacity: 20, level: 'متوسط', syllabus: 'فهم احتياجات المستخدم\nرسم مسارات الاستخدام\nبناء النموذج الأولي', video: '', price: 25 }
@@ -72,12 +72,12 @@
   };
   const icon = key => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + iconPaths[key] + '</svg>';
   document.querySelectorAll('#navigation [data-view]').forEach(button => { button.querySelector('.nav-icon').innerHTML = icon(button.dataset.view); });
-  const model = createWorkspace();
+  const model = window.OfoqFrontend.companyWorkspace ||= createWorkspace();
   const $ = id => document.getElementById(id);
   const fields = $('contentForm').elements;
   let current = 'overview', editingId = null, editingType = 'event', reviewingId = null, toastTimer;
   const views = {
-    overview: ['نظرة عامة', 'فعالياتك ودروسك والمتقدمون، في مساحة واحدة.'],
+    overview: ['نظرة عامة', 'وظائفك وفرص التدريب والمتقدمون، في مساحة واحدة.'],
     events: ['الفعاليات', 'أنشئ فعاليات شركتك، وحدّث تفاصيلها وتحكّم بنشرها.'],
     courses: ['دروس الأكاديمية', 'شارك خبرة شركتك من خلال دروس ووحدات تعليمية.'],
     applicants: ['المتقدمون', 'راجع طلبات الفعاليات والدروس وحدّد المقبولين.'],
@@ -88,7 +88,7 @@
   const button = (text, action, id, className = 'secondary') => `<button class="${className}" data-action="${action}" data-id="${id}">${text}</button>`;
   function toast(text) { $('toast').textContent = text; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 4000); }
   function show(view, updateHash = true) {
-    current = views[view] ? view : 'overview';
+    current = ['overview','profile'].includes(view) ? view : 'overview';
     for (const [id, active] of [['overviewView', 'overview'], ['contentView', ['events', 'courses']], ['applicantsView', 'applicants'], ['profileView', 'profile']]) $(id).hidden = Array.isArray(active) ? !active.includes(current) : current !== active;
     $('pageTitle').textContent = $('breadcrumb').textContent = views[current][0];
     $('pageDescription').textContent = views[current][1];
@@ -103,16 +103,14 @@
     return new Intl.DateTimeFormat('ar-JO', time ? { dateStyle: 'medium', timeStyle: 'short' } : { dateStyle: 'medium' }).format(new Date(value.length === 10 ? value + 'T12:00:00' : value));
   }
   function renderOverview() {
-    const stats = [
-      ['الفعاليات', model.content.filter(item => item.type === 'event').length, 'فعاليات شركتك'],
-      ['دروس الأكاديمية', model.content.filter(item => item.type === 'course').length, 'دروس ووحدات تعليمية'],
-      ['المنشورات النشطة', model.content.filter(item => item.status === 'published').length, 'حالتها منشور في المعاينة'],
-      ['المتقدمون', model.applications.length, model.applications.filter(item => item.status === 'pending').length + ' طلبات بانتظار مراجعتك']
-    ];
-    $('stats').innerHTML = stats.map(([title, total, hint], index) => `<article class="stat"><div class="stat-top">${title}<span class="stat-icon" aria-hidden="true">${icon(["events", "courses", "published", "applicants"][index])}</span></div><strong>${total}</strong><small>${hint}</small></article>`).join('');
-    $('recentContent').innerHTML = model.content.slice(0, 4).map(item => `<div class="company-row"><div><h3>${escape(item.title)}</h3><p>${typeLabel(item.type)} · ${escape(item.category)}</p></div><div class="row-actions">${badge(item.status)}${button('تعديل', 'edit', item.id, 'text-button')}</div></div>`).join('');
-    const pending = model.applications.filter(item => item.status === 'pending');
-    $('pendingApplicants').innerHTML = pending.length ? pending.slice(0, 3).map(item => `<div class="company-row"><div><h3>${escape(item.name)}</h3><p>${escape(model.find(item.contentId).title)}</p></div>${button('مراجعة الطلب', 'application', item.id, 'text-button')}</div>`).join('') : '<p class="muted">راجعت كل الطلبات. لا توجد طلبات جديدة الآن.</p>';
+    const owned=[...(window.OfoqFrontend.companyJobs||[]),...(window.OfoqFrontend.companyInternships||[])];
+    const requests=window.OfoqFrontend.applications.filter(row=>owned.some(item=>item.id===row.id));
+    const stats=[['الوظائف',window.OfoqFrontend.companyJobs?.length||0],['فرص التدريب',window.OfoqFrontend.companyInternships?.length||0],['الفرص المنشورة',owned.filter(row=>row.status==='published').length],['المتقدمون',requests.length]];
+    $('stats').innerHTML=stats.map(([title,total])=>'<article class="stat"><div class="stat-top">'+title+'</div><strong>'+total+'</strong><small>خلال هذه الزيارة</small></article>').join('');
+    $('recentContent').replaceChildren();
+    for(const item of owned.slice(0,4)){const row=document.createElement('div');row.className='company-row';row.textContent=item.title+' — '+(item.status==='published'?'منشورة':'متوقفة');$('recentContent').append(row);}
+    if(!owned.length)$('recentContent').textContent='أضف وظيفة أو فرصة تدريب من قسم الوظائف والتدريب.';
+    $('pendingApplicants').textContent=requests.length?'عدد الطلبات: '+requests.length+' — راجعها من قسم الوظائف والتدريب.':'لا توجد طلبات بعد.';
   }
   function labelTable(id) {
     const body = $(id);
@@ -146,21 +144,9 @@
     $('applicantRows').innerHTML = filtered.map(item => `<tr><td class="applicant-identity"><strong>${escape(item.name)}</strong><small>${escape(item.skills)}</small></td><td class="content-title">${escape(model.find(item.contentId).title)}</td><td>${escape(date(item.date))}</td><td>${badge(item.status, true)}</td><td>${button('عرض الطلب', 'application', item.id)}</td></tr>`).join('');
     labelTable('applicantRows');
   }
+  addEventListener('ofoq:company-content',renderOverview);
   function render() { renderOverview(); if (['events', 'courses'].includes(current)) renderContent(); if (current === 'applicants') renderApplications(); }
-  function openEditor(type, id = null) {
-    const item = id ? model.find(id) : null;
-    editingId = id; editingType = item?.type || type;
-    $('contentForm').reset(); $('editorError').textContent = '';
-    $('contentForm').querySelectorAll('input,textarea').forEach(field => field.setCustomValidity(''));
-    for (const [fieldset, active] of [['eventFields', editingType === 'event'], ['courseFields', editingType === 'course']]) { $(fieldset).hidden = !active; $(fieldset).disabled = !active; }
-    $('editorTitle').textContent = (item ? 'تعديل ' : 'إضافة ') + typeLabel(editingType);
-    if (item) {
-      for (const key of ['title', 'category', 'status', 'description', 'eventDate', 'venue', 'instructor', 'hours', 'level', 'syllabus', 'video', 'price']) if (fields[key] && item[key] !== undefined) fields[key].value = item[key];
-      fields[editingType === 'event' ? 'eventCapacity' : 'courseCapacity'].value = item.capacity;
-    } else { fields.status.value = 'draft'; fields[editingType === 'event' ? 'eventCapacity' : 'courseCapacity'].value = 30; }
-    $('editor').showModal();
-    fields.title.focus();
-  }
+  function openEditor() { toast('الدورات والورش والفعاليات يديرها أدمن الموقع.'); }
   function openApplication(id) {
     const application = model.applications.find(item => item.id === id);
     if (!application) return;
@@ -182,6 +168,7 @@
     if (target.dataset.create) openEditor(target.dataset.create);
     if (target.dataset.close) $(target.dataset.close).close();
     const { action, id } = target.dataset;
+    if (['edit','pause','publish','archive','application'].includes(action)) return;
     if (action === 'edit') openEditor(model.find(id).type, id);
     if (action === 'application') openApplication(id);
     if (action === 'applications') {
@@ -192,15 +179,7 @@
     if (nextState) { model.setPublication(id, nextState); render(); toast('حالة المنشور الآن: ' + contentStates[nextState] + ' · داخل المعاينة'); }
   });
   $('contentForm').addEventListener('input', event => { event.target.setCustomValidity?.(''); $('editorError').textContent = ''; });
-  $('contentForm').addEventListener('submit', event => {
-    event.preventDefault();
-    for (const field of $('contentForm').querySelectorAll('input[required],textarea[required]')) if (!field.matches(':disabled') && !field.value.trim()) field.setCustomValidity('يرجى تعبئة هذا الحقل.');
-    if (!$('contentForm').reportValidity()) return;
-    const record = { type: editingType, title: fields.title.value, category: fields.category.value, status: fields.status.value, description: fields.description.value, price: Number(fields.price.value), capacity: Number(fields[editingType === 'event' ? 'eventCapacity' : 'courseCapacity'].value) };
-    const keys = editingType === 'event' ? ['eventDate', 'venue'] : ['instructor', 'hours', 'level', 'syllabus', 'video'];
-    keys.forEach(key => { record[key] = key === 'hours' ? Number(fields[key].value) : fields[key].value.trim(); });
-    try { model.save(record, editingId); $('editor').close(); show(editingType === 'event' ? 'events' : 'courses'); toast('تم حفظ المنشور في هذه الجلسة.'); } catch (error) { $('editorError').textContent = error.message; }
-  });
+  $('contentForm').addEventListener('submit',event=>event.preventDefault());
   for (const [id, state] of [['acceptApplicant', 'accepted'], ['rejectApplicant', 'rejected']]) $(id).addEventListener('click', () => {
     try { model.review(reviewingId, state); openApplication(reviewingId); render(); toast(state === 'accepted' ? 'تم قبول الطلب في المعاينة.' : 'تم رفض الطلب في المعاينة.'); } catch (error) { toast(error.message); $('applicationState').textContent = error.message; }
   });
@@ -212,6 +191,7 @@
     if (!form.reportValidity()) return;
     document.querySelectorAll('[data-company-name]').forEach(item => item.textContent = form.elements.companyName.value.trim());
     for (const [id, key] of [['companyIndustry', 'industry'], ['companyLocation', 'location'], ['companyBio', 'bio']]) $(id).textContent = form.elements[key].value.trim();
+    window.OfoqFrontend.companyProfile={name:form.elements.companyName.value.trim(),bio:form.elements.bio.value.trim()};
     toast('تم تحديث بيانات الشركة في هذه الجلسة.');
   });
   for (const id of ['contentSearch', 'contentStatus']) $(id).addEventListener(id === 'contentSearch' ? 'input' : 'change', renderContent);

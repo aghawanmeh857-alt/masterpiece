@@ -3,17 +3,27 @@
   const key = 'ofoq-demo-signed-in';
   const root = new URL('../', document.currentScript.src);
   let signedIn = false;
-  try { signedIn = sessionStorage.getItem(key) === 'true'; } catch {}
+  document.querySelectorAll('.account-menu-links a').forEach(link => {
+    if (/\/Auth\//i.test(new URL(link.href).pathname)) link.dataset.auth = 'guest';
+  });
+  document.querySelectorAll('.account-menu-links').forEach(menu => {
+    if (menu.querySelector('[data-logout]')) return;
+    const logout = document.createElement('button');
+    logout.type = 'button'; logout.dataset.logout = ''; logout.dataset.auth = 'member';
+    logout.className = 'text-button'; logout.textContent = 'تسجيل الخروج'; menu.append(logout);
+  });
+  try { signedIn = window.OfoqFrontend.memory.getItem(key) === 'true'; } catch {}
   function sync() {
-    try { signedIn = sessionStorage.getItem(key) === 'true'; } catch {}
+    try { signedIn = window.OfoqFrontend.memory.getItem(key) === 'true'; } catch {}
     document.querySelectorAll('[data-auth]').forEach(element => {
       element.hidden = element.dataset.auth === 'member' ? !signedIn : signedIn;
     });
   }
   window.OfoqDemoAuth = {
-    signIn() {
+    signIn(role = 'member') {
       signedIn = true;
-      try { sessionStorage.setItem(key, 'true'); } catch {}
+      window.OfoqFrontend.user = { signedIn: true, role };
+      try { window.OfoqFrontend.memory.setItem(key, 'true'); } catch {}
       sync();
     },
     destination() {
@@ -22,7 +32,7 @@
       if (!next) return fallback.href;
       try {
         const target = new URL(next, location.href);
-        if (target.origin === root.origin && target.pathname.startsWith(root.pathname) && target.pathname.endsWith('.html') && !target.pathname.includes('/Auth/')) return target.href;
+        if (target.origin === root.origin && target.pathname.startsWith(root.pathname) && target.pathname.endsWith('.html') && !/\/(Auth|Admin|company)\//i.test(target.pathname)) return target.href;
       } catch {}
       return fallback.href;
     }
@@ -30,11 +40,12 @@
   document.addEventListener('click', event => {
     if (!event.target.closest('[data-logout]')) return;
     signedIn = false;
-    try { sessionStorage.removeItem(key); } catch {}
+    window.OfoqFrontend.user = { signedIn: false, role: 'member' };
+    try { window.OfoqFrontend.memory.removeItem(key); } catch {}
     sync();
     const home = new URL('hero/userHero.html', root);
     home.searchParams.set('theme', document.documentElement.dataset.theme || 'light');
-    location.assign(home.href);
+    window.OfoqFrontend.navigate(home.href);
   });
   addEventListener('pageshow', sync);
   sync();

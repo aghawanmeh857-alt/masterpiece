@@ -1,4 +1,4 @@
-/* OFOQ learning catalog and classroom. */
+/* SAEI learning catalog and classroom. */
 .academy-heading-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; }
 .academy-cart-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 18px; background: #ff783d; color: #111e30; border: 1px solid #ff783d; border-radius: 8px; font-size: 14px; font-weight: 800; text-decoration: none; white-space: nowrap; }
 .academy-cart-button:hover { background: #ff986b; color: #111e30; }
@@ -155,3 +155,27 @@ body[data-section="academy"] .overview-learning .course-grid { grid-template-col
 @media (max-width: 767px) { [data-section="academy"] .workspace { grid-template-columns: 1fr; } .course-intro { grid-template-columns: 1fr; padding: 20px; } .outcomes ul { grid-template-columns: 1fr; } .learning-tabs button { padding: 12px; font-size: 12px; } .lecture-screen { padding: 16px; } .lecture-slide { padding-inline: 0; } [data-section="academy"] .featured-path { padding: 24px; } }
 @media (max-width: 480px) { [data-section="academy"] .course-grid { grid-template-columns: 1fr; } .lecture-controls { gap: 5px; } .lecture-controls button { padding: 7px 9px; } }
 @media (prefers-reduced-motion: reduce) { .course-cover img { transition: none; } }
+
+/* Compact academy and workshop cards. */
+body[data-section="academy"] .course-grid{gap:20px 16px}
+body[data-section="academy"] .course-card .course-cover{aspect-ratio:2.1/1}
+body[data-section="academy"] .course-body{padding-top:10px;gap:5px}
+body[data-section="academy"] .course-body h2{font-size:14px;line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body[data-section="academy"] .course-instructor{font-size:11px}
+body[data-section="academy"] .course-meta{font-size:11px;line-height:1.7}
+body[data-section="academy"] .course-price{font-size:16px;line-height:1.6}
+body[data-section="academy"] .learning-badge{font-size:10px;padding:2px 6px}
+body[data-section="academy"] .course-actions{gap:6px;padding-top:6px}
+body[data-section="academy"] .course-actions .learn-primary{min-height:36px;padding:7px 9px;font-size:11px}
+body[data-section="academy"] .course-actions .learn-wish{min-width:36px;min-height:36px;padding:3px 8px;font-size:19px}
+body[data-section="academy"] .course-actions .course-add-cart{min-height:36px;padding:7px 9px;font-size:11px}
+@media(min-width:1400px){body[data-section="academy"] #courseList.course-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Framed course cards, matching the project and job listings. */
+body[data-section="academy"] .course-card{border:1px solid var(--field-border);border-radius:14px;background:var(--surface);box-shadow:0 4px 18px rgba(var(--border-rgb),.06);overflow:hidden}
+body[data-section="academy"] .course-card:hover{border-color:#ff783d80;transform:none}
+body[data-section="academy"] .course-card .course-cover{border-radius:0;border-bottom:1px solid var(--field-border)}
+body[data-section="academy"] .course-body{padding:14px 14px 0;gap:7px}
+body[data-section="academy"] .course-body .course-actions{margin-inline:-14px;margin-top:auto;padding:12px 14px;border-top:1px solid var(--field-border);background:var(--surface-raised)}
+body[data-section="academy"] .course-body .course-price{padding-bottom:8px;font-size:16px}
+body[data-section="academy"] .course-actions .learn-primary{min-width:0}

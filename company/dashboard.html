@@ -1,25 +1,33 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+  <script src="../assets/frontend-runtime.js"></script>
+  <script src="../assets/platform-data.js"></script>
+  <script src="../assets/publishing.js"></script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f3f6fb"><title>لوحة الشركة — أفق</title>
-  <link rel="icon" href="../assets/branding/ofoq-logo.png">
+  <meta name="theme-color" content="#f3f6fb"><title>لوحة الشركة — سعي</title>
+  <link rel="icon" href="../assets/branding/saei-logo.svg">
   <link rel="stylesheet" href="dashboard.css?v=company-5">
   <script defer src="../assets/arabic-ui.js"></script>
   <script defer src="dashboard.js"></script>
+  <script defer src="opportunities.js"></script>
   <script defer src="../assets/dashboard-interactions.js?v=2"></script>
   <link rel="stylesheet" href="../assets/dashboard-interactions.css?v=3">
+<link rel="stylesheet" href="../assets/cards.css">
+<link rel="stylesheet" href="../assets/dashboard-ui.css">
+<link rel="stylesheet" href="../assets/fonts.css">
+  <link rel="stylesheet" href="../assets/popup-ui.css">
 </head>
 <body data-section="company">
   <a class="skip-link" href="#main">انتقل إلى المحتوى</a>
   <aside class="sidebar" id="sidebar" aria-label="مساحة الشركة">
-    <a class="brand" href="../hero/userHero.html"><span class="logo-frame"><img src="../assets/branding/ofoq-logo.png" alt="أفق" width="1254" height="1254"></span><span>حساب الشركة<small>مساحة الشركاء</small></span></a>
+    <a class="brand" href="../hero/userHero.html"><span class="logo-frame"><img src="../assets/branding/saei-logo.svg" alt="سعي" width="1254" height="1254"></span><span>حساب الشركة<small>مساحة الشركاء</small></span></a>
     <p class="nav-label">إدارة شركتك</p>
     <nav id="navigation" aria-label="أقسام لوحة الشركة">
       <button data-view="overview" aria-current="page"><span class="nav-icon" aria-hidden="true">◫</span>نظرة عامة</button>
-      <button data-view="events"><span class="nav-icon" aria-hidden="true">▦</span>الفعاليات</button>
-      <button data-view="courses"><span class="nav-icon" aria-hidden="true">▤</span>دروس الأكاديمية</button>
-      <button data-view="applicants"><span class="nav-icon" aria-hidden="true">♧</span>المتقدمون</button>
+
+
+
       <button data-view="profile"><span class="nav-icon" aria-hidden="true">⚙</span>بيانات الشركة</button>
     </nav>
     <div class="sidebar-bottom"><span class="online-dot"></span> مساحة شركة تجريبية<a href="../hero/userHero.html">زيارة الموقع ↗</a><a href="../Account/Messages/messages.html">الرسائل ↗</a></div>
@@ -27,16 +35,16 @@
   <div class="workspace">
     <header class="topbar">
       <button id="menuButton" class="icon-button" aria-label="فتح قائمة الشركة" aria-expanded="false" aria-controls="sidebar">☰</button>
-      <div class="breadcrumbs">أفق <span>/</span> لوحة الشركة <span>/</span> <strong id="breadcrumb">نظرة عامة</strong></div>
+      <div class="breadcrumbs">سعي <span>/</span> لوحة الشركة <strong id="breadcrumb" hidden>نظرة عامة</strong></div>
       <div class="top-actions"><button id="themeToggle" class="theme-toggle" type="button">☾ الوضع الليلي</button><span class="admin-avatar" aria-hidden="true">ش</span><span class="admin-name"><span data-company-name>برايت لابز</span><small>حساب شركة</small></span></div>
     </header>
     <main id="main" tabindex="-1">
-      <div class="page-heading"><div><p class="eyebrow">أفق / مساحة الشركة</p><h1 id="pageTitle">نظرة عامة</h1><p id="pageDescription">فعالياتك ودروسك والمتقدمون، في مساحة واحدة.</p></div><div class="heading-actions"><span id="today"></span><button id="addButton" class="primary" hidden>+ إضافة</button></div></div>
-      <p class="preview-note"><span aria-hidden="true">◈</span>معاينة حساب شركة. التعديلات والنشر والطلبات تخص هذه الجلسة فقط، وتُعاد عند تحديث الصفحة؛ لا تُنشر للموقع العام.</p>
+      <div class="page-heading"><div><h1 id="pageTitle">نظرة عامة</h1><p id="pageDescription">وظائفك وفرص التدريب والمتقدمون، في مساحة واحدة.</p></div><div class="heading-actions"><span id="today" hidden></span><button id="addButton" class="primary" hidden>+ إضافة</button></div></div>
+
       <section id="overviewView" aria-label="نظرة عامة">
-        <div class="company-welcome"><div><span class="eyebrow">نحو أثر أكبر</span><h2>أهلًا، <span data-company-name>برايت لابز</span>.</h2><p>شاركوا خبرتكم، واجمعوا أصحاب الطموح حول فرص جديدة.</p></div><div class="welcome-actions"><button class="primary" data-create="event">+ فعالية جديدة</button><button class="secondary" data-create="course">+ درس جديد</button></div></div>
+        <div class="company-welcome"><div><span class="eyebrow">نحو أثر أكبر</span><h2>أهلًا، <span data-company-name>برايت لابز</span>.</h2><p>شاركوا خبرتكم، واجمعوا أصحاب الطموح حول فرص جديدة.</p></div><div class="welcome-actions"><button class="primary" data-company-open="jobs" data-company-create>+ وظيفة جديدة</button><button class="secondary" data-company-open="internships" data-company-create>+ فرصة تدريب</button></div></div>
         <div id="stats" class="stats-grid"></div>
-        <div class="company-overview-grid"><article class="panel"><div class="panel-heading"><h2>آخر المنشورات</h2><button class="text-button" data-view="events">إدارة المحتوى ←</button></div><div id="recentContent"></div></article><article class="panel"><div class="panel-heading"><h2>طلبات تحتاج مراجعتك</h2><button class="text-button" data-view="applicants">كل المتقدمين ←</button></div><div id="pendingApplicants"></div></article></div>
+        <div class="company-overview-grid"><article class="panel"><div class="panel-heading"><h2>آخر المنشورات</h2></div><div id="recentContent"></div></article><article class="panel"><div class="panel-heading"><h2>طلبات تحتاج مراجعتك</h2></div><div id="pendingApplicants"></div></article></div>
       </section>
       <section id="contentView" hidden aria-label="إدارة المنشورات">
         <div class="panel table-panel"><div class="table-toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="contentSearch" type="search" aria-label="البحث في المنشورات" placeholder="ابحث بالعنوان أو المجال…"></label><label class="filter-label">حالة النشر<select id="contentStatus"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="published">منشور</option><option value="paused">متوقف</option><option value="archived">مؤرشف</option></select></label><span class="muted" id="contentCount" role="status"></span></div><div class="table-scroll"><table><caption class="visually-hidden" id="contentCaption">منشورات الشركة</caption><thead><tr><th scope="col">المنشور</th><th scope="col" id="dateColumn">التاريخ</th><th scope="col">حالة النشر</th><th scope="col">المتقدمون</th><th scope="col">الإجراءات</th></tr></thead><tbody id="contentRows"></tbody></table></div><div id="contentEmpty" class="empty-state" hidden><h2>لا توجد منشورات هنا</h2><p>غيّر البحث أو الفلاتر، أو أضف أول منشور لشركتك.</p><button class="primary" id="emptyCreate">+ إضافة منشور</button></div></div>
@@ -47,7 +55,7 @@
       <section id="profileView" hidden aria-label="بيانات الشركة">
         <div class="settings-grid"><form id="companyForm" class="panel"><h2>هوية الشركة</h2><label>اسم الشركة<input name="companyName" minlength="2" maxlength="80" required value="برايت لابز"></label><label>البريد الإلكتروني للعمل<input name="email" type="email" dir="ltr" required value="hello@example.com" maxlength="150"></label><label>المجال<input name="industry" required maxlength="80" value="تطوير المنتجات الرقمية والتدريب"></label><label>الموقع<input name="location" required maxlength="100" value="عمّان، الأردن"></label><label>نبذة عن الشركة<textarea name="bio" required maxlength="1200" rows="4">نطوّر منتجات رقمية ونشارك خبرتنا من خلال فعاليات ودروس عملية لصنّاع المستقبل.</textarea></label><button class="primary" type="submit">حفظ التغييرات في الجلسة</button></form><article class="panel company-profile-preview"><span class="company-symbol" aria-hidden="true">◈</span><p class="eyebrow">حساب شركة</p><h2 data-company-name>برايت لابز</h2><p id="companyIndustry">تطوير المنتجات الرقمية والتدريب</p><p id="companyLocation">عمّان، الأردن</p><p id="companyBio">نطوّر منتجات رقمية ونشارك خبرتنا من خلال فعاليات ودروس عملية لصنّاع المستقبل.</p><span class="company-label">شريك المعرفة والفرص</span></article></div>
       </section>
-      <footer><span>© <span id="year"></span> أفق · لوحة الشركة</span><span>مساحة تجريبية</span></footer>
+      <footer><span>© <span id="year"></span> سعي · لوحة الشركة</span><span>البيانات مؤقتة خلال هذه الزيارة.</span></footer>
     </main>
   </div>
   <dialog id="editor" aria-labelledby="editorTitle"><form id="contentForm"><div class="dialog-heading"><div><p class="eyebrow">إدارة المحتوى</p><h2 id="editorTitle">إضافة منشور</h2></div><button class="icon-button" type="button" data-close="editor" aria-label="إغلاق">×</button></div>

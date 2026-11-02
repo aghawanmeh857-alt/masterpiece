@@ -1,45 +1,40 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+  <script src="../../assets/frontend-runtime.js"></script>
+  <script src="../../assets/platform-data.js"></script>
   <meta charset="UTF-8">
     
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1526">
-  <title>إنشاء حساب — أفق</title>
+  <title>إنشاء حساب — سعي</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
   
   
-  <link rel="icon" type="image/png" href="../../assets/branding/ofoq-logo.png?v=ofoq-11">
+  <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg">
     
   <link rel="stylesheet" href="register.css">
   <link rel="stylesheet" href="../../assets/arabic-ui.css">
   <script defer src="../../assets/arabic-ui.js"></script>
+  <script defer src="../../assets/demo-auth.js"></script>
+<link rel="stylesheet" href="../../assets/cards.css">
+<link rel="stylesheet" href="../../assets/fonts.css">
+  <link rel="stylesheet" href="../../assets/auth-motion.css">
+  <script defer src="../../assets/auth-motion.js"></script>
+  <link rel="stylesheet" href="../../assets/popup-ui.css">
+  <link rel="stylesheet" href="../../assets/shared-navbar.css">
 </head>
 <body data-section="lobby">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-  <header class="site-header">
-  <div class="container-xl header-inner">
-    <a href="../../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
-      <span class="ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
-    </a>
-    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
-      <a data-section-link="freelance" href="../../Freelance/freelance.html">العمل الحر</a>
-      <a data-section-link="academy" href="../../Academy/academy.html">الأكاديمية</a>
-      <a data-section-link="internships" href="../../Internships/internships.html">فرص التدريب</a>
-      <a data-section-link="jobs" href="../../Jobs/jobs.html">الوظائف</a>
-      <a data-section-link="events" href="../../Events/events.html">الفعاليات</a>
-    </nav></details>
-    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Login/login.html">تسجيل الدخول</a><a href="register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../../Account/Profile/profile.html">الملف الشخصي</a><a href="../../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../../Account/Messages/messages.html">الرسائل</a><a href="../../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
-  </div>
-</header>
+  <script src="../../assets/shared-navbar.js" data-mode="auth"></script>
   <main id="mainContent" tabindex="-1" class="container-xl auth-page">
     <div class="auth-shell">
       <section class="auth-story" aria-labelledby="storyTitle">
-        <p class="eyebrow">أفق / خطوتك القادمة</p>
+        <p class="eyebrow">سعي / خطوتك القادمة</p>
         <h1 id="storyTitle">أفكار كبيرة.<br><span>ننجزها معًا.</span></h1>
         <p>تواصل مع من يشاركونك الطموح، وشارك أفكارك وخذ خطوتك المهنية القادمة.</p>
         <div class="auth-illustration" aria-hidden="true">
-          <div class="auth-orbit"></div><div class="auth-monogram ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/ofoq-logo.png" alt="أفق | OFOQ" width="1254" height="1254"></div><span class="auth-dot"></span>
+          <div class="auth-orbit"></div><div class="auth-monogram ofoq-brand"><img class="ofoq-logo" src="../../assets/branding/saei-logo.svg" alt="سعي | SAEI" width="1254" height="1254"></div><span class="auth-dot"></span>
         </div>
         <ul class="auth-benefits">
           <li><span>01</span> اكتشف فرص العمل الحر</li>
@@ -55,6 +50,7 @@
         <h2 id="formTitle">أنشئ حسابك</h2>
         <p class="auth-subtitle">مكان واحد لفرصتك القادمة.</p>
         <form autocomplete="off" id="authForm" novalidate>
+          <div class="field"><label for="serviceType">ما خطوتك القادمة؟</label><select id="serviceType" class="form-select"><option value="freelance">تنفيذ مشروع Freelance</option><option value="jobs">التقديم على وظيفة</option><option value="internships">فرصة تدريب</option><option value="academy">الالتحاق بدورة أو أكاديمية</option><option value="workshops">ورشة تدريبية</option><option value="events">التسجيل في فعالية</option><option value="profile">تجهيز ملفي الشخصي</option></select></div>
           <div class="field"><label for="accountType">نوع الحساب</label><select id="accountType" class="form-select"><option value="member">حساب شخصي</option><option value="company">حساب شركة</option></select></div>
           
             <div class="field">
@@ -87,8 +83,8 @@
         </form>
         <div id="authSuccess" class="auth-success" role="status" tabindex="-1" hidden>
           <span aria-hidden="true">✓</span>
-          <h3>اكتملت معاينة النموذج!</h3>
-          <p>اجتازت البيانات التحقق من الحقول. هذه معاينة فقط؛ لم يُنشأ حساب ولم يحدث تسجيل دخول.</p>
+          <h3>أهلًا بك في سعي!</h3>
+          <p>تم تفعيل حسابك ضمن التجربة الحالية. أكمل رحلتك من الزر أدناه.</p>
           <a class="btn btn-orange w-100" href="../../Freelance/freelance.html">استكشف العمل الحر ←</a>
           <button id="tryAgain" type="button" class="text-button">تجربة النموذج مجددًا</button>
         </div>
@@ -96,7 +92,7 @@
     </div>
   </main>
   <footer class="page-footer container-xl">
-  <span>© OFOQ <span id="year"></span></span>
+  <span>© SAEI <span id="year"></span></span>
   <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
 </footer>
   

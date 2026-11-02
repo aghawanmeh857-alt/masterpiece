@@ -13,7 +13,7 @@
     create(courses) {
       const catalog = new Map(courses.map(course => [course.id, course]));
       let saved = {}; let persistent = true;
-      try { saved = JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch { persistent = false; }
+      try { saved = JSON.parse(window.OfoqFrontend.memory.getItem(key) || '{}') || {}; } catch { persistent = false; }
       const validIds = value => Array.isArray(value) ? [...new Set(value.filter(id => catalog.has(id)))] : [];
       const state = { enrolled: validIds(saved.enrolled), cart: validIds(saved.cart), wishlist: validIds(saved.wishlist), progress: {}, current: {}, notes: {} };
       state.cart = state.cart.filter(id => !state.enrolled.includes(id));
@@ -27,9 +27,11 @@
         }
       }
       function save() {
-        try { localStorage.setItem(key, JSON.stringify(state)); persistent = true; } catch { persistent = false; }
+        try { window.OfoqFrontend.memory.setItem(key, JSON.stringify(state)); persistent = true; } catch { persistent = false; }
         const notice = document.getElementById('storageNotice');
-        if (notice) { notice.hidden = persistent; notice.textContent = 'التخزين المحلي غير متاح؛ تغييراتك ستبقى خلال هذه الزيارة فقط.'; }
+        if (notice) { notice.hidden = persistent; notice.textContent = 'تعذّر ربط الحالة بين الصفحات؛ التغييرات الحالية متاحة في هذه الصفحة.'; }
+        window.OfoqFrontend.learning = state;
+        window.OfoqFrontend.courses = courses;
         return persistent;
       }
       const store = {

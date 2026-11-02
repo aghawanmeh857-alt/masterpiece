@@ -6,7 +6,7 @@
   dialog.setAttribute('aria-labelledby', 'paymentTitle');
   dialog.setAttribute('aria-describedby', 'paymentNotice');
   dialog.innerHTML = `
-    <div class="payment-heading"><div><p class="payment-eyebrow">أفق / الدفع</p><h2 id="paymentTitle">اختر طريقة الدفع</h2></div><button class="payment-close" type="button" aria-label="إغلاق نافذة الدفع">×</button></div>
+    <div class="payment-heading"><div><p class="payment-eyebrow">سعي / الدفع</p><h2 id="paymentTitle">اختر طريقة الدفع</h2></div><button class="payment-close" type="button" aria-label="إغلاق نافذة الدفع">×</button></div>
     <div class="payment-summary"><div><span id="paymentKind"></span><h3 id="paymentItem"></h3></div><div class="payment-total"><span>المبلغ الإجمالي</span><strong id="paymentAmount"></strong></div></div>
     <fieldset class="payment-methods"><legend>كيف تفضّل الدفع؟</legend>
       <label class="payment-method"><input type="radio" name="paymentMethod" value="card" checked><span class="payment-method-icon" aria-hidden="true">▣</span><span><strong>بطاقة بنكية</strong><small>Visa · Mastercard</small></span><span class="payment-check" aria-hidden="true">✓</span></label>
@@ -24,6 +24,9 @@
     const amount = Number(trigger.dataset.paymentAmount);
     if (!Number.isFinite(amount) || amount <= 0) return;
     opener = trigger;
+    dialog.querySelector('.payment-continue').disabled = false;
+    dialog.querySelector('.payment-continue').textContent = 'تأكيد التسجيل التجريبي ←';
+    dialog.querySelector('.payment-cancel').textContent = 'إلغاء';
     get('paymentKind').textContent = trigger.dataset.paymentKind || 'تفاصيل الدفع';
     get('paymentItem').textContent = trigger.dataset.paymentTitle;
     get('paymentAmount').textContent = new Intl.NumberFormat('ar-JO', {maximumFractionDigits: 2}).format(amount) + ' دولار';
@@ -51,8 +54,16 @@
   });
   dialog.querySelector('.payment-continue').addEventListener('click', () => {
     const card = dialog.querySelector('[value="card"]').checked;
-    get('paymentStatus').textContent = 'طريقة الدفع المختارة: ' + (card ? 'بطاقة بنكية.' : 'محفظة إلكترونية.') + ' الدفع الفعلي غير متاح في النسخة الحالية، ولم يُخصم أي مبلغ.';
+    const id = opener.closest('[data-item]')?.dataset.item || new URLSearchParams(location.search).get('id') || opener.dataset.paymentTitle;
+    const path = new URL('../Events/Event/event.html', [...document.scripts].find(script => script.src.endsWith('/assets/payment.js')).src);
+    path.searchParams.set('id', id);
+    window.OfoqFrontend.register(id, opener.dataset.paymentTitle, path.href);
+    get('paymentStatus').textContent = 'تم تأكيد التسجيل ضمن التجربة باستخدام ' + (card ? 'البطاقة البنكية.' : 'المحفظة الإلكترونية.') + ' لم يُخصم أي مبلغ. تجد الفعالية في لوحة متابعتك.';
     get('paymentStatus').hidden = false;
+    opener.textContent = '✓ مسجّل';
+    dialog.querySelector('.payment-continue').disabled = true;
+    dialog.querySelector('.payment-continue').textContent = '✓ تم التسجيل';
+    dialog.querySelector('.payment-cancel').textContent = 'إغلاق';
   });
   for (const button of dialog.querySelectorAll('.payment-close, .payment-cancel')) button.addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => {

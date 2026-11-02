@@ -125,3 +125,5 @@ window.OfoqCourses = [
     ]
   }
 ];
+
+if (window.OfoqFrontend?.contentFor) window.OfoqCourses = window.OfoqFrontend.contentFor('courses',window.OfoqCourses);

@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -143,9 +127,29 @@ if (document.body.dataset.page === 'messages') {
 
 if (document.body.dataset.page === 'settings') {
   const form = get('settingsForm');
+  const app = window.OfoqFrontend;
+  function populate() {
+    get('settingsName').value = app.profile.name;
+    get('settingsEmail').value = app.profile.email;
+    get('settingsAvailability').value = app.settings.availability;
+    for (const id of ['projectUpdates', 'courseUpdates', 'communityUpdates']) get(id).checked = app.settings[id];
+  }
+  populate();
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    get('settingsName').value = get('settingsName').value.trim();
+    get('settingsName').setCustomValidity(get('settingsName').value.length >= 2 ? '' : 'اكتب اسمًا من حرفين على الأقل.');
+    if (!form.reportValidity()) return;
+    app.profile.name = get('settingsName').value;
+    app.profile.email = get('settingsEmail').value.trim();
+    app.settings.availability = get('settingsAvailability').value;
+    for (const id of ['projectUpdates', 'courseUpdates', 'communityUpdates']) app.settings[id] = get(id).checked;
+    get('settingsStatus').textContent = 'تم تطبيق التفضيلات وتحديث بيانات ملفك خلال هذه الزيارة.';
+  });
   form.addEventListener('input', event => event.target.setCustomValidity(''));
   get('resetSettings').addEventListener('click', () => {
     form.reset();
+    populate();
     form.querySelectorAll('input').forEach(input => input.setCustomValidity(''));
     get('settingsStatus').textContent = 'أُعيدت الإعدادات التوضيحية.';
   });

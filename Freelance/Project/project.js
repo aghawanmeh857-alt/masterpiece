@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -137,6 +121,8 @@ const projects = [
 ];
 
 
+if (window.OfoqFrontend?.contentFor) projects.splice(0, projects.length, ...window.OfoqFrontend.contentFor('projects',projects));
+
 (function () {
 // The list and detail pages read the same example data.
 const kind = document.body.dataset.kind;
@@ -174,7 +160,7 @@ if (!record) {
   get('notFound').hidden = false;
   get('notFound').focus();
 } else {
-  document.title = record.title + ' — OFOQ';
+  document.title = record.title + ' — SAEI';
   get('detailTitle').textContent = record.title;
   get('detailDescription').textContent = record.description;
   get('detailDescription').insertAdjacentHTML('afterend', window.OfoqPublishers.card(window.OfoqPublishers.forRecord(kind, record)));

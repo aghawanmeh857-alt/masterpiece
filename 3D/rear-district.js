@@ -1,4 +1,4 @@
-// Reuse the New York model's own tower, geometry and textures behind OFOQ.
+// Reuse the New York model's own tower, geometry and textures behind SAEI.
 export const REAR_DISTRICT_LAYOUT = [
   { x: -14, z: -109, height: 29, rotation: 0 },
   { x: 8, z: -113, height: 35, rotation: Math.PI / 2 },

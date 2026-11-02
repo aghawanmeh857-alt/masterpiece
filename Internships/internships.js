@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -220,7 +204,7 @@ async function startListings() {
   const cartKey = 'ofoq-internship-cart-v1';
   let internshipCart = [];
   const readCart = () => {
-    try { const value = JSON.parse(localStorage.getItem(cartKey) || '[]'); internshipCart = Array.isArray(value) ? value.filter(item => item && typeof item.id === 'string') : []; } catch { internshipCart = []; }
+    try { const value = JSON.parse(window.OfoqFrontend.memory.getItem(cartKey) || '[]'); internshipCart = Array.isArray(value) ? value.filter(item => item && typeof item.id === 'string') : []; } catch { internshipCart = []; }
   };
   readCart();
   const cartShortcut = document.createElement('a');
@@ -232,7 +216,7 @@ async function startListings() {
   function updateCartCount() {
     let courseCount = 0;
     try {
-      const learning = JSON.parse(localStorage.getItem('ofoq-learning-v1') || '{}');
+      const learning = JSON.parse(window.OfoqFrontend.memory.getItem('ofoq-learning-v1') || '{}');
       if (Array.isArray(learning?.cart)) courseCount = new Set(learning.cart).size;
     } catch {}
     const count = internshipCart.length + courseCount;
@@ -242,6 +226,7 @@ async function startListings() {
   updateCartCount();
   if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
   await window.componentsReady;
+if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('internships', pageData.items);
 
   const savedKey = 'ofoq-saved-internships-v1';
   const knownIds = new Set(pageData.items.map(item => item.id));
@@ -249,13 +234,13 @@ async function startListings() {
   let savedOnly = false;
   function readSaved() {
     try {
-      const data = JSON.parse(localStorage.getItem(savedKey) || '[]');
+      const data = JSON.parse(window.OfoqFrontend.memory.getItem(savedKey) || '[]');
       saved = new Set(Array.isArray(data) ? data.filter(id => knownIds.has(id)) : []);
     } catch { /* Keep the current selection if browser storage is unavailable. */ }
   }
   readSaved();
   function saveFavorites() {
-    try { localStorage.setItem(savedKey, JSON.stringify([...saved])); get('savedNotice').hidden = true; }
+    try { window.OfoqFrontend.memory.setItem(savedKey, JSON.stringify([...saved])); get('savedNotice').hidden = true; }
     catch { get('savedNotice').hidden = false; get('savedNotice').textContent = 'التخزين غير متاح؛ المفضلة محفوظة خلال هذه الزيارة فقط.'; }
   }
 
@@ -318,7 +303,7 @@ async function startListings() {
     const detailUrl = 'Internship/internship.html?id=' + encodeURIComponent(item.id);
     const cover = {design: 'mobile', development: 'code', marketing: 'marketing', career: 'dashboard'}[item.category] || 'dashboard';
     return `
-      <article class="listing-card" data-item="${item.id}">
+      <article class="listing-card" data-item="${item.id}" data-card-details="${safeText(JSON.stringify(item))}">
         <div class="opportunity-media">
         <a class="opportunity-cover" href="${detailUrl}" aria-label="تفاصيل ${safeText(item.title)}">
           <img src="../assets/project-covers/${cover}.svg" alt="" width="800" height="450" loading="lazy">
@@ -360,7 +345,9 @@ async function startListings() {
     get('previewSuccess').hidden = true;
   }
 
+  let selectedItem = null;
   function openDetails(item) {
+    selectedItem = item;
     resetPreview();
     get('detailTitle').textContent = item.title;
     get('detailDescription').textContent = item.description;
@@ -381,11 +368,11 @@ async function startListings() {
       if (internshipCart.some(entry => entry.id === item.id)) {
         const url = new URL('../Academy/Cart/cart.html', location.href);
         url.searchParams.set('theme', document.documentElement.dataset.theme || 'light');
-        location.assign(url.href);
+        window.OfoqFrontend.navigate(url.href);
         return;
       }
       const next = [...internshipCart, {id: item.id, title: item.title, company: item.company}];
-      try { localStorage.setItem(cartKey, JSON.stringify(next)); }
+      try { window.OfoqFrontend.memory.setItem(cartKey, JSON.stringify(next)); }
       catch { get('savedNotice').hidden = false; get('savedNotice').textContent = 'تعذّر حفظ الفرصة في السلة. يرجى السماح بالتخزين في المتصفح والمحاولة مجددًا.'; return; }
       internshipCart = next;
       updateCartCount();
@@ -437,6 +424,9 @@ async function startListings() {
   get('previewForm').addEventListener('submit', event => {
     event.preventDefault();
     if (!get('previewForm').reportValidity()) return;
+    if (!selectedItem) return;
+    window.OfoqFrontend.apply('internship', selectedItem.id, selectedItem.title, new URL('Internship/internship.html?id=' + selectedItem.id, location.href).href);
+    get('previewSuccess').textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
     get('previewArea').hidden = true;
     get('previewSuccess').hidden = false;
     get('previewSuccess').setAttribute('tabindex', '-1');
@@ -448,6 +438,6 @@ async function startListings() {
   renderItems();
 }
 
-startListings().catch(error => console.error('OFOQ listing page:', error));
+startListings().catch(error => console.error('SAEI listing page:', error));
 
 })();

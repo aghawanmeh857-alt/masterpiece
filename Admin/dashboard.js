@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'sceneSettings'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -115,7 +99,7 @@ const examples = {
     {
       "id": "1",
       "title": "لوحة متابعة بـReact لشركة خدمات لوجستية",
-      "owner": "فريق أفق",
+      "owner": "فريق سعي",
       "category": "development",
       "description": "بناء لوحة إدارة تتضمن رسومًا بيانية وأدوارًا للمستخدمين.",
       "date": "2026-10-08",
@@ -124,7 +108,7 @@ const examples = {
     {
       "id": "2",
       "title": "إعادة تصميم واجهات تطبيق جوّال",
-      "owner": "فريق أفق",
+      "owner": "فريق سعي",
       "category": "design",
       "description": "إعادة تصميم شاشات تطبيق لياقة بدنية قائم.",
       "date": "2026-10-07",
@@ -133,7 +117,7 @@ const examples = {
     {
       "id": "3",
       "title": "صفحة تعريفية لمنتج برمجي",
-      "owner": "فريق أفق",
+      "owner": "فريق سعي",
       "category": "development",
       "description": "صفحة تعريفية متجاوبة تعرض الأسعار ونموذج التواصل.",
       "date": "2026-10-06",
@@ -142,7 +126,7 @@ const examples = {
     {
       "id": "4",
       "title": "محتوى تواصل اجتماعي لمقهى",
-      "owner": "فريق أفق",
+      "owner": "فريق سعي",
       "category": "marketing",
       "description": "خطة شهرية للمنشورات والقصص على Instagram.",
       "date": "2026-10-05",
@@ -285,7 +269,7 @@ const examples = {
     {
       "id": "ideas-event",
       "title": "أمسية صنّاع الأفكار",
-      "owner": "مجتمع أفق",
+      "owner": "مجتمع سعي",
       "category": "career",
       "description": "تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.",
       "date": "2026-10-10",
@@ -322,7 +306,7 @@ const examples = {
   "users": [
     {
       "id": "admin",
-      "title": "أدمن أفق",
+      "title": "أدمن سعي",
       "owner": "admin@example.com",
       "category": "الإدارة",
       "role": "admin",
@@ -423,9 +407,10 @@ const examples = {
   ]
 };
 const $ = id => document.getElementById(id);
+window.OfoqPublishing.mount($('recordForm'),{admin:true});
 const make = (tag, text, className) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; };
 let model, current = 'overview', page = 1, editing = null, deleting = null, toastTimer;
-let sceneReady = false;
+let sceneReady = false, adminSaving = false;
 function sendScene(config) {
   if (sceneReady) $('sceneFrame').contentWindow.postMessage({type: 'ofoq-preview-config', ...config}, location.origin);
 }
@@ -459,6 +444,7 @@ function records() {
     title.append(make('strong', record.title), make('small', current === 'review' ? sections[record.section][0] : record.date));
     status.append(make('span', statusLabels[record.status], 'badge ' + record.status)); controls.append(action(current === 'messages' ? 'عرض / رد' : 'تعديل', 'edit', record));
     if (record.status === 'pending' && contentKeys.includes(record.section)) controls.append(action('اعتماد', 'approve', record));
+    if(['courses','events','jobs','internships','projects'].includes(record.section))controls.append(action('ملف PDF','pdf',record));
     controls.append(action('حذف', 'delete', record)); buttons.append(controls); row.append(title, owner, category, status, buttons); return row;
   }));
   $('emptyState').hidden = items.length !== 0; $('previousPage').disabled = page <= 1; $('nextPage').disabled = page >= pages; $('pageNumber').textContent = `صفحة ${page} من ${pages}`;
@@ -482,10 +468,13 @@ function show(view, updateHash = true) {
 function render() { overview(); if (model.data[current] || current === 'review') records(); activityList('fullActivity', model.activity.length); }
 function openEditor(section, id = null) {
   const record = id === null ? null : model.data[section]?.find(item => item.id === id); if (id !== null && !record) return;
+  if(adminSaving)return;
   editing = { section, id }; const form = $('recordForm'); form.reset();
   for (const field of ['title', 'owner', 'category', 'description', 'status', 'role']) if (record) form.elements.namedItem(field).value = record[field] || '';
   $('editorTitle').textContent = (record ? 'تعديل · ' : 'إضافة · ') + sections[section][0]; $('roleLabel').hidden = section !== 'users';
   $('titleLabel').firstChild.textContent = section === 'users' ? 'الاسم' : 'العنوان'; $('ownerLabel').firstChild.textContent = section === 'users' ? 'البريد الإلكتروني' : 'المسؤول / الجهة';
+  form.elements.description.required=contentKeys.includes(section);form.elements.description.minLength=contentKeys.includes(section)?10:0;
+  window.OfoqPublishing.fill(form,record||{},section);
   $('editor').showModal(); form.elements.title.focus();
 }
 function scenePreview() {
@@ -508,15 +497,32 @@ new MutationObserver(() => sendScene({resume: true, active: current === 'scene',
   .observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
 document.addEventListener('click', event => {
   const button = event.target.closest('button'); if (!button || !model) return;
-  if (button.dataset.close) $(button.dataset.close).close();
+  if (button.dataset.close && !adminSaving) $(button.dataset.close).close();
   if (button.dataset.view) show(button.dataset.view);
   if (button.dataset.create) openEditor(button.dataset.create);
   const { action: name, section, id } = button.dataset;
   if (name === 'edit') openEditor(section, id);
-  if (name === 'approve') toast('هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.');
+  if(name==='pdf'){const record=model.data[section]?.find(row=>row.id===id),file=window.OfoqPublishing.documentFor(record?.pdf);if(!file)toast('لم يرفق الناشر ملف PDF حتى الآن.');else{const link=make('a');link.href=file.url;link.download=file.name;document.body.append(link);link.click();link.remove();}}
+  if (name === 'approve') { const row = model.data[section]?.find(item => item.id === id); if (row) { row.status = 'published'; window.OfoqFrontend.publishContent?.(section,row); model.activity.unshift({title: 'اعتماد سجل', detail: row.title}); render(); toast('تم الاعتماد خلال هذه الزيارة.'); } }
   if (name === 'delete') { deleting = { section, id }; $('deleteText').textContent = model.data[section].find(item => item.id === id)?.title || ''; $('deleteDialog').showModal(); }
 });
-$('confirmDelete').addEventListener('click', () => { $('deleteDialog').close(); toast('هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.'); });
+$('confirmDelete').addEventListener('click', () => { if (!deleting) return; const {section,id}=deleting; model.data[section]=model.data[section].filter(item=>item.id!==id); ((window.OfoqFrontend.removedContent ||= {})[section] ||= []).push(id); model.activity.unshift({title:'حذف سجل',detail:sections[section][0]}); page=1; $('deleteDialog').close(); render(); toast('تم حذف السجل خلال هذه الزيارة.'); });
+$('editor').addEventListener('cancel',event=>{if(adminSaving)event.preventDefault();});
+$('recordForm').addEventListener('submit',async event=>{
+ event.preventDefault();if(adminSaving)return;const form=event.currentTarget,target={...editing};
+ for(const field of form.querySelectorAll('[required]'))if(!field.matches(':disabled'))field.value=field.value.trim();
+ if(!form.reportValidity())return;
+ const values=Object.fromEntries(['title','owner','category','description','status','role'].map(key=>[key,form.elements[key].value]));
+ const old=model.data[target.section].find(item=>item.id===target.id),submit=form.querySelector('[type=submit]');adminSaving=true;submit.disabled=true;
+ try{
+ const publishing=await window.OfoqPublishing.read(form);
+ const updated={...old,...values,...publishing,publisherName:values.owner,publisherRole:old?.publisherRole||'admin',date:old?.date||new Date().toISOString().slice(0,10),id:old?.id||crypto.randomUUID()};
+ if(['jobs','internships'].includes(target.section))updated.company=values.owner;
+ if(old)Object.assign(old,updated);else model.data[target.section].unshift(updated);window.OfoqFrontend.publishContent?.(target.section,updated);
+ const source=(target.section==='jobs'?window.OfoqFrontend.companyJobs:target.section==='internships'?window.OfoqFrontend.companyInternships:null)?.find(row=>row.id===updated.id);if(source)Object.assign(source,updated);
+ model.activity.unshift({title:old?'تعديل سجل':'إضافة سجل',detail:values.title});page=1;$('editor').close();render();toast('تم تطبيق التغيير خلال هذه الزيارة.');
+ }catch(error){toast(error.message);}finally{adminSaving=false;submit.disabled=false;}
+});
 $('addButton').addEventListener('click', () => openEditor(current));
 for (const id of ['search', 'statusFilter']) $(id).addEventListener(id === 'search' ? 'input' : 'change', () => { page = 1; records(); });
 $('previousPage').addEventListener('click', () => { page--; records(); }); $('nextPage').addEventListener('click', () => { page++; records(); });
@@ -524,9 +530,22 @@ $('menuButton').addEventListener('click', () => { const open = $('sidebar').clas
 document.addEventListener('keydown', event => { if (event.key === 'Escape') { $('sidebar').classList.remove('open'); $('menuButton').setAttribute('aria-expanded', 'false'); } });
 $('sceneSettings').addEventListener('input', () => { $('durationValue').textContent = $('sceneSettings').elements.duration.value + ' ثانية'; $('smoothnessValue').textContent = $('sceneSettings').elements.smoothness.value + ' ثانية'; });
 $('sceneSettings').addEventListener('submit', event => { event.preventDefault(); scenePreview(); });
+$('siteSettings').addEventListener('submit', event => {
+  event.preventDefault(); const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  $('previewName').textContent = form.elements.name.value.trim();
+  $('previewTagline').textContent = form.elements.tagline.value.trim();
+  $('sitePreview').style.setProperty('--accent', form.elements.accent.value);
+  $('sitePreview').style.background = form.elements.theme.value === 'dark' ? '#0b1526' : '#f3f6fb';
+  $('sitePreview').style.color = form.elements.theme.value === 'dark' ? '#f3f6fb' : '#14263d';
+  toast('تم تحديث معاينة الهوية.');
+});
 $('replayScene').addEventListener('click', scenePreview);
 try {
-  model = createModel(examples);
+  model = window.OfoqFrontend.adminWorkspace ||= createModel(examples);
+  const session = window.OfoqFrontend;
+  const incoming=[...(session.companyJobs||[]).map(row=>({section:'jobs',row})),...(session.companyInternships||[]).map(row=>({section:'internships',row})),...Object.entries(session.contentChanges||{}).filter(([section])=>contentKeys.includes(section)).flatMap(([section,rows])=>rows.map(row=>({section,row})))];
+  for(const {section,row}of incoming){if(session.removedContent?.[section]?.includes(row.id))continue;const record={...row,owner:row.owner||row.company||row.instructor||'إدارة سعي',status:row.status==='published'?'published':row.status==='pending'||row.status==='draft'?'pending':'archived'};const old=model.data[section].find(item=>item.id===row.id);if(old)Object.assign(old,record);else model.data[section].unshift(record);}
   $('navigation').replaceChildren(...Object.entries(sections).map(([key, [title, icon]]) => { const button = make('button'); button.type = 'button'; button.dataset.view = key; button.append(make('span', icon, 'nav-icon'), make('span', title)); return button; }));
   $('today').textContent = new Intl.DateTimeFormat('ar-JO', { dateStyle: 'long', timeZone: 'Asia/Amman' }).format(new Date()); $('year').textContent = new Date().getFullYear();
   show(location.hash.slice(1), false); scenePreview(); addEventListener('hashchange', () => show(location.hash.slice(1), false));

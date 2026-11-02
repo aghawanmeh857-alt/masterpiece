@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -113,7 +97,7 @@ const pageData = {
     {
       "id": "ideas-event",
       "title": "أمسية صنّاع الأفكار",
-      "company": "مجتمع أفق",
+      "company": "مجتمع سعي",
       "category": "career",
       "location": "onsite",
       "itemType": "meetup",
@@ -123,7 +107,7 @@ const pageData = {
       "date": "2026-10-10",
       "deadline": "2026-11-14",
       "eventTime": "6:00–8:00 مساءً · بتوقيت عمّان",
-      "venue": "مساحة أفق · عمّان",
+      "venue": "مساحة سعي · عمّان",
       "symbol": "↗",
       "description": "تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.",
       "details": [
@@ -177,7 +161,7 @@ const pageData = {
       "date": "2026-10-08",
       "deadline": "2026-11-21",
       "eventTime": "5:00–6:30 مساءً · بتوقيت عمّان",
-      "venue": "مساحة أفق وعبر الإنترنت · مثال",
+      "venue": "مساحة سعي وعبر الإنترنت · مثال",
       "symbol": "◈",
       "description": "حوار حول الأبحاث وسهولة الوصول والقرارات التي تصنع منتجات أفضل.",
       "details": [
@@ -227,6 +211,7 @@ const pageData = {
 async function startListings() {
   if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
   await window.componentsReady;
+if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('events', pageData.items);
 
   function get(id) {
     return document.getElementById(id);
@@ -283,7 +268,7 @@ async function startListings() {
     const cover = {development: 'code', design: 'mobile', marketing: 'marketing', career: 'dashboard'}[item.category] || 'dashboard';
     const dateBlock = `<span class="opportunity-event-date"><strong>${item.deadline.slice(8)}</strong><span>${new Intl.DateTimeFormat('ar-JO', {month:'short', timeZone:'UTC'}).format(new Date(item.deadline+'T12:00:00Z'))} ${item.deadline.slice(0,4)}</span></span>`;
     return `
-      <article class="listing-card" data-item="${item.id}">
+      <article class="listing-card" data-item="${item.id}" data-card-details="${safeText(JSON.stringify(item))}">
         <div class="opportunity-media"><a class="opportunity-cover" href="${detailUrl}" aria-label="تفاصيل ${safeText(item.title)}"><img src="../assets/project-covers/${cover}.svg" alt="" width="800" height="450" loading="lazy">${dateBlock}</a></div>
         <div class="listing-details">
           <p class="listing-category">${labels[item.category]}</p>
@@ -320,7 +305,9 @@ async function startListings() {
     get('previewSuccess').hidden = true;
   }
 
+  let selectedItem = null;
   function openDetails(item) {
+    selectedItem = item;
     resetPreview();
     get('detailTitle').textContent = item.title;
     get('detailDescription').textContent = item.description;
@@ -358,6 +345,9 @@ async function startListings() {
   get('previewForm').addEventListener('submit', event => {
     event.preventDefault();
     if (!get('previewForm').reportValidity()) return;
+    if (!selectedItem) return;
+    window.OfoqFrontend.register(selectedItem.id, selectedItem.title, new URL('Event/event.html?id=' + selectedItem.id, location.href).href);
+    get('previewSuccess').textContent = 'تم التسجيل في الفعالية خلال هذه الزيارة.';
     get('previewArea').hidden = true;
     get('previewSuccess').hidden = false;
     get('previewSuccess').setAttribute('tabindex', '-1');
@@ -369,6 +359,6 @@ async function startListings() {
   renderItems();
 }
 
-startListings().catch(error => console.error('OFOQ listing page:', error));
+startListings().catch(error => console.error('SAEI listing page:', error));
 
 })();

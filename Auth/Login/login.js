@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'authForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -118,6 +102,7 @@ form.addEventListener('submit', event => {
   if (!form.reportValidity()) return;
 
   const companyAccount = document.getElementById("accountType").value === "company";
+  window.OfoqFrontend.profile.email = form.querySelector('input[type="email"]').value.trim();
   // Clear passwords immediately after previewing the form.
   form.reset();
   checkPasswords();
@@ -130,8 +115,8 @@ form.addEventListener('submit', event => {
   const success = document.getElementById('authSuccess');
   success.hidden = false;
   success.focus();
-  window.OfoqDemoAuth.signIn();
-  location.assign(window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : window.OfoqDemoAuth.destination()));
+  window.OfoqDemoAuth.signIn(companyAccount ? 'company' : 'member');
+  window.OfoqFrontend.navigate(window.siteThemeUrl(companyAccount ? "../../company/dashboard.html" : window.OfoqDemoAuth.destination()));
 });
 
 document.getElementById('tryAgain').addEventListener('click', () => {

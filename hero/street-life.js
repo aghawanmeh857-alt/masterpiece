@@ -1,4 +1,4 @@
-// Animated Sketchfab characters already bundled with OFOQ. Vehicles are not
+// Animated Sketchfab characters already bundled with SAEI. Vehicles are not
 // substituted here: the selected sedan will be supplied by the user separately.
 export const STREET_ROUTES = [
   [[22, 19], [22, 2], [22, -18], [20.5, -30], [20.5, -48], [22, -60], [23.5, -48], [23.5, -24], [23.5, 2]],

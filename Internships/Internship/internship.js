@@ -1,20 +1,4 @@
 
-// Forms are interface examples. Only search and filter forms process their inputs.
-document.addEventListener('submit', function (event) {
-  const form = event.target;
-  if (['searchForm', 'filterForm', 'previewForm'].includes(form.id)) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  form.reset();
-  let status = form.querySelector('[data-screen-status]');
-  if (!status) {
-    status = document.createElement('p');
-    status.dataset.screenStatus = '';
-    status.setAttribute('role', 'status');
-    form.append(status);
-  }
-  status.textContent = 'هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.';
-}, true);
 document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 (function () {
 // Theme travels in page links; no browser storage or backend is needed.
@@ -217,6 +201,7 @@ const pageData = {
 (function () {
 // The list and detail pages read the same example data.
 const kind = document.body.dataset.kind;
+if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('internships', pageData.items);
 const records = kind === 'course' ? courses : kind === 'project' ? projects : pageData.items;
 const requestedId = new URLSearchParams(location.search).get('id');
 const record = requestedId === null ? records[0] : records.find(item => String(item.id) === requestedId);
@@ -251,7 +236,7 @@ if (!record) {
   get('notFound').hidden = false;
   get('notFound').focus();
 } else {
-  document.title = record.title + ' — OFOQ';
+  document.title = record.title + ' — SAEI';
   get('detailTitle').textContent = record.title;
   get('detailDescription').textContent = record.description;
   get('detailDescription').insertAdjacentHTML('afterend', window.OfoqPublishers.card(window.OfoqPublishers.forRecord(kind, record)));
@@ -323,8 +308,11 @@ get('previewForm').addEventListener('submit', event => {
     input.setCustomValidity(input.value.trim() ? '' : 'يرجى إدخال نص.');
   });
   if (!form.reportValidity()) return;
+  window.OfoqFrontend.apply('internship', record.id, record.title, location.href);
   form.reset();
   form.hidden = true;
+  get('previewSuccess').querySelector('h3') && (get('previewSuccess').querySelector('h3').textContent = 'تم تقديم الطلب');
+  get('previewSuccess').querySelector('p') && (get('previewSuccess').querySelector('p').textContent = 'يمكنك متابعة نشاطك من لوحة المتابعة خلال هذه الزيارة.');
   get('previewSuccess').hidden = false;
   get('previewSuccess').focus();
 });

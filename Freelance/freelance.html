@@ -2,12 +2,15 @@
 <html lang="ar" dir="rtl">
 
 <head>
+  <script src="../assets/frontend-runtime.js"></script>
+  <script src="../assets/platform-data.js"></script>
+  <script src="../assets/publishing.js"></script>
   <meta charset="UTF-8">
     
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1526">
 
-  <title>استكشف المشاريع — أفق</title>
+  <title>استكشف المشاريع — سعي</title>
 
   <link
     rel="stylesheet"
@@ -16,7 +19,7 @@
 
   
   
-  <link rel="icon" type="image/png" href="../assets/branding/ofoq-logo.png?v=ofoq-11">
+  <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg">
   
     
 
@@ -25,27 +28,18 @@
   <link rel="stylesheet" href="marketplace.css">
   <script src="../assets/publishers.js"></script>
   <script defer src="../assets/arabic-ui.js"></script>
+  <script defer src="../assets/demo-auth.js"></script>
+<link rel="stylesheet" href="../assets/cards.css">
+<link rel="stylesheet" href="../assets/fonts.css">
+  <link rel="stylesheet" href="../assets/popup-ui.css">
+  <link rel="stylesheet" href="../assets/shared-navbar.css">
 </head>
 
 <body data-section="freelance">
   <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
 
   <!-- النافبار المشترك -->
-<header class="site-header">
-  <div class="container-xl header-inner">
-    <a href="../hero/userHero.html" class="brand" aria-label="أفق | OFOQ الرئيسية">
-      <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/ofoq-logo.png?v=ofoq-11" alt="أفق | OFOQ" width="1254" height="1254"></span>
-    </a>
-    <details class="site-navigation" open><summary>الأقسام</summary><nav class="section-nav" aria-label="أقسام أفق">
-      <a data-section-link="freelance" href="freelance.html">العمل الحر</a>
-      <a data-section-link="academy" href="../Academy/academy.html">الأكاديمية</a>
-      <a data-section-link="internships" href="../Internships/internships.html">فرص التدريب</a>
-      <a data-section-link="jobs" href="../Jobs/jobs.html">الوظائف</a>
-      <a data-section-link="events" href="../Events/events.html">الفعاليات</a>
-    </nav></details>
-    <nav class="account-links header-actions" aria-label="الحساب والمظهر"><button class="theme-toggle" type="button" aria-label="التبديل إلى الوضع الليلي">☾ الوضع الليلي</button><details class="account-menu"><summary>الحساب</summary><div class="account-menu-links"><a href="../Auth/Login/login.html">تسجيل الدخول</a><a href="../Auth/Register/register.html" class="register-link">إنشاء حساب</a><span class="account-menu-label">مساحة تجريبية</span><a href="../Account/Profile/profile.html">الملف الشخصي</a><a href="../Account/Dashboard/dashboard.html">لوحة المتابعة</a><a href="../Account/Messages/messages.html">الرسائل</a><a href="../Account/Settings/settings.html">الإعدادات</a></div></details></nav>
-  </div>
-</header>
+<script src="../assets/shared-navbar.js" data-mode="site"></script>
   <main id="mainContent" tabindex="-1" class="container-xl page-content">
 
     <div class="page-heading">
@@ -109,7 +103,7 @@
 
         <div class="results-meta">
           <p id="resultCount" role="status" aria-live="polite"></p>
-          <button id="project-favorites" class="project-favorites-filter" type="button" aria-pressed="false">♡ المفضلة <span id="projectFavoritesCount">0</span></button>
+          <button hidden id="project-favorites" class="project-favorites-filter" type="button" aria-pressed="false">♡ المفضلة <span id="projectFavoritesCount">0</span></button>
         </div>
         <p id="favoritesStatus" class="favorites-status" role="status" aria-live="polite"></p>
 
@@ -132,7 +126,7 @@
         </div>
 
         <p class="demo-note">
-          نسخة تجريبية. المشاريع والطلبات أمثلة توضيحية؛ لا تُحفظ الطلبات ولا تُرسل.
+          تفاعل مع المشاريع وتابع طلباتك خلال هذه الزيارة. لا تُرسل الطلبات إلى جهة خارجية.
         </p>
 
       </section>
@@ -147,24 +141,14 @@
       <button id="openPost" class="btn btn-orange" type="button">+ شارك مشروعًا</button>
     </section>
 
-    <section id="community" class="community-section" aria-labelledby="communityTitle">
-      <div class="community-heading">
-        <div><p class="eyebrow mb-2">العمل الحر / المجتمع</p><h2 id="communityTitle">أفكار تبحث عن فريق.</h2></div>
-        <span id="ideaCount">لم تُشارك أي أفكار بعد</span>
-      </div>
-      <p class="community-note">معاينة تجريبية. المنشورات والتعليقات مؤقتة وتختفي عند تحديث الصفحة. استخدم اسمًا مستعارًا لتجربة الحوار.</p>
-      <p id="communityStatus" class="community-status" role="status"></p>
-      <div id="emptyIdeas" class="empty-ideas">
-        <span aria-hidden="true">✧</span><h3>قد تكون الفكرة المميزة القادمة فكرتك.</h3>
-        <p>اضغط «شارك مشروعًا» بالأعلى لطرح فكرتك وبدء الحوار.</p>
-      </div>
+    <section id="community" class="community-section" aria-label="المشاريع المشتركة" hidden>
       <div id="ideaFeed" class="idea-feed"></div>
     </section>
   </main>
 
   <!-- الفوتر المشترك -->
   <footer class="page-footer container-xl">
-  <span>© OFOQ <span id="year"></span></span>
+  <span>© SAEI <span id="year"></span></span>
   <a data-room-link href="../hero/userHero.html#freelance">العودة إلى قسم <span data-room-name>العمل الحر</span>  <span aria-hidden="true">↗</span></a>
 </footer>
 
@@ -181,7 +165,7 @@
 
         <div class="modal-header">
           <div>
-            <p class="eyebrow mb-2">أفق / التقديم</p>
+            <p class="eyebrow mb-2">سعي / التقديم</p>
 
             <h2 id="applyTitle" class="modal-title fs-5">
               طلب العمل على المشروع
@@ -249,7 +233,7 @@
             </div>
 
             <p class="demo-note">
-              هذه تجربة توضيحية للتقديم فقط؛ لا يُرسل طلب فعلي ولا تُرفع الملفات. تبقى بياناتك في هذه الصفحة فقط وتُمسح عند إغلاق النافذة.
+              بعد التأكيد يظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا تُرسل البيانات أو الملفات إلى جهة خارجية.
             </p>
 
             <button class="btn btn-orange w-100" type="submit">
@@ -291,7 +275,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content panel">
         <div class="modal-header">
-          <div><p class="eyebrow mb-2">أفق / شارك فكرة</p><h2 id="postModalTitle" class="modal-title fs-5">ابحث عن مستقلين لفكرتك</h2></div>
+          <div><p class="eyebrow mb-2">سعي / شارك فكرة</p><h2 id="postModalTitle" class="modal-title fs-5">ابحث عن مستقلين لفكرتك</h2></div>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
         <div class="modal-body">
@@ -301,11 +285,11 @@
             <div class="field"><label for="postDescription">فكرتك والمساعدة التي تحتاجها</label><textarea id="postDescription" class="form-control" dir="auto" rows="4" minlength="20" maxlength="2000" placeholder="اشرح فكرتك والمهارات التي تبحث عنها…" data-text required></textarea></div>
             <div class="post-row">
               <div class="field"><label for="postCategory">المجال</label><select id="postCategory" class="form-select"><option>التطوير</option><option>التصميم</option><option>التسويق</option><option>أخرى</option></select></div>
-              <div class="field"><label for="postBudget">الميزانية بالدولار (اختياري)</label><input id="postBudget" class="form-control" type="number" min="1" max="1000000" step="1" placeholder="e.g. 500"></div>
+              <div class="field"><label for="postBudget">الميزانية بالدولار</label><input id="postBudget" class="form-control" type="number" required min="1" max="1000000" step="1" placeholder="e.g. 500"></div>
             </div>
             <div class="field"><label for="postSkills">المهارات المطلوبة (اختياري)</label><input id="postSkills" class="form-control" dir="auto" maxlength="150" placeholder="React، Figma، كتابة المحتوى"></div>
-            <p class="demo-note">هذه معاينة للمنشور فقط؛ لا يُنشر أو يُحفظ أو يُرسل أي محتوى.</p>
-            <button class="btn btn-orange w-100" type="submit">معاينة المنشور ←</button>
+            <p class="demo-note">يظهر المنشور والتعليقات ضمن التجربة الحالية؛ تحديث الصفحة يبدأ تجربة جديدة.</p>
+            <button class="btn btn-orange w-100" type="submit">نشر المشروع ←</button>
           </form>
         </div>
       </div>
@@ -345,6 +329,9 @@
   
 
   <script src="freelance.js"></script>
+  <script src="../assets/community.js"></script>
   <script src="../assets/application-form.js"></script>
+<script defer src="../assets/project-details.js"></script>
+<script type="module" src="../assets/card-details.js"></script>
 </body>
 </html>

@@ -1,0 +1,28 @@
+.auth-shell { animation: auth-arrive .65s cubic-bezier(.2,.8,.2,1) both; }
+.auth-form-panel .field { position: relative; transition: transform .22s ease; }
+.auth-form-panel .field > label { transition: color .2s ease, transform .2s ease; transform-origin: right; }
+.auth-form-panel .field:focus-within > label { color: #ff783d; transform: translateX(-5px); }
+.auth-form-panel .form-control,
+.auth-form-panel .form-select { transition: border-color .2s ease, box-shadow .25s ease, background-color .25s ease; }
+.auth-form-panel .form-control:focus,
+.auth-form-panel .form-select:focus { border-color: #ff783d; box-shadow: 0 0 0 4px #ff783d20, 0 8px 24px #ff783d12; }
+.auth-form-panel .field.is-typing .form-control { box-shadow: 0 0 0 4px #ff783d28, 0 8px 28px #ff783d20; }
+.auth-form-panel .field::after { content: ''; position: absolute; bottom: 0; right: 12px; left: 12px; height: 2px; background: linear-gradient(90deg, transparent, #ffb797, #ff783d, transparent); transform: scaleX(0); opacity: 0; pointer-events: none; transition: transform .35s ease, opacity .35s ease; }
+.auth-form-panel .field.is-typing::after { transform: scaleX(1); opacity: 1; }
+.auth-tabs a, .auth-form-panel button, .auth-success .btn { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
+.auth-tabs a:hover, .auth-form-panel .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px #ff783d25; }
+.auth-form-panel button:active, .auth-tabs a:active { transform: scale(.97); }
+.auth-success:not([hidden]) { animation: auth-arrive .5s cubic-bezier(.2,.8,.2,1) both; }
+.auth-success:not([hidden]) > span { display: inline-block; animation: auth-check .55s cubic-bezier(.2,1.5,.5,1) both; }
+.auth-illustration { transition: filter .3s ease; isolation: isolate; }
+.auth-illustration .auth-orbit { z-index: 0; }
+.auth-illustration .auth-monogram { z-index: 2; }
+.auth-illustration .auth-dot { z-index: 1; }
+.auth-illustration .auth-dot { left: 100px; top: 85px; transform: translate(-50%, -50%) rotate(var(--orbit-angle, -110deg)) translateX(80px); will-change: transform; }
+.auth-shell:has(.is-typing) .auth-illustration { filter: drop-shadow(0 0 18px #ff783d35); }
+@keyframes auth-arrive { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes auth-check { from { opacity: 0; transform: scale(.4) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell, .auth-shell *, .auth-shell *::after { animation: none !important; transition: none !important; }
+  .auth-tabs a:hover, .auth-form-panel .btn:hover, .auth-form-panel button:active, .auth-tabs a:active, .auth-form-panel .field:focus-within > label { transform: none; }
+}

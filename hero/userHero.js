@@ -1,7 +1,5 @@
 import { createScenicPlantings } from '../3D/scenic-plantings.js';
-import { createGpuTiming } from './gpu-timing.js';
 import { mergeStaticMeshes } from './static-meshes.js';
-import { nextRenderScale } from './render-budget.js';
 import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js';
 // المشهد ثلاثي الأبعاد يحتاج Three.js. بقية الشاشات لا تستخدم مكتبات.
 import * as THREE from 'three';
@@ -9,7 +7,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime } from './tour-motion.js';
+import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime, nextRenderScale } from './tour-motion.js';
 import { doorProximity, advanceDoor } from './door-motion.js';
 import { createStreetLife, createCityAircraft } from './street-life.js';
 import { createCityTraffic } from './city-traffic.js';
@@ -816,7 +814,6 @@ async function createBuildingTour(container, {
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance'
   });
-  const gpuTiming = createGpuTiming(renderer.getContext(), milliseconds => { document.documentElement.dataset.gpuFrameMs = milliseconds.toFixed(1); }, new URLSearchParams(location.search).has('performanceStats'));
   renderer.localClippingEnabled = true;
   renderer.setSize(innerWidth, innerHeight);
   const maxPixelRatio = () => Math.min(devicePixelRatio, 1.25, Math.sqrt(1200000 / (innerWidth * innerHeight)));
@@ -1441,7 +1438,6 @@ async function createBuildingTour(container, {
   resize();
   let last = performance.now(), renderFrame = null;
   let sampleTime = 0, sampleFrames = 0;
-  let updateWork = 0, renderWork = 0;
   let nextLightSelection = 0;
   const frustum = new THREE.Frustum();
   const viewProjection = new THREE.Matrix4();
@@ -1454,7 +1450,6 @@ async function createBuildingTour(container, {
     last = now;
     if (document.hidden) { sampleTime = 0; sampleFrames = 0; return; }
     if (preview && !preview.active) return;
-    const workStarted = performance.now();
     if (preview?.playing) {
       preview.elapsed = Math.min(preview.duration, preview.elapsed + dt);
       // Follow the entrance portion of the existing tour, including the sliding doors.
@@ -1555,25 +1550,14 @@ async function createBuildingTour(container, {
       localLights.forEach(light => { light.visible = selected.has(light); });
       document.documentElement.dataset.activeLocalLights = String(nearest.length);
     }
-    const renderStarted = performance.now();
-    gpuTiming.begin(now);
     renderer.render(scene, camera);
-    gpuTiming.end();
-    updateWork += renderStarted - workStarted;
-    renderWork += performance.now() - renderStarted;
     document.documentElement.dataset.activePeople = String(activePeople);
     // Lower resolution only after sustained slow frames, ignoring loading stalls.
     if (document.documentElement.dataset.modelLoad === 'ready' && elapsedMs > 0 && elapsedMs < 1000) {
       sampleTime += elapsedMs; sampleFrames++;
       if (sampleTime >= 1500) {
         const averageFrameMs = sampleTime / sampleFrames;
-        document.documentElement.dataset.updateWorkMs = (updateWork / sampleFrames).toFixed(1);
-        document.documentElement.dataset.renderWorkMs = (renderWork / sampleFrames).toFixed(1);
-        document.documentElement.dataset.drawCalls = String(renderer.info.render.calls);
-        document.documentElement.dataset.renderTriangles = String(renderer.info.render.triangles);
-        updateWork = 0; renderWork = 0;
         const nextScale = nextRenderScale(renderScale, averageFrameMs, innerWidth * innerHeight);
-        document.documentElement.dataset.averageFrameMs = averageFrameMs.toFixed(1);
         if (nextScale !== renderScale) {
           renderScale = nextScale;
           renderer.setPixelRatio(renderScale);
@@ -1789,7 +1773,7 @@ async function createBuildingTour(container, {
     document.documentElement.dataset.plazaFountain = 'unavailable';
     console.warn('SAEI: imported plaza fountain could not be loaded.', error);
   });
-  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion, renderer }).then(walk => {
+  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(walk => {
     if (disposed) { walk.destroy(); return; }
     autumnWalk = walk;
     scene.traverse(node => { if (node.userData.autumnReplacement) node.visible = false; });
@@ -1854,7 +1838,6 @@ async function createBuildingTour(container, {
     },
     destroy() {
       disposed = true;
-      gpuTiming.destroy();
       if (renderFrame !== null) cancelAnimationFrame(renderFrame);
       removeEventListener('resize', resize);
       coastal.destroy?.();

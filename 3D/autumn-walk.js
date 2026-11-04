@@ -1,6 +1,6 @@
 import { createTreeBillboards } from './tree-billboards.js';
 // Maple Trees by Jagobo (CC BY 4.0). Original download remains unchanged.
-export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = false, renderer }) {
+export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = false }) {
   const asset = await loader.loadAsync(new URL('./maple-trees.glb', import.meta.url).href);
   asset.scene.updateMatrixWorld(true);
   const group = new THREE.Group();
@@ -48,10 +48,6 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     mesh.geometry.translate(-center.x, -bounds.min.y, -center.z);
     mesh.geometry.scale(scale, scale, scale);
   });
-  if (renderer && new URLSearchParams(location.search).has('bakeTrees')) {
-    const { bakeTreeAtlas } = await import('./bake-tree-atlas.js');
-    bakeTreeAtlas(THREE, renderer, template, scene.environment);
-  }
   const canopyTrees = [];
   const crownLift = 3.1;
   const bark = [...materials].find(material => /bark/i.test(material.name));
@@ -105,10 +101,8 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
   });
   group.add(falling);
   let billboards = null;
-  if (!new URLSearchParams(location.search).has('bakeTrees')) {
-    try { billboards = await createTreeBillboards(THREE, template, canopyTrees, group); }
-    catch (error) { console.warn('SAEI: keeping full tree geometry because the photographs are unavailable.', error); }
-  }
+  try { billboards = await createTreeBillboards(THREE, template, canopyTrees, group); }
+  catch (error) { console.warn('SAEI: keeping full tree geometry because the photographs are unavailable.', error); }
   scene.add(group);
   let elapsed = 0;
   function update(dt, outside = true, camera) {

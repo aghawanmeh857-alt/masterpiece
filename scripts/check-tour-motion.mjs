@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime } from '../hero/tour-motion.js';
+import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime, nextRenderScale } from '../hero/tour-motion.js';
 
 for (let index = 0; index < TOUR_STOPS.length; index++) assert.equal(tourTarget(index), TOUR_STOPS[index]);
 let previous = 0;
@@ -32,3 +32,13 @@ assert.equal(roomAtTourTime(64), 5);
 assert.equal(tourTarget(-1), 0);
 assert.equal(tourTarget(9), 64);
 console.log('Passed: scroll mapping, bounded movement, no overshoot, settling, reverse scrolling, room synchronization and 30/60/144fps consistency.');
+
+assert.equal(nextRenderScale(1,16,1920*1080),1);
+assert(nextRenderScale(1,200,1920*1080)<1,'Severe slow frames must lower pixel work');
+let scale=1;
+for(let i=0;i<30;i++) scale=nextRenderScale(scale,200,1920*1080);
+assert(Math.abs(scale-Math.sqrt(280000/(1920*1080)))<1e-9);
+assert.equal(nextRenderScale(scale,200,1920*1080),scale,'Never shrink below the pixel budget');
+assert.equal(nextRenderScale(.3,200,1920*1080),.3,'Never increase an already lower scale');
+assert.equal(nextRenderScale(1,NaN,1920*1080),1);
+console.log('Passed: fast frames unchanged, severe stalls handled, bounded render scale without oscillation.');

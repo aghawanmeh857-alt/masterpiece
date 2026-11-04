@@ -48,85 +48,14 @@ document.querySelector('.theme-toggle').addEventListener('click', function () {
 
 
 // بيانات الغرف والفرص التجريبية.
-const rooms = [{
-  id: 'lobby',
-  name: 'الرئيسية',
-  caption: 'أهلًا بك',
-  title: 'مستقبلك يبدأ<br><em>من هنا.</em>',
-  description: 'ادخل مساحة تجمع التعلّم والعمل والأشخاص الذين يشاركونك الطموح. كل غرفة تفتح بابًا جديدًا.',
-  action: 'ابدأ رحلتك',
-  tags: ['تعلّم', 'تواصل', 'انطلق'],
-  cards: [
-    ['مساحتك للعمل', 'تعرّف على غرف SAEI الست واختر المسار المناسب لك.'],
-    ['مجتمع الطموح', 'تواصل مع أشخاص يشاركونك رحلة التطور.'],
-    ['خطوتك القادمة', 'استكشف التعلّم والفرص المهنية في مكان واحد.']
-  ]
-}, {
-  id: 'freelance',
-  name: 'العمل الحر',
-  caption: 'اصنع طريقك',
-  title: 'موهبتك.<br><em>قواعدك.</em>',
-  description: 'مساحة للمستقلين وصنّاع الأفكار. اكتشف مشاريع جديدة وابدأ بناء عمل يحمل بصمتك.',
-  action: 'استكشف المشاريع',
-  tags: ['تصميم', 'تطوير', 'محتوى'],
-  cards: [
-    ['تصميم هوية بصرية', 'مشروع توضيحي · عن بُعد · مدة أسبوعين'],
-    ['تطوير موقع إلكتروني', 'مشروع توضيحي · HTML وCSS وJavaScript'],
-    ['كتابة محتوى إبداعي', 'مشروع توضيحي · حملة إطلاق منتج']
-  ]
-}, {
-  id: 'academy',
-  name: 'الأكاديمية',
-  caption: 'واصل التعلّم',
-  title: 'تعلّم اليوم.<br><em>اصنع الغد.</em>',
-  description: 'ادخل قاعة الأفكار. مسارات تعليمية وورش عملية تساعدك على تحويل الفضول إلى مهارة.',
-  action: 'تصفّح المسارات',
-  tags: ['ورش عملية', 'مهارات', 'إرشاد'],
-  cards: [
-    ['أساسيات تصميم تجربة المستخدم', 'مسار توضيحي · 6 جلسات · مستوى مبتدئ'],
-    ['تطوير واجهات الويب', 'مسار توضيحي · 8 جلسات · تطبيق عملي'],
-    ['بناء ملف أعمالك', 'ورشة توضيحية · ساعتان · مراجعة المشاريع']
-  ]
-}, {
-  id: 'internships',
-  name: 'فرص التدريب',
-  caption: 'خطوتك الأولى',
-  title: 'أول تجربة.<br><em>أثر كبير.</em>',
-  description: 'ابدأ رحلتك المهنية بجانب فريق يدعمك. اكتشف تدريبات تمنحك الخبرة والثقة للخطوة التالية.',
-  action: 'اكتشف التدريبات',
-  tags: ['خبرة', 'توجيه', 'بداية'],
-  cards: [
-    ['متدرّب تصميم', 'فرصة توضيحية · 3 أشهر · عمل هجين'],
-    ['متدرّب تطوير واجهات', 'فرصة توضيحية · شهران · عن بُعد'],
-    ['متدرّب تسويق رقمي', 'فرصة توضيحية · 3 أشهر · ضمن فريق']
-  ]
-}, {
-  id: 'jobs',
-  name: 'الوظائف',
-  caption: 'ابحث عن مكانك',
-  title: 'مكانك القادم.<br><em>ينتظرك.</em>',
-  description: 'مهاراتك تستحق المساحة المناسبة. تعرّف على فرص عمل تناسب طموحك وتفتح فصلًا جديدًا.',
-  action: 'تصفّح الوظائف',
-  tags: ['فرص جديدة', 'فرق', 'نمو'],
-  cards: [
-    ['مصمّم تجربة مستخدم', 'وظيفة توضيحية · دوام كامل · عمل هجين'],
-    ['مطوّر واجهات أمامية', 'وظيفة توضيحية · دوام كامل · عن بُعد'],
-    ['مدير مجتمع', 'وظيفة توضيحية · دوام جزئي · عمل هجين']
-  ]
-}, {
-  id: 'events',
-  name: 'الفعاليات',
-  caption: 'ننجز معًا',
-  title: 'لقاء واحد.<br><em>ألف احتمال.</em>',
-  description: 'تواصل، شارك، وألهم الآخرين. لقاءات وفعاليات تجمع الأفكار بالأشخاص القادرين على تحقيقها.',
-  action: 'استكشف الفعاليات',
-  tags: ['لقاءات', 'مجتمع', 'إلهام'],
-  cards: [
-    ['ليلة صنّاع الأفكار', 'فعالية توضيحية · جلسات مشاركة وتعارف'],
-    ['ورشة بناء المنتجات', 'فعالية توضيحية · فرق صغيرة · تطبيق عملي'],
-    ['لقاء المستقلين', 'فعالية توضيحية · حوار مفتوح وتبادل خبرات']
-  ]
-}];
+const rooms = [
+  {id:'lobby',name:'الرئيسية',caption:'أهلًا بك',action:'ابدأ رحلتك'},
+  {id:'freelance',name:'العمل الحر',caption:'اصنع طريقك',action:'استكشف المشاريع'},
+  {id:'academy',name:'الأكاديمية',caption:'واصل التعلّم',action:'تصفّح المسارات'},
+  {id:'internships',name:'فرص التدريب',caption:'خطوتك الأولى',action:'اكتشف التدريبات'},
+  {id:'jobs',name:'الوظائف',caption:'ابحث عن مكانك',action:'تصفّح الوظائف'},
+  {id:'events',name:'الفعاليات',caption:'ننجز معًا',action:'استكشف الفعاليات'}
+];
 
 const $ = id => document.getElementById(id);
 
@@ -193,26 +122,6 @@ function setRoom(index) {
   refreshReadingPanels();
 
   const room = rooms[index];
-  const section = ROOM_SECTIONS[index];
-
-  $('headline').innerHTML = section.title;
-  $('description').textContent = section.description;
-  renderRoomSections($('roomSections'), index, window.siteThemeUrl);
-
-  $('roomLabel').textContent =
-    `${String(index + 1).padStart(2, '0')} / ${room.name}`;
-
-  $('roomAction').innerHTML =
-    `${room.action} <span aria-hidden="true">←</span>`;
-
-  $('tags').replaceChildren(
-    ...room.tags.map(tag => {
-      const element = document.createElement('span');
-      element.textContent = tag;
-      return element;
-    })
-  );
-
   $('counter').textContent =
     `${String(index + 1).padStart(2, '0')} / 06`;
 
@@ -267,63 +176,7 @@ document.querySelector('.brand').addEventListener(
   }
 );
 
-// كل غرفة تفتح الصفحة الخاصة بها؛ تبقى الجولة ثلاثية الأبعاد كما هي.
-$('roomAction').addEventListener('click', () => {
-  const pages = [null, '../Freelance/freelance.html', '../Academy/academy.html',
-    '../Internships/internships.html', '../Jobs/jobs.html', '../Events/events.html'
-  ];
-  if (currentRoom === 0) scrollTo({top:chapters[1].offsetTop*.52,behavior:reducedMotion?'instant':'smooth'});
-  else if (pages[currentRoom]) window.location.href = window.siteThemeUrl(pages[currentRoom]);
-});
-
-// بطاقات الفرص داخل نافذة Bootstrap.
-$('exploreModal').addEventListener('show.bs.modal', () => {
-  const room = rooms[Math.max(currentRoom, 0)];
-
-  $('modalTitle').textContent =
-    currentRoom === 0 ? 'مساحات SAEI' : room.action;
-
-  $('modalIntro').textContent = room.description;
-
-  $('opportunities').replaceChildren(
-    ...room.cards.map(([title, description], i) => {
-      const column = document.createElement('div');
-      column.className = 'col-md-4';
-
-      const article = document.createElement('article');
-      article.className = 'opportunity';
-
-      const label = document.createElement('small');
-      label.textContent = `0${i + 1} / ${room.name}`;
-
-      const heading = document.createElement('h3');
-      heading.textContent = title;
-
-      const text = document.createElement('p');
-      text.textContent = description;
-
-      const button = document.createElement('button');
-      button.className = 'btn btn-outline-light w-100';
-      button.textContent = 'جرّب اختيار الفرصة';
-
-      button.addEventListener('click', () => {
-        bootstrap.Toast.getOrCreateInstance(
-          $('demoToast')
-        ).show();
-      });
-
-      article.append(label, heading, text, button);
-      column.append(article);
-
-      return column;
-    })
-  );
-});
-
-
 const mobileTour = matchMedia('(max-width: 767px)');
-const tourStory = document.querySelector('.story');
-tourStory.hidden = true;
 const tourFooter = document.querySelector('.tour-footer');
 const tourCaption = document.querySelector('.scene-caption');
 const tourEnd = document.getElementById('journeyEnd');
@@ -334,7 +187,7 @@ let mobileOverlayTimer = null;
 function syncMobileTourOverlay() {
   const hide = tourEndVisible || (mobileTour.matches && mobileOverlayExpired);
   document.documentElement.classList.toggle('mobile-tour-started', hide);
-  for (const element of [tourStory, tourFooter, tourCaption]) {
+  for (const element of [tourFooter, tourCaption]) {
     if (!element) continue;
     element.inert = hide;
     element.setAttribute('aria-hidden', String(hide));

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
-<rect width="240" height="240" rx="38" fill="#f7fafc"/>
-<path d="M47 103a73 73 0 0 1 146 0v17H47z" fill="#ff783d"/>
-<path d="M79 111V75l36-20v56zm49 0V46l34 18v47z" fill="#f7fafc"/>
-<path d="M36 123q84-17 168 0" fill="none" stroke="#14263d" stroke-width="6" stroke-linecap="round"/>
-<text x="120" y="183" text-anchor="middle" font-family="Tahoma,Arial,sans-serif" font-size="62" font-weight="700" fill="#14263d">أفق</text>
-<text x="120" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" letter-spacing="8" fill="#14263d">OFOQ</text>
-</svg>

@@ -20,7 +20,9 @@
   fileInfo.setAttribute('role', 'status');
   const remove = document.createElement('button');
   remove.type = 'button'; remove.className = 'text-button cv-remove';
-  remove.textContent = 'حذف الملف'; remove.hidden = true;
+  remove.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg><span>إزالة الملف</span>';
+  remove.setAttribute('aria-label', 'إزالة ملف السيرة الذاتية المرفق');
+  remove.hidden = true;
   cv.after(fileInfo, remove);
   document.getElementById('applicantCVHint').textContent = 'PDF أو Word، حتى 5 ميغابايت. الملف للمعاينة فقط؛ لا يُرفع أو يُحفظ.';
   const fields = [name, email, experience, portfolio, cv];

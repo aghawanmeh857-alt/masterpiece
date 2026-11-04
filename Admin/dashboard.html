@@ -55,7 +55,8 @@
   <dialog id="editor"><form autocomplete="off" id="recordForm"><div class="dialog-heading"><h2 id="editorTitle">إضافة سجل</h2><button class="icon-button" type="button" data-close="editor" aria-label="إغلاق">×</button></div><label id="titleLabel">العنوان<input name="title" maxlength="140" required></label><label id="ownerLabel">المسؤول / الجهة<input name="owner" maxlength="100" required></label><div class="form-row"><label>التصنيف<input name="category" maxlength="60" required></label><label>الحالة<select name="status"><option value="published">منشور / نشط</option><option value="pending">بانتظار المراجعة</option><option value="archived">مؤرشف / معطّل</option></select></label></div><label id="roleLabel" hidden>الصلاحية<select name="role"><option value="member">مستخدم</option><option value="editor">محرر محتوى</option><option value="admin">أدمن</option></select></label><label>التفاصيل / الرد<textarea name="description" rows="4" maxlength="1500"></textarea></label><div class="dialog-actions"><button type="button" class="secondary" data-close="editor">إلغاء</button><button class="primary" type="submit">تأكيد التعديل المؤقت</button></div></form></dialog>
   <dialog id="deleteDialog"><div class="dialog-heading"><h2>حذف السجل؟</h2><button type="button" class="icon-button" data-close="deleteDialog" aria-label="إغلاق">×</button></div><p id="deleteText"></p><p class="muted">الحذف يخص البيانات التجريبية في هذه الجلسة فقط.</p><div class="dialog-actions"><button class="secondary" data-close="deleteDialog">إلغاء</button><button id="confirmDelete" class="danger">حذف السجل</button></div></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="dashboard.js"></script>
+  <script defer src="../assets/theme.js"></script>
+<script type="module" src="dashboard.js"></script>
   <script defer src="../assets/dashboard-interactions.js?v=2"></script>
 </body>
 </html>

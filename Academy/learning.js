@@ -65,6 +65,15 @@
         checkout(ids, onComplete) {
           const items = validIds(ids).filter(id => !this.has(id)).map(id => catalog.get(id));
           if (!items.length) return;
+          const amount = items.reduce((sum,item) => sum + item.price, 0);
+          if (window.OfoqPayment && amount > 0) {
+            window.OfoqPayment.open({
+              title: items.map(item => item.title).join('، '), amount,
+              kind: 'الدورات والورش التدريبية',
+              onComplete: () => { this.enroll(items.map(item => item.id)); onComplete?.(); }
+            });
+            return;
+          }
           const dialog = document.createElement('dialog'); dialog.className = 'learning-checkout';
           dialog.setAttribute('aria-label', 'إتمام الشراء التجريبي');
           const heading = document.createElement('h2'); heading.textContent = 'خطوتك القادمة تبدأ هنا';

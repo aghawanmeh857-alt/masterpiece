@@ -55,14 +55,14 @@ html body .modal-dialog{max-width:min(800px,calc(100vw - 32px))}
 html body .modal-header{padding:24px 28px;align-items:flex-start}
 html body .modal-header .modal-title{font-size:23px!important;line-height:1.65}
 html body .modal-body{padding:24px 28px 28px}
-html body .modal-body form:has(>.field){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px}
+html body .modal-body form:has(>.field){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px;align-items:start}
 html body .modal-body form:has(>.field)>*{grid-column:1/-1;min-width:0}
 html body .modal-body form:has(>.field)>.field{grid-column:auto;margin:0;display:flex;flex-direction:column}
 html body .modal-body form:has(>.field)>.field:has(textarea,input[type=file]){grid-column:1/-1}
 html body .modal-body .preview-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px}
 html body .modal-body .preview-fields>.field{margin:0;display:flex;flex-direction:column}
 html body .modal-body .field>label{font-size:14px;line-height:1.7;margin-bottom:10px}
-html body .modal-body .field:has(input)>label{flex:1}
+html body .modal-body .field:has(input)>label{flex:none}
 html body .modal :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select){min-height:48px}
 html body .card-details-dialog{width:min(800px,calc(100% - 32px))}
 html body .card-popup-toolbar,html body .card-popup-actions{padding:18px 28px}
@@ -85,3 +85,12 @@ html body .card-popup-close{position:absolute;top:16px;left:18px;right:auto;marg
 html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading{position:relative;padding-left:64px}
 html body:is([data-section=company],[data-dashboard=admin]) dialog .dialog-heading :is(.btn-close,[aria-label="إغلاق"]){position:absolute;top:0;left:0;right:auto;margin:0}
 @media(max-width:600px){html body .modal-header{padding-left:70px}html body .modal-header .btn-close{top:12px;left:12px}html body .card-popup-close{top:12px;left:12px}}
+/* Attachment information and its remove action. */
+html body .modal .cv-file-info:not(:empty){display:flex;align-items:center;gap:8px;margin:12px 0 8px;padding:10px 13px;border:1px solid var(--field-border,#cbd5e1);border-radius:10px;background:var(--field-bg,#f8fafc);color:var(--text-muted,#52647b);font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+html body .modal .cv-file-info:empty{display:none}
+html body .modal button.cv-remove{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;gap:7px;width:auto;min-height:34px;margin:0 0 10px;padding:7px 11px;border:1px solid #dc66583d;border-radius:9px;background:#dc66580a;color:#b83c30;font-family:inherit;font-size:12px;font-weight:500;line-height:1.4;text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s}
+html body .modal button.cv-remove:hover{background:#dc66581a;border-color:#dc665880}
+html[data-theme=dark] body .modal button.cv-remove{color:#ffaaa0}
+html body .modal button.cv-remove[hidden]{display:none!important}
+html body .modal button.cv-remove:focus-visible{outline:2px solid #dc6658;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html body .modal button.cv-remove{transition:none}}

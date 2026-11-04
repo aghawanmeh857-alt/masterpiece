@@ -139,6 +139,19 @@ document.addEventListener('click',event=>{
 },true);
 action.addEventListener('click',()=>{
   const card=source,primary=card?.querySelector('.project-offer>.btn,.listing-offer>.btn,.course-actions>.learn-primary');
+  if (card && document.body.dataset.section === 'internships') {
+    const data = dataFor(card);
+    const fee = Number(data.applicationFee || 0);
+    if (fee > 0 && window.OfoqPayment) {
+      dialog.close();
+      window.OfoqPayment.open({title:data.title,amount:fee,kind:'رسوم التقديم على التدريب',onComplete:()=>{
+        const href=new URL('../Internships/Internship/internship.html',location.href);href.searchParams.set('id',data.id);
+        window.OfoqFrontend.apply('internship',data.id,data.title,href.href);
+        action.textContent='✓ تم التقديم';
+      }});
+      return;
+    }
+  }
   if(!primary)return;dialog.close();passthrough.add(card);try{primary.click();}finally{passthrough.delete(card);}
 });
 dialog.querySelector('.card-popup-close').addEventListener('click',()=>dialog.close());

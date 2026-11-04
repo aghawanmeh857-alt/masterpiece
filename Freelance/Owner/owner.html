@@ -15,7 +15,8 @@
   <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg">
     
 
-  <link rel="stylesheet" href="owner.css">
+  <link rel="stylesheet" href="../../assets/site-base.css">
+<link rel="stylesheet" href="../../assets/project-page.css">
   <link rel="stylesheet" href="../../assets/arabic-ui.css">
   <script defer src="../../assets/arabic-ui.js"></script>
   <script defer src="../../assets/demo-auth.js"></script>
@@ -46,6 +47,7 @@
 <dialog id="meetingDialog" class="interview-dialog"><form autocomplete="off" id="meetingForm"><div class="dialog-top"><h2 id="meetingCandidate">تحديد مقابلة</h2><button class="dialog-close" type="button" data-close="meetingDialog" aria-label="إغلاق">×</button></div><label for="meetingProvider">منصة الاجتماع</label><select id="meetingProvider" name="provider" class="form-select"><option value="jitsi">Jitsi — داخل الموقع</option><option value="zoom">Zoom — رابط جاهز</option></select><label for="meetingDate">موعد المقابلة · بتوقيت جهازك</label><input id="meetingDate" class="form-control" name="date" type="datetime-local" required><div id="zoomField" hidden><label for="zoomUrl">رابط اجتماع Zoom</label><input id="zoomUrl" name="url" type="url" dir="ltr" class="form-control" placeholder="https://zoom.us/j/123456789"></div><p class="dialog-hint">هذه شاشة عرض فقط؛ لا يتم حفظ أو إرسال أي بيانات.</p><p id="meetingError" role="alert" class="dialog-error"></p><div class="dialog-buttons"><button class="btn btn-small-outline" type="button" data-close="meetingDialog">إلغاء</button><button class="btn btn-orange">تحديد الموعد في المعاينة</button></div></form></dialog>
 <dialog id="shareDialog" class="interview-dialog"><div class="dialog-top"><h2>رابط المقابلة</h2><button class="dialog-close" data-close="shareDialog" aria-label="إغلاق">×</button></div><label for="shareLink">انسخ هذا الرابط</label><input id="shareLink" class="form-control" dir="ltr" readonly></dialog>
 
-  <script type="module" src="owner.js"></script>
+  <script defer src="../../assets/theme.js"></script>
+<script type="module" src="owner.js"></script>
 </body>
 </html>

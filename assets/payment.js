@@ -19,11 +19,22 @@
   document.body.append(dialog);
   const get = id => dialog.querySelector('#' + id);
   let opener = null;
+  let completion = null;
+  window.OfoqPayment = {
+    open({title, amount, kind = 'رسوم المشاركة', onComplete}) {
+      const trigger = document.createElement('button');
+      trigger.dataset.paymentAmount = String(amount);
+      trigger.dataset.paymentTitle = title;
+      trigger.dataset.paymentKind = kind;
+      openPayment(trigger, onComplete);
+    }
+  };
 
-  function openPayment(trigger) {
+  function openPayment(trigger, onComplete = null) {
     const amount = Number(trigger.dataset.paymentAmount);
     if (!Number.isFinite(amount) || amount <= 0) return;
     opener = trigger;
+    completion = onComplete;
     dialog.querySelector('.payment-continue').disabled = false;
     dialog.querySelector('.payment-continue').textContent = 'تأكيد التسجيل التجريبي ←';
     dialog.querySelector('.payment-cancel').textContent = 'إلغاء';
@@ -53,7 +64,12 @@
     get('paymentStatus').hidden = true;
   });
   dialog.querySelector('.payment-continue').addEventListener('click', () => {
+    if (dialog.querySelector('.payment-continue').disabled) return;
     const card = dialog.querySelector('[value="card"]').checked;
+    if (completion) {
+      const finish = completion; completion = null;
+      dialog.close(); finish(); return;
+    }
     const id = opener.closest('[data-item]')?.dataset.item || new URLSearchParams(location.search).get('id') || opener.dataset.paymentTitle;
     const path = new URL('../Events/Event/event.html', [...document.scripts].find(script => script.src.endsWith('/assets/payment.js')).src);
     path.searchParams.set('id', id);

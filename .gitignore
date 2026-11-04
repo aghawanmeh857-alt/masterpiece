@@ -1,3 +1,8 @@
 # Local agent settings and UI verification screenshots.
 .codex/
 .tmp-*
+
+# Local SQL Server backups and database files.
+*.bak
+*.mdf
+*.ldf

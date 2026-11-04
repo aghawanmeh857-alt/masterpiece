@@ -1,5 +1,6 @@
+import { mergeStaticMeshes } from './static-meshes.js';
 // Lightweight jointed beach visitors and a timber pier; no extra model downloads.
-export function createBeachLife(THREE, coast, { reducedMotion = false } = {}) {
+export function createBeachLife(THREE, coast, { reducedMotion = false, mergeGeometries } = {}) {
   const group = new THREE.Group();
   group.name = 'OFOQBeachLife';
   group.userData.dynamicScene = true;
@@ -71,6 +72,8 @@ export function createBeachLife(THREE, coast, { reducedMotion = false } = {}) {
   }
   // Three shallow steps connect the sand to the raised deck.
   for (let i = 0; i < 3; i++) box(pier, [.65, .18 + i * .17, 3.6], [-33.1 - i * .65, .23 + i * .085, 8], timber);
+
+  if (mergeGeometries) mergeStaticMeshes(THREE, pier, mergeGeometries).geometries.forEach(geometry => geometries.add(geometry));
 
   const volleyballZ = -15, volleyballDistance = 5;
   const players = [person('Beach volleyball A', -49, volleyballZ, '#d87759', Math.PI), person('Beach volleyball B', -49, volleyballZ - volleyballDistance, '#568e9c')];

@@ -1,3 +1,7 @@
+import { createScenicPlantings } from '../3D/scenic-plantings.js';
+import { createGpuTiming } from './gpu-timing.js';
+import { mergeStaticMeshes } from './static-meshes.js';
+import { nextRenderScale } from './render-budget.js';
 import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js';
 // المشهد ثلاثي الأبعاد يحتاج Three.js. بقية الشاشات لا تستخدم مكتبات.
 import * as THREE from 'three';
@@ -9,7 +13,7 @@ import { TOUR_STOPS, tourTarget, advanceTour, roomAtTourTime } from './tour-moti
 import { doorProximity, advanceDoor } from './door-motion.js';
 import { createStreetLife, createCityAircraft } from './street-life.js';
 import { createCityTraffic } from './city-traffic.js';
-import { createModernCity } from './modern-city.js';
+import { createAccessRoads } from './access-roads.js';
 import { createBeachLife } from './beach-life.js';
 import { HEADQUARTERS_MODEL, placeHeadquartersModel } from '../3D/model-layout.js';
 import { createAutumnWalk } from '../3D/autumn-walk.js';
@@ -87,30 +91,54 @@ const readingStops = chapters.map((chapter, index) => {
 });
 function refreshReadingPanels() {
   readingStops.forEach((stop, index) => {
-    const local = scrollY - stop.chapter.offsetTop;
+    const local = scrollY - stop.top;
     const readingLocal = local - (stop.opening || 0);
     const active = index === currentRoom && readingLocal >= -20 && readingLocal < stop.reading && (index !== 0 || renderedTourTime >= receptionTime - .5);
     const fadeDistance = Math.max(1, Math.min(180, stop.reading * .3));
     const remaining = Math.max(0, Math.min(1, (stop.reading - readingLocal) / fadeDistance));
     const opacity = remaining * remaining * (3 - 2 * remaining);
-    stop.article.style.setProperty('--station-opacity', String(opacity));
-    stop.article.classList.toggle('station-active', active);
-    stop.article.inert = !active || opacity < .15;
-    stop.article.setAttribute('aria-hidden', String(!active || opacity < .15));
-    const overflow = Math.max(0, stop.article.offsetHeight - (innerHeight - 210));
-    stop.article.style.setProperty('--reading-offset', Math.min(Math.max(readingLocal, 0), overflow) + 'px');
+    const inert = !active || opacity < .15;
+    if (stop.active !== active) {
+      stop.article.classList.toggle('station-active', active);
+      stop.active = active;
+    }
+    if (stop.inert !== inert) {
+      stop.article.inert = inert;
+      stop.article.setAttribute('aria-hidden', String(inert));
+      stop.inert = inert;
+    }
+    if (!active) return;
+    const nextOpacity = opacity.toFixed(3);
+    const movement = Math.max(0, Math.min(1, (readingLocal - stop.hold) / (stop.reading - stop.hold)));
+    const nextOffset = (movement * stop.exitDistance).toFixed(1) + 'px';
+    if (stop.opacity !== nextOpacity) {
+      stop.article.style.setProperty('--station-opacity', nextOpacity);
+      stop.opacity = nextOpacity;
+    }
+    if (stop.offset !== nextOffset) {
+      stop.article.style.setProperty('--reading-offset', nextOffset);
+      stop.offset = nextOffset;
+    }
   });
 }
 function measureReadingStops() {
   readingStops.forEach((stop, index) => {
     stop.opening = index === 0 ? innerHeight * 1.8 : 0;
-    stop.reading = Math.max(innerHeight * .65, stop.article.offsetHeight - innerHeight + 380);
+    // Hold the panel in place first, then leave a longer reading window before travel.
+    stop.hold = innerHeight * .25;
+    stop.reading = stop.hold + Math.max(innerHeight * 1.75, stop.article.offsetHeight - innerHeight + 380);
     stop.travel = index === 5 ? innerHeight * .35 : innerHeight * 1.15;
     stop.chapter.style.setProperty('--station-height', (stop.opening + stop.reading + stop.travel) + 'px');
   });
+  // Measure once after layout changes, never while animating the camera.
+  readingStops.forEach(stop => {
+    stop.top = stop.chapter.offsetTop;
+    stop.exitDistance = stop.article.offsetHeight + (innerWidth < 768 ? 130 : 150);
+  });
 }
 measureReadingStops();
-new ResizeObserver(() => { measureReadingStops(); progressAtScroll(); }).observe(document.querySelector('.station-content'));
+const readingResizeObserver = new ResizeObserver(() => { measureReadingStops(); progressAtScroll(); });
+readingStops.forEach(stop => readingResizeObserver.observe(stop.article));
 document.fonts.ready.then(() => { measureReadingStops(); progressAtScroll(); });
 
 
@@ -222,7 +250,7 @@ function progressAtScroll() {
   refreshReadingPanels();
   if (adminPreview) return;
   let index = 0;
-  for (let i = 1; i < readingStops.length; i++) if (scrollY >= readingStops[i].chapter.offsetTop) index = i;
+  for (let i = 1; i < readingStops.length; i++) if (scrollY >= readingStops[i].top) index = i;
   const stop = readingStops[index];
   const local = scrollY - stop.chapter.offsetTop;
   const travel = Math.max(0, Math.min(1, (local - stop.opening - stop.reading) / stop.travel));
@@ -236,9 +264,14 @@ function progressAtScroll() {
     sceneApi?.moveToTime(journeyTime);
   } else sceneApi?.move(raw);
 }
-addEventListener('scroll', progressAtScroll, {
-  passive: true
-});
+let pendingScrollFrame = null;
+addEventListener('scroll', () => {
+  if (pendingScrollFrame !== null) return;
+  pendingScrollFrame = requestAnimationFrame(() => {
+    pendingScrollFrame = null;
+    progressAtScroll();
+  });
+}, { passive: true });
 addEventListener('resize', () => { measureReadingStops(); progressAtScroll(); });
 
 function restoreRoom() {
@@ -494,7 +527,7 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
   const beach = new THREE.Mesh(sand, sandMaterial);
   beach.receiveShadow = true;
   coast.add(beach);
-  const beachLife = createBeachLife(THREE, coast, { reducedMotion });
+  const beachLife = createBeachLife(THREE, coast, { reducedMotion, mergeGeometries });
 
   // Promenade and a short boardwalk link the coast to the existing plaza.
   box([4, .16, 148], [-28, .20, -5], pathMaterial);
@@ -503,10 +536,11 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
 
   const waterGeometry = new THREE.PlaneGeometry(245, 320, 80, 65);
   waterGeometry.rotateX(-Math.PI / 2);
-  const waterMaterial = new THREE.MeshPhysicalMaterial({
-    color: '#147d9a', roughness: .24, metalness: .28, clearcoat: 1
+  const waterMaterial = new THREE.MeshStandardMaterial({
+    color: '#147d9a', roughness: .24, metalness: .28
   });
   const ocean = new THREE.Mesh(waterGeometry, waterMaterial);
+  ocean.name = 'OFOQOcean';
   ocean.position.set(-180, -.05, -5);
   ocean.receiveShadow = true;
   coast.add(ocean);
@@ -660,6 +694,11 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
     sunDisc.visible = sunOpacity > 0;
     moon.visible = moonOpacity > 0;
     sun.intensity = 3.5 * daylight;
+    const daylightShadows = amount < .98;
+    if (sun.castShadow !== daylightShadows) {
+      sun.castShadow = daylightShadows;
+      renderer.shadowMap.needsUpdate = true;
+    }
     moonLight.intensity = .8 * amount;
     moonLight.position.copy(moon.position);
     cloudMaterial.opacity = .65 * daylight;
@@ -745,6 +784,7 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
   themeObserver.observe(document.documentElement, {
     attributes: true, attributeFilter: ['data-theme']
   });
+  const coastalBatches = mergeStaticMeshes(THREE, coast, mergeGeometries, new Set([ocean, beachLife.group])).geometries;
   document.documentElement.dataset.coastalModels = 'palm-tree,beach-table';
   document.documentElement.dataset.beachPalms = '9';
   document.documentElement.dataset.beachTables = '5';
@@ -753,144 +793,9 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
     destroy() {
       destroyed = true;
       beachLife.destroy();
+      coastalBatches.forEach(geometry => geometry.dispose());
       themeObserver.disconnect();
       if (transitionFrame !== null) cancelAnimationFrame(transitionFrame);
-    }
-  };
-}
-
-
-// 5. مباني المدينة
-
-// Real buildings from the selected Sketchfab pack, arranged beside the coast.
-async function createCityNeighborhood(THREE, scene) {
-  const city = new THREE.Group();
-  city.name = 'OFOQCity';
-  const loader = new GLTFLoader();
-  const url = new URL('./assets/3d/environment/ccity-building-set-1.glb', import.meta.url);
-  const model = await loader.loadAsync(url.href);
-  model.scene.updateMatrixWorld(true);
-  const materials = new Map();
-  const glowingMaterials = [];
-
-  function cityMaterial(original) {
-    if (!materials.has(original)) {
-      const material = original.clone();
-      material.metalness = Math.min(material.metalness, .15);
-      material.roughness = Math.max(material.roughness, .65);
-      if (/glow/i.test(material.name)) {
-        material.emissive.set('#ffe2b8');
-        material.emissiveIntensity = 0;
-        glowingMaterials.push(material);
-      }
-      materials.set(original, material);
-    }
-    return materials.get(original);
-  }
-
-  function placeBuilding(name, x, z, footprint, rotation = 0) {
-    const source = model.scene.getObjectByName(name);
-    if (!source) throw new Error('Missing city building: ' + name);
-    const groups = new Map();
-    source.traverse(node => {
-      if (!node.isMesh) return;
-      const geometry = node.geometry.index ? node.geometry.toNonIndexed() : node.geometry.clone();
-      geometry.applyMatrix4(node.matrixWorld);
-      // Merge tiny source pieces by material to keep rendering light.
-      for (const key of Object.keys(geometry.attributes)) {
-        if (!['position', 'normal', 'uv'].includes(key)) geometry.deleteAttribute(key);
-      }
-      if (!geometry.attributes.normal) geometry.computeVertexNormals();
-      if (!geometry.attributes.uv) geometry.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(geometry.attributes.position.count * 2), 2));
-      if (!groups.has(node.material)) groups.set(node.material, []);
-      groups.get(node.material).push(geometry);
-    });
-    const building = new THREE.Group();
-    building.name = name;
-    for (const [material, pieces] of groups) {
-      const geometry = mergeGeometries(pieces);
-      pieces.forEach(piece => piece.dispose());
-      if (!geometry) throw new Error('Cannot merge city building: ' + name);
-      const mesh = new THREE.Mesh(geometry, cityMaterial(material));
-      mesh.receiveShadow = true;
-      building.add(mesh);
-    }
-    const bounds = new THREE.Box3().setFromObject(building);
-    const size = bounds.getSize(new THREE.Vector3());
-    const center = bounds.getCenter(new THREE.Vector3());
-    building.children.forEach(mesh => mesh.geometry.translate(-center.x, -bounds.min.y, -center.z));
-    building.scale.setScalar(footprint / Math.max(size.x, size.z));
-    building.rotation.y = rotation;
-    building.position.set(x, .03, z);
-    city.add(building);
-  }
-
-  // Main tower stays taller; no buildings occupy the beach or entrance corridor.
-  const layout = [
-    ['Filler_Housing', 47, -28, 19],
-    ['LM_Clinic2', 76, -18, 24],
-    ['LM_Laundrette', 109, -22, 18],
-    ['LM_Paramount1', 47, -64, 20],
-    ['LM_PawnShop1', 79, -59, 19],
-    ['Filler_Housing1', 110, -58, 19],
-    ['المشاريع', 2, -120, 34],
-    ['LM_Paramount9', 47, -120, 20],
-    ['FFactory', 72, -120, 32],
-    ['Filler_Housing2', 110, -121, 19],
-    ['Projects2', 72, -158, 32, Math.PI / 2],
-    ['LM_PawnShop3', 110, -157, 19]
-  ];
-  layout.forEach(item => placeBuilding(...item));
-
-  const asphalt = new THREE.MeshStandardMaterial({color: '#424c59', roughness: .95});
-  const pavement = new THREE.MeshStandardMaterial({color: '#aab6c1', roughness: .9});
-  const marking = new THREE.MeshStandardMaterial({color: '#e8dfbc', roughness: .9});
-  function box(size, position, material) {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-    mesh.position.set(...position);
-    mesh.receiveShadow = true;
-    city.add(mesh);
-  }
-  box([100, .08, 120], [80, -.09, -32], pavement);
-  box([150, .08, 85], [57, -.09, -137], pavement);
-  box([10, .04, 205], [30, -.035, -72], asphalt);
-  box([147, .04, 10], [58, -.035, -95], asphalt);
-  box([10, .04, 190], [94, -.035, -70], asphalt);
-  for (let z = -165; z < 30; z += 9) {
-    box([.22, .015, 3.5], [30, -.005, z], marking);
-    box([.22, .015, 3.5], [94, -.005, z], marking);
-  }
-  for (let x = -10; x < 130; x += 9) box([3.5, .015, .22], [x, -.005, -95], marking);
-  // Raised sidewalks and curb edges separate pedestrian paths from traffic.
-  for (const x of [22.5, 38.5, 85, 102]) {
-    box([4.6, .08, 100], [x, .01, -20], pavement);
-    for (let z = -67; z < 27; z += 2.5) box([4.6, .006, .035], [x, .054, z], marking);
-  }
-  for (const x of [24.8, 35.2, 88.8, 99.2]) box([.16, .16, 108], [x, .03, -20], pavement);
-  // Crosswalks are visible at the front of the business district.
-  for (const x of [30, 94]) for (let z = 7.5; z < 12; z += .9) box([9.5, .018, .45], [x, -.002, z], marking);
-
-  model.scene.traverse(object => object.geometry?.dispose());
-  scene.add(city);
-  const state = document.documentElement.dataset;
-  state.cityStatus = 'ready';
-  state.cityModel = 'ccity-building-set-1';
-  state.cityBuildings = String(layout.length);
-  state.cityMeshes = String(city.children.reduce((count, object) => count + (object.isMesh ? 1 : object.children.length), 0));
-  return {
-    destroy() {
-      scene.remove(city);
-      const textures = new Set();
-      city.traverse(object => object.geometry?.dispose());
-      for (const material of [...materials.values(), asphalt, pavement, marking]) {
-        for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
-        material.dispose();
-      }
-      textures.forEach(texture => texture.dispose());
-    },
-    setNight(amount) {
-      glowingMaterials.forEach(material => { material.emissiveIntensity = .65 * amount; });
-      state.cityLightLevel = Number(amount).toFixed(4);
     }
   };
 }
@@ -911,6 +816,7 @@ async function createBuildingTour(container, {
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance'
   });
+  const gpuTiming = createGpuTiming(renderer.getContext(), milliseconds => { document.documentElement.dataset.gpuFrameMs = milliseconds.toFixed(1); }, new URLSearchParams(location.search).has('performanceStats'));
   renderer.localClippingEnabled = true;
   renderer.setSize(innerWidth, innerHeight);
   const maxPixelRatio = () => Math.min(devicePixelRatio, 1.25, Math.sqrt(1200000 / (innerWidth * innerHeight)));
@@ -953,11 +859,10 @@ async function createBuildingTour(container, {
     floor = mat('#a8b5c1'),
     wood = mat('#b88d61'),
     black = mat('#162233'),
-    glass = new THREE.MeshPhysicalMaterial({
+    glass = new THREE.MeshStandardMaterial({
       color: '#6fa3be',
       metalness: .75,
       roughness: .085,
-      clearcoat: 1,
       envMapIntensity: 1.4
     }),
     green = mat('#42765a');
@@ -1085,7 +990,7 @@ async function createBuildingTour(container, {
     }
   }
   const people = [],
-    deskGroups = [];
+    deskGroups = [], interiorProps = [];
 
  function person(x, z, { seated = false, rotation = 0 } = {}) {
     const group = new THREE.Group();
@@ -1134,7 +1039,7 @@ async function createBuildingTour(container, {
   box(20, .2, 20, 0, .02, 10, mat('#b4b8bd'));
   box(5, .04, 20, 0, .15, 10, mat('#d8d6cd'));
   // Enclosed podium and a slender, closed skyscraper facade above its entrance.
-  logo(11.5, 0, 43, 2.3);
+  logo(13.2, 0, 43, 2.3);
   const skylineFallback = [];
   for (const [x, z, h] of [
       [60, -75, 27],
@@ -1152,7 +1057,7 @@ async function createBuildingTour(container, {
   box(8.35, 4.8, .3, -5.8, 2.4, 2, glass);
   box(8.35, 4.8, .3, 5.8, 2.4, 2, glass);
   box(3.3, 1.35, .45, 0, 4.15, 2, navy);
-  logo(2.1, 0, 4.05, 2.3);
+  logo(2.7, 0, 4.05, 2.3);
   box(4.7, .18, 3.1, 0, 3.15, 3.3, steel);
   box(3.2, .08, .16, 0, 3.03, 4.85, lightMat);
   const doorMat = new THREE.MeshStandardMaterial({
@@ -1164,6 +1069,7 @@ async function createBuildingTour(container, {
   });
   const doorLeft = box(1.5, 3, .14, -.77, 1.5, 2.05, doorMat),
     doorRight = box(1.5, 3, .14, .77, 1.5, 2.05, doorMat);
+  doorLeft.castShadow = doorRight.castShadow = false;
   const roomDoors = [];
   let mainDoorAmount = 0;
   function slidingRoomDoor(name, x, z, rotation, width = 5.1, height = 3.35) {
@@ -1184,11 +1090,14 @@ async function createBuildingTour(container, {
       for (const y of [.035, height - .035]) box(half, .07, .17, 0, y, 0, steel, leaf);
       // A narrow safety stripe makes the closed glass visible from both sides.
       box(half - .1, .055, .15, 0, 1.25, 0, steel, leaf);
+      mergeStaticMeshes(THREE, leaf, mergeGeometries);
       return leaf;
     });
     for (const side of [-1, 1]) box(.1, height + .1, .24, side * half, height / 2, 0, steel, group);
     box(width + .15, .12, .3, 0, height + .025, 0, navy, group);
-    roomDoors.push({ name, x, z, height, width, leaves, amount: 0 });
+    group.traverse(node => { if (node.isMesh) node.castShadow = false; });
+    mergeStaticMeshes(THREE, group, mergeGeometries, new Set(leaves));
+    roomDoors.push({ name, x, z, height, width, leaves, group, amount: 0 });
     document.documentElement.dataset.roomDoorCount = String(roomDoors.length);
   }
   box(.1, 3, .1, -1.55, 1.5, 2.1, steel);
@@ -1209,13 +1118,14 @@ async function createBuildingTour(container, {
   const receptionist = person(5, -9.05, {
     color: '#344d7a'
   });
-  logo(3, 5, 2.8, -12, true);
+  logo(3.4, 5, 2.8, -12, true);
   plant(-7, -4);
   plant(8, -4);
   for (let z of [-5, -8]) {
     const sofa = new THREE.Group();
     sofa.position.set(-6, .05, z);
     sofa.userData.lobbySofa = true;
+    interiorProps.push(sofa);
     sofa.userData.dynamicScene = true;
     scene.add(sofa);
     box(2.8, .52, 1, 0, .6, 0, navy, sofa);
@@ -1342,48 +1252,15 @@ async function createBuildingTour(container, {
   plant(-8, -80);
   plant(8, -80);
 
-  let city = null;
-  let streetLife = null, traffic = null, autumnWalk = null, plazaFountain = null, realisticFurniture = null;
+  let city = null, headquartersExterior = null;
+  let streetLife = null, traffic = null, autumnWalk = null, plazaFountain = null, realisticFurniture = null, scenicPlantings = null;
   const aircraft = createCityAircraft(THREE, scene, reducedMotion);
   let cityLightLevel = 0;
   const localLights = [];
   function batchStaticMeshes() {
-    scene.updateMatrixWorld(true);
-    const excluded = new Set([doorLeft, doorRight]);
-    const batches = new Map();
-    scene.traverse(mesh => {
-      if (!mesh.isMesh || mesh.isSkinnedMesh || excluded.has(mesh) || Array.isArray(mesh.material) || mesh.material.transparent) return;
-      let ancestor = mesh;
-      while (ancestor) {
-        if (ancestor.userData.dynamicDoor || ancestor.userData.dynamicScene) return;
-        if (ancestor === coastal.group || ancestor.name === 'OFOQCoast' || ancestor.name === 'OFOQCity' || ancestor.userData.mixer) return;
-        ancestor = ancestor.parent;
-      }
-      if (Object.keys(mesh.geometry.morphAttributes).length) return;
-      const center = new THREE.Vector3().setFromMatrixPosition(mesh.matrixWorld);
-      const attributes = Object.entries(mesh.geometry.attributes).map(([key,a]) => key + ':' + a.itemSize + ':' + a.array.constructor.name).sort().join(',');
-      const key = mesh.material.uuid + ':' + Math.floor(center.x / 20) + ':' + Math.floor(center.z / 20) + ':' + mesh.castShadow + ':' + mesh.receiveShadow + ':' + attributes;
-      if (!batches.has(key)) batches.set(key, []);
-      batches.get(key).push(mesh);
-    });
-    const retiredGeometry = new Set();
-    let saved = 0;
-    for (const meshes of batches.values()) {
-      if (meshes.length < 2) continue;
-      const pieces = meshes.map(mesh => (mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()).applyMatrix4(mesh.matrixWorld));
-      const geometry = mergeGeometries(pieces, false);
-      pieces.forEach(piece => piece.dispose());
-      if (!geometry) continue;
-      geometry.computeBoundingSphere();
-      const combined = new THREE.Mesh(geometry, meshes[0].material);
-      combined.castShadow = meshes[0].castShadow; combined.receiveShadow = meshes[0].receiveShadow;
-      combined.name = 'StaticBatch'; scene.add(combined);
-      meshes.forEach(mesh => { retiredGeometry.add(mesh.geometry); mesh.removeFromParent(); }); saved += meshes.length - 1;
-    }
-    const liveGeometry = new Set();
-    scene.traverse(object => { if (object.geometry) liveGeometry.add(object.geometry); });
-    retiredGeometry.forEach(geometry => { if (!liveGeometry.has(geometry)) geometry.dispose(); });
-    document.documentElement.dataset.batchedMeshes = String(saved);
+    const excluded = new Set([doorLeft, doorRight, scene.getObjectByName('OFOQCoast'), scene.getObjectByName('OFOQCity')]);
+    const result = mergeStaticMeshes(THREE, scene, mergeGeometries, excluded, {cellSize: 20, disposeUnused: true});
+    document.documentElement.dataset.batchedMeshes = String(result.savedMeshes);
   }
   let env = null;
   let requestedNight = document.documentElement.dataset.theme === 'dark';
@@ -1515,7 +1392,7 @@ async function createBuildingTour(container, {
   // السكرول يحدّد الوجهة فقط؛ حلقة الرسم تحرّك الكاميرا تدريجيًا.
   let targetTime = 0;
   let roomJump = null;
-  let cameraSmoothness = .28;
+  let cameraSmoothness = .4;
   let preview = adminPreview ? {active: false} : null;
   let previewCity = true, previewPeople = true;
   const cameraPath = new THREE.CatmullRomCurve3(keys.map(key => new THREE.Vector3(...key[1])), false, 'centripetal');
@@ -1564,6 +1441,8 @@ async function createBuildingTour(container, {
   resize();
   let last = performance.now(), renderFrame = null;
   let sampleTime = 0, sampleFrames = 0;
+  let updateWork = 0, renderWork = 0;
+  let nextLightSelection = 0;
   const frustum = new THREE.Frustum();
   const viewProjection = new THREE.Matrix4();
   const characterBounds = new THREE.Sphere(new THREE.Vector3(), 1.5);
@@ -1575,6 +1454,7 @@ async function createBuildingTour(container, {
     last = now;
     if (document.hidden) { sampleTime = 0; sampleFrames = 0; return; }
     if (preview && !preview.active) return;
+    const workStarted = performance.now();
     if (preview?.playing) {
       preview.elapsed = Math.min(preview.duration, preview.elapsed + dt);
       // Follow the entrance portion of the existing tour, including the sliding doors.
@@ -1582,7 +1462,7 @@ async function createBuildingTour(container, {
       if (preview.elapsed === preview.duration) preview.playing = false;
     }
     if (roomJump) {
-      const progress = Math.max(0, Math.min(1, (now - roomJump.started) / 1800));
+      const progress = Math.max(0, Math.min(1, (now - roomJump.started) / 2800));
       seek(THREE.MathUtils.lerp(roomJump.start, roomJump.target, smooth(progress)));
       if (progress === 1) roomJump = null;
     } else if (Math.abs(targetTime - time) > .0001) {
@@ -1620,28 +1500,30 @@ async function createBuildingTour(container, {
       });
       if (fade === 1) { holder.visible = false; employeeExits.delete(holder); }
     });
-    streetLife?.update(dt, camera, previewCity, previewPeople && !requestedNight);
-    traffic?.update(dt, camera, previewCity);
+    const exteriorVisible = previewCity && time < 19;
+    if (headquartersExterior) headquartersExterior.visible = time < 19;
+    if (city?.group) city.group.visible = exteriorVisible;
+    streetLife?.update(dt, camera, exteriorVisible, previewPeople && !requestedNight);
+    traffic?.update(dt, camera, exteriorVisible);
     aircraft.update(dt, time < 17, previewCity);
     const entranceTarget = Math.max(doorProximity(camera.position, { x: 0, z: 2.05, height: 3 }), streetLife?.entranceProximity() || 0, employeeDoorProximity({ x: 0, z: 2.05, height: 3 }));
     const mainDoorNext = advanceDoor(mainDoorAmount, entranceTarget, dt, reducedMotion);
-    let doorsChanged = Math.abs(mainDoorNext - mainDoorAmount) > .0001;
     mainDoorAmount = mainDoorNext;
     doorLeft.position.x = -.77 - 1.55 * mainDoorAmount;
     doorRight.position.x = .77 + 1.55 * mainDoorAmount;
     document.documentElement.dataset.doorOpen = String(mainDoorAmount > .95);
     document.documentElement.dataset.entranceDoorAmount = mainDoorAmount.toFixed(2);
     for (const door of roomDoors) {
+      const dx = camera.position.x - door.x, dz = camera.position.z - door.z;
+      door.group.visible = time > 10 && dx * dx + dz * dz < 35 * 35;
       const target = Math.max(doorProximity(camera.position, door), employeeDoorProximity(door));
       const amount = advanceDoor(door.amount, target, dt, reducedMotion);
-      if (Math.abs(amount - door.amount) > .0001) doorsChanged = true;
       door.amount = amount;
       door.leaves.forEach((leaf, index) => {
         const side = index === 0 ? -1 : 1;
         leaf.position.x = side * (door.width / 4 + (door.width / 2 + .06) * amount);
       });
     }
-    if (doorsChanged) renderer.shadowMap.needsUpdate = true;
     document.documentElement.dataset.roomDoors = JSON.stringify(roomDoors.map(door => ({ name: door.name, open: Number(door.amount.toFixed(2)) })));
     camera.updateMatrixWorld();
     viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
@@ -1657,25 +1539,43 @@ async function createBuildingTour(container, {
       if (reducedMotion || !holder.visible || distance > 18 * 18) return;
       mixer.update(dt); activePeople++;
     });
+    // Interior furniture is occluded outside and in distant rooms.
+    for (const group of deskGroups) group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
+    for (const group of interiorProps) group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
     // Stop invisible ocean geometry updates after entering the building.
     coastal.update(dt, camera, time < 7, previewPeople && !requestedNight);
-    autumnWalk?.update(dt, time < 15);
+    autumnWalk?.update(dt, time < 15, camera);
+    scenicPlantings?.update(camera, previewCity && time < 15, Number(document.documentElement.dataset.dayNightProgress ?? (requestedNight ? 1 : 0)));
     plazaFountain?.update(dt, time < 15);
-    // Four nearby local lights keep illumination without evaluating eighteen per pixel.
-    if (localLights.length) {
-      const nearest = localLights.map(light => ({light, distance: camera.position.distanceToSquared(light.position)})).sort((a,b) => a.distance-b.distance).slice(0,4);
+    // Two nearby local lights keep the night lighting affordable on integrated GPUs.
+    if (localLights.length && now >= nextLightSelection) {
+      nextLightSelection = now + 100;
+      const nearest = localLights.map(light => ({light, distance: camera.position.distanceToSquared(light.position)})).sort((a,b) => a.distance-b.distance).slice(0,2);
       const selected = new Set(nearest.map(item => item.light));
       localLights.forEach(light => { light.visible = selected.has(light); });
       document.documentElement.dataset.activeLocalLights = String(nearest.length);
     }
+    const renderStarted = performance.now();
+    gpuTiming.begin(now);
     renderer.render(scene, camera);
+    gpuTiming.end();
+    updateWork += renderStarted - workStarted;
+    renderWork += performance.now() - renderStarted;
     document.documentElement.dataset.activePeople = String(activePeople);
     // Lower resolution only after sustained slow frames, ignoring loading stalls.
-    if (document.documentElement.dataset.modelLoad === 'ready' && elapsedMs > 0 && elapsedMs < 100) {
+    if (document.documentElement.dataset.modelLoad === 'ready' && elapsedMs > 0 && elapsedMs < 1000) {
       sampleTime += elapsedMs; sampleFrames++;
-      if (sampleTime >= 2000) {
-        if (sampleTime / sampleFrames > 28 && renderScale > .75) {
-          renderScale = Math.max(.75, renderScale - .15);
+      if (sampleTime >= 1500) {
+        const averageFrameMs = sampleTime / sampleFrames;
+        document.documentElement.dataset.updateWorkMs = (updateWork / sampleFrames).toFixed(1);
+        document.documentElement.dataset.renderWorkMs = (renderWork / sampleFrames).toFixed(1);
+        document.documentElement.dataset.drawCalls = String(renderer.info.render.calls);
+        document.documentElement.dataset.renderTriangles = String(renderer.info.render.triangles);
+        updateWork = 0; renderWork = 0;
+        const nextScale = nextRenderScale(renderScale, averageFrameMs, innerWidth * innerHeight);
+        document.documentElement.dataset.averageFrameMs = averageFrameMs.toFixed(1);
+        if (nextScale !== renderScale) {
+          renderScale = nextScale;
           renderer.setPixelRatio(renderScale);
           renderer.setSize(innerWidth, innerHeight);
         }
@@ -1710,6 +1610,8 @@ async function createBuildingTour(container, {
       realisticFurniture = furnitureAssets;
       const tower = placeHeadquartersModel(THREE, headquarters.scene);
       scene.add(tower);
+      headquartersExterior = tower;
+      mergeStaticMeshes(THREE, tower, mergeGeometries);
       const outdoor = createOutdoorFacilities(THREE, scene);
       const setOutdoorNight = outdoor.userData.setNight;
       outdoor.userData.setNight = amount => {
@@ -1786,6 +1688,8 @@ async function createBuildingTour(container, {
         const wrapper = new THREE.Group();
         wrapper.position.set(x, .05, -8);
         wrapper.add(plants.clone(true));
+        wrapper.userData.dynamicScene = true;
+        interiorProps.push(wrapper);
         scene.add(wrapper);
       }
     
@@ -1856,12 +1760,9 @@ async function createBuildingTour(container, {
       document.documentElement.dataset.modelLoad = 'fallback';
     }
   }
-  // City assets are optional: loading them cannot interrupt the tour or sky.
+  // Keep access roads and lighting without loading the removed city.
   document.documentElement.dataset.cityStatus = 'loading';
-  createModernCity(THREE, scene, new GLTFLoader()).catch(error => {
-    console.warn('SAEI: modern city unavailable; loading the previous district.', error);
-    return createCityNeighborhood(THREE, scene);
-  }).then(neighborhood => {
+  createAccessRoads(THREE, scene, { mergeGeometries }).then(neighborhood => {
     if (disposed) { neighborhood.destroy(); return; }
     city = neighborhood;
     scene.getObjectByName('OFOQCity').visible = previewCity;
@@ -1869,11 +1770,15 @@ async function createBuildingTour(container, {
     renderer.shadowMap.needsUpdate = true;
     skylineFallback.forEach(mesh => { scene.remove(mesh); mesh.geometry.dispose(); });
   }).catch(error => {
-    if (!disposed) document.documentElement.dataset.cityStatus = 'fallback';
+    if (!disposed) document.documentElement.dataset.cityStatus = 'roads-unavailable';
     console.warn('SAEI: city models unavailable; keeping the base skyline.', error);
   });
   document.documentElement.dataset.modelLoad = 'loading';
   loadModels();
+  createScenicPlantings(THREE, scene).then(plantings => {
+    if (disposed) { plantings.destroy(); return; }
+    scenicPlantings = plantings;
+  }).catch(error => console.warn('SAEI: optional park photographs unavailable.', error));
   createPlazaFountain(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(fountain => {
     if (disposed) { fountain.destroy(); return; }
     plazaFountain = fountain;
@@ -1884,7 +1789,7 @@ async function createBuildingTour(container, {
     document.documentElement.dataset.plazaFountain = 'unavailable';
     console.warn('SAEI: imported plaza fountain could not be loaded.', error);
   });
-  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(walk => {
+  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion, renderer }).then(walk => {
     if (disposed) { walk.destroy(); return; }
     autumnWalk = walk;
     scene.traverse(node => { if (node.userData.autumnReplacement) node.visible = false; });
@@ -1949,10 +1854,12 @@ async function createBuildingTour(container, {
     },
     destroy() {
       disposed = true;
+      gpuTiming.destroy();
       if (renderFrame !== null) cancelAnimationFrame(renderFrame);
       removeEventListener('resize', resize);
       coastal.destroy?.();
       autumnWalk?.destroy();
+      scenicPlantings?.destroy();
       plazaFountain?.destroy();
       realisticFurniture?.destroy();
       city?.destroy();

@@ -33,6 +33,7 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
     sourceGeometries.add(mesh.geometry);
     if (Array.isArray(mesh.material)) return;
     sourceMaterials.add(mesh.material);
+    if (mesh.material.transparent) mesh.material.forceSinglePass = true;
     let ancestor = mesh, wheel = 'body';
     while (ancestor) {
       if (/^DEF-Wheel/.test(ancestor.name)) { wheel = ancestor.name; break; }
@@ -83,6 +84,16 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
   const headMaterial = new THREE.MeshBasicMaterial({ color: '#fff4db', transparent: true, opacity: 0, toneMapped: false });
   const tailMaterial = new THREE.MeshBasicMaterial({ color: '#ff2737', transparent: true, opacity: 0, toneMapped: false });
   ownedMaterials.add(headMaterial); ownedMaterials.add(tailMaterial);
+  const distantBodyGeometry = new THREE.BoxGeometry(1.8, .5, 4.3).translate(0, .65, 0);
+  const distantPieces = [new THREE.BoxGeometry(1.55, .65, 2.1).translate(0, 1.18, -.15)];
+  for (const x of [-.87, .87]) for (const z of [-1.35, 1.35]) {
+    distantPieces.push(new THREE.CylinderGeometry(.34, .34, .22, 8).rotateZ(Math.PI / 2).translate(x, .35, z));
+  }
+  const distantTrimGeometry = mergeGeometries(distantPieces, false);
+  distantPieces.forEach(geometry => geometry.dispose());
+  geometries.add(distantBodyGeometry); geometries.add(distantTrimGeometry);
+  const distantTrimMaterial = new THREE.MeshStandardMaterial({ color: '#14202c', roughness: .6 });
+  ownedMaterials.add(distantTrimMaterial);
   for (let index = 0; index < 6; index++) {
     const car = template.clone(true);
     car.name = 'Sedan-' + (index + 1);
@@ -99,6 +110,15 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
       }
       node.material = paint.get(original);
     });
+    const detailedParts = [...car.children];
+    const distant = new THREE.Group();
+    distant.name = 'DistantSedan';
+    distant.scale.setScalar(1 / scale);
+    const distantPaint = new THREE.MeshStandardMaterial({color: paintColors[index], metalness: .4, roughness: .4});
+    ownedMaterials.add(distantPaint);
+    distant.add(new THREE.Mesh(distantBodyGeometry, distantPaint), new THREE.Mesh(distantTrimGeometry, distantTrimMaterial));
+    distant.visible = false;
+    car.add(distant);
     const lamps = new THREE.Group();
     lamps.name = 'NightDrivingLights'; lamps.visible = false;
     car.add(lamps);
@@ -116,7 +136,7 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
     }
     const lane = TRAFFIC_LANES[index % TRAFFIC_LANES.length];
     const speed = 5.5 + (index % 3) * .35;
-    cars.push({ car, lane, speed, distance: (index < 4 ? index * 38 : (index - 4) * 38 + 100), wheels, lamps, headlights });
+    cars.push({ car, lane, speed, distance: (index < 4 ? index * 38 : (index - 4) * 38 + 100), wheels, lamps, headlights, detailedParts, distant });
     root.add(car);
   }
   let elapsed = 0;
@@ -140,17 +160,24 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
       const step = reducedMotion ? 0 : Math.max(0, Math.min(dt, .05));
       elapsed += step;
       root.visible = visible;
+      if (!visible) return;
       for (const record of cars) {
         record.distance += step * record.speed;
         const position = lanePosition(record.lane, record.distance);
         record.car.position.set(position.x, .01, position.z);
         record.car.rotation.y = record.lane.axis === 'x' ? record.lane.direction * Math.PI / 2 : record.lane.direction > 0 ? 0 : Math.PI;
         record.wheels.forEach(wheel => { wheel.rotation.x += step * record.speed / .34; });
-        record.car.visible = record.car.position.distanceToSquared(camera.position) < 220 * 220;
+        const distance = record.car.position.distanceToSquared(camera.position);
+        record.car.visible = distance < 90 * 90;
+        // Hysteresis prevents flicker when the camera sits near the LOD boundary.
+        const threshold = record.distant.visible ? 30 : 36;
+        const detailed = distance < threshold * threshold;
+        record.detailedParts.forEach(part => { part.visible = detailed; });
+        record.distant.visible = !detailed;
       }
       // All cars show their lamps; only the nearest two project light onto
       // the road, avoiding twelve simultaneous spotlights on slower devices.
-      const nearest = new Set(visible && nightAmount > .001 ? [...cars].sort((a, b) => a.car.position.distanceToSquared(camera.position) - b.car.position.distanceToSquared(camera.position)).filter(record => record.car.position.distanceToSquared(camera.position) < 85 * 85).slice(0, 2) : []);
+      const nearest = new Set(visible && camera.position.y < 8 && nightAmount > .001 ? [...cars].sort((a, b) => a.car.position.distanceToSquared(camera.position) - b.car.position.distanceToSquared(camera.position)).filter(record => record.car.position.distanceToSquared(camera.position) < 35 * 35).slice(0, 1) : []);
       cars.forEach(record => record.headlights.forEach(light => { light.visible = nearest.has(record); light.intensity = 55 * nightAmount; }));
       document.documentElement.dataset.activeCarHeadlights = String(nearest.size * 2);
       document.documentElement.dataset.trafficTime = elapsed.toFixed(2);

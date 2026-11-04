@@ -64,21 +64,23 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
     holder.add(model); group.add(holder);
     return { holder, mixer, index, moving, speed: .88 + (index % 5) * .09 };
   }
-  // Eighteen walkers: six in the exterior plaza and twelve on sidewalks.
-  for (let index = 0; index < 18; index++) {
+  // A quieter entrance: two walkers in the plaza, with sidewalk traffic unchanged.
+  const plazaWalkerCount = 2, sidewalkWalkerCount = 12;
+  const walkerCount = plazaWalkerCount + sidewalkWalkerCount;
+  for (let index = 0; index < walkerCount; index++) {
     const person = character(boss, index, true);
-    const routeIndex = index < 6 ? 3 : Math.floor((index - 6) / 4);
+    const routeIndex = index < plazaWalkerCount ? 3 : Math.floor((index - plazaWalkerCount) / 4);
     person.route = curves[routeIndex];
     person.routeIndex = routeIndex;
     person.length = person.route.getLength();
-    person.distance = person.length * (index < 6 ? index / 6 : (index % 4) / 4);
+    person.distance = person.length * (index < plazaWalkerCount ? index / plazaWalkerCount : ((index - plazaWalkerCount) % 4) / 4);
     characters.push(person);
   }
   // Female model has its original gesture animation; keep these people in
   // small conversation groups instead of making an idle pose slide down a path.
-  const gatherings = [[-5, 8], [-6, 7], [9, 8], [10, 7], [17, -4], [18.3, -4.4]];
+  const gatherings = [[-5, 8], [-6, 7], [17, -4], [18.3, -4.4]];
   gatherings.forEach(([x, z], offset) => {
-    const person = character(colleague && offset % 2 ? colleague : woman, 18 + offset, false);
+    const person = character(colleague && offset % 2 ? colleague : woman, walkerCount + offset, false);
     person.holder.position.set(x, .05, z);
     person.holder.rotation.y = offset % 2 ? -Math.PI / 2 : Math.PI / 2;
     characters.push(person);
@@ -86,6 +88,7 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
   let clock = 0;
   function update(dt, camera, visible = true, peopleVisible = true) {
     group.visible = visible && peopleVisible;
+    if (!group.visible) return;
     const step = reducedMotion || !group.visible ? 0 : Math.max(0, Math.min(dt, .05));
     clock += step;
     let animated = 0;
@@ -106,9 +109,9 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
       }
     }
     document.documentElement.dataset.streetPeople = String(characters.length);
-    document.documentElement.dataset.streetWalkers = '18';
+    document.documentElement.dataset.streetWalkers = String(walkerCount);
     document.documentElement.dataset.streetVisitors = '0';
-    document.documentElement.dataset.plazaWalkers = '6';
+    document.documentElement.dataset.plazaWalkers = String(plazaWalkerCount);
     document.documentElement.dataset.streetCharacterModels = colleague ? '3' : '2';
     document.documentElement.dataset.streetAnimated = String(animated);
     document.documentElement.dataset.streetVisiblePeople = String(group.visible ? characters.filter(person => person.holder.visible).length : 0);
@@ -122,7 +125,7 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
     entranceProximity() {
       if (!group.visible) return 0;
       let amount = 0;
-      for (const person of characters.slice(0, 6)) {
+      for (const person of characters.slice(0, plazaWalkerCount)) {
         const distance = Math.hypot(person.holder.position.x, person.holder.position.z - 2.05);
         const progress = Math.max(0, Math.min(1, (7 - distance) / 3.5));
         amount = Math.max(amount, progress * progress * (3 - 2 * progress));

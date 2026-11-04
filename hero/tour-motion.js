@@ -11,12 +11,12 @@ export function tourTarget(raw, reducedMotion = false) {
 
 // Frame-rate independent easing. A scroll event only updates the destination;
 // rendering advances toward it, including when the wheel is released.
-export function advanceTour(time, target, dt, smoothness = .28) {
+export function advanceTour(time, target, dt, smoothness = .32) {
   const elapsed = Math.max(0, Math.min(dt, .05));
   const delta = target - time;
   if (Math.abs(delta) < .001) return target;
   const eased = delta * (1 - Math.exp(-elapsed / smoothness));
-  const limit = 18 * elapsed;
+  const limit = 12 * elapsed;
   return time + Math.max(-limit, Math.min(limit, eased));
 }
 

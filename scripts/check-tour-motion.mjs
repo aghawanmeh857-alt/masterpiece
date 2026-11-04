@@ -12,7 +12,7 @@ function run(fps, start, target, seconds) {
   let time = start;
   for (let frame = 0; frame < fps * seconds; frame++) {
     const next = advanceTour(time, target, 1 / fps);
-    assert(Math.abs(next - time) <= 18 / fps + 1e-8, 'Each frame has a bounded movement');
+    assert(Math.abs(next - time) <= 12 / fps + 1e-8, 'Each frame has a bounded movement');
     assert(next >= Math.min(start, target) && next <= Math.max(start, target), 'No overshoot');
     time = next;
   }

@@ -1,5 +1,6 @@
+import { createTreeBillboards } from './tree-billboards.js';
 // Maple Trees by Jagobo (CC BY 4.0). Original download remains unchanged.
-export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = false }) {
+export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = false, renderer }) {
   const asset = await loader.loadAsync(new URL('./maple-trees.glb', import.meta.url).href);
   asset.scene.updateMatrixWorld(true);
   const group = new THREE.Group();
@@ -47,6 +48,11 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     mesh.geometry.translate(-center.x, -bounds.min.y, -center.z);
     mesh.geometry.scale(scale, scale, scale);
   });
+  if (renderer && new URLSearchParams(location.search).has('bakeTrees')) {
+    const { bakeTreeAtlas } = await import('./bake-tree-atlas.js');
+    bakeTreeAtlas(THREE, renderer, template, scene.environment);
+  }
+  const canopyTrees = [];
   const crownLift = 3.1;
   const bark = [...materials].find(material => /bark/i.test(material.name));
   const trunkGeometry = new THREE.CylinderGeometry(.23, .36, crownLift + .12, 10);
@@ -57,6 +63,7 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     tree.position.set(side * 8.8, .35 + crownLift, z);
     tree.rotation.y = side < 0 ? .12 : Math.PI + .12;
     group.add(tree);
+    canopyTrees.push(tree);
     const trunk = new THREE.Mesh(trunkGeometry, bark);
     trunk.position.set(side * 8.8, .35 + crownLift / 2, z);
     group.add(trunk);
@@ -87,7 +94,7 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     ground.setColorAt(i, new THREE.Color(palette[i % palette.length]));
   }
   group.add(ground);
-  const falling = new THREE.InstancedMesh(leafGeometry, leafMaterial, 110);
+  const falling = new THREE.InstancedMesh(leafGeometry, leafMaterial, 12);
   falling.name = 'FallingMapleLeaves';
   falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   // All poses remain within this fixed volume; no per-frame bounds computation.
@@ -97,9 +104,15 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     return { x: (random() - .5) * 10, z: 7 + random() * 27, phase: random() * Math.PI * 2, start: random(), speed: .045 + random() * .04, scale: .13 + random() * .1 };
   });
   group.add(falling);
+  let billboards = null;
+  if (!new URLSearchParams(location.search).has('bakeTrees')) {
+    try { billboards = await createTreeBillboards(THREE, template, canopyTrees, group); }
+    catch (error) { console.warn('SAEI: keeping full tree geometry because the photographs are unavailable.', error); }
+  }
   scene.add(group);
   let elapsed = 0;
-  function update(dt, outside = true) {
+  function update(dt, outside = true, camera) {
+    if (outside && camera) billboards?.update(camera, Number(document.documentElement.dataset.dayNightProgress || 0));
     group.visible = outside;
     falling.visible = !reducedMotion;
     if (!outside || reducedMotion) return;
@@ -121,6 +134,7 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
   return {
     update,
     destroy() {
+      billboards?.destroy();
       scene.remove(group);
       ground.dispose(); falling.dispose();
       geometries.forEach(geometry => geometry.dispose());

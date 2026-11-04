@@ -1,20 +1,5 @@
 // Placement only: keep original GLB geometry, textures and proportions intact.
-export const CITY_MODEL = 'fixed-new-york-highway-interstate-95.glb';
 export const HEADQUARTERS_MODEL = 'free-london-skyscraper.glb';
-
-export function placeCityModel(THREE, model) {
-  const holder = new THREE.Group();
-  holder.name = 'NewYorkInterstate95';
-  holder.add(model);
-  holder.updateMatrixWorld(true);
-  const bounds = new THREE.Box3().setFromObject(holder);
-  const size = bounds.getSize(new THREE.Vector3());
-  const scale = 220 / Math.max(size.x, size.z);
-  holder.scale.setScalar(scale);
-  // Leave the existing access roads, pedestrian paths and coast unobstructed.
-  holder.position.set(44 - bounds.min.x * scale, .03 - bounds.min.y * scale, -190 - bounds.min.z * scale);
-  return holder;
-}
 
 export function placeHeadquartersModel(THREE, model) {
   const holder = new THREE.Group();
@@ -40,9 +25,13 @@ export function placeHeadquartersModel(THREE, model) {
     if (sourceBounds.max.y < officeBase) node.visible = false;
     const materials = Array.isArray(node.material) ? node.material : [node.material];
     materials.forEach(material => {
+      // The exterior is a closed model: avoid drawing its transparent back faces twice.
+      if (material.transparent) material.forceSinglePass = true;
+      if (material.clearcoat > 0) material.clearcoat = 0;
       material.clippingPlanes = [roofPlane];
       material.clipShadows = true;
     });
+    if (materials.every(material => material.opacity === 0)) node.visible = false;
     node.castShadow = true;
     node.receiveShadow = true;
   });

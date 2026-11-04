@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { nextRenderScale } from '../hero/render-budget.js';
+assert.equal(nextRenderScale(1,16,1920*1080),1);
+assert(nextRenderScale(1,200,1920*1080)<1,'Severe slow frames must lower pixel work');
+let scale=1;
+for(let i=0;i<30;i++) scale=nextRenderScale(scale,200,1920*1080);
+assert(Math.abs(scale-Math.sqrt(280000/(1920*1080)))<1e-9);
+assert.equal(nextRenderScale(scale,200,1920*1080),scale,'Never shrink below the pixel budget');
+assert.equal(nextRenderScale(.3,200,1920*1080),.3,'Never increase an already lower scale');
+assert.equal(nextRenderScale(1,NaN,1920*1080),1);
+console.log('Passed: fast frames unchanged, severe stalls handled, bounded render scale without oscillation.');

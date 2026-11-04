@@ -1,33 +1,10 @@
-// New York, Highway Interstate 95 by 99.Miles, downloaded by the user.
-// Original GLB is kept unchanged in /3D. Placement/lighting happen at runtime.
+import { mergeStaticMeshes } from './static-meshes.js';
+// Lightweight access roads and street lighting; no imported city model.
 import { addCityAppearance } from './city-appearance.js';
-import { CITY_MODEL, placeCityModel } from '../3D/model-layout.js';
-import { addRearDistrict } from '../3D/rear-district.js';
-export async function createModernCity(THREE, scene, loader) {
-  const asset = await loader.loadAsync(new URL('../3D/' + CITY_MODEL, import.meta.url).href);
+export async function createAccessRoads(THREE, scene, { mergeGeometries }) {
   const city = new THREE.Group(); city.name = 'OFOQCity';
   city.userData.dynamicScene = true;
-  city.add(placeCityModel(THREE, asset.scene));
-  const sourceMaterials = new Map(), roadMaterials = [], geometry = new Set();
-  asset.scene.traverse(node => {
-    if (!node.isMesh) return;
-    geometry.add(node.geometry); node.receiveShadow = true; node.castShadow = false;
-    const material = source => {
-      if (!sourceMaterials.has(source)) {
-        const result = source.clone();
-        result.roughness = Math.max(.48, result.roughness || 0);
-        // Preserve the author's metallic/roughness maps instead of flattening
-        // all seven materials to the same mostly-matte surface.
-        result.metalness = source.metalness;
-        result.envMapIntensity = 1.05;
-        sourceMaterials.set(source, result);
-      }
-      return sourceMaterials.get(source);
-    };
-    node.material = Array.isArray(node.material) ? node.material.map(material) : material(node.material);
-  });
-  const rearDistrict = addRearDistrict(THREE, city, asset.scene);
-  geometry.add(rearDistrict.geometry);
+  const roadMaterials = [], geometry = new Set();
   const asphalt = new THREE.MeshStandardMaterial({ color: '#353c45', roughness: .95 });
   const pavement = new THREE.MeshStandardMaterial({ color: '#a8afb5', roughness: .92 });
   const marking = new THREE.MeshStandardMaterial({ color: '#e6e4d8', roughness: .8 });
@@ -58,13 +35,13 @@ export async function createModernCity(THREE, scene, loader) {
   asphalt.map = appearance.asphaltMap; asphalt.color.set('#ffffff');
   pavement.map = appearance.pavementMap; pavement.color.set('#ffffff');
   scene.add(city);
+  mergeStaticMeshes(THREE, city, mergeGeometries).geometries.forEach(item => geometry.add(item));
   const state = document.documentElement.dataset;
-  state.cityStatus = 'ready'; state.cityModel = 'fixed-new-york-highway-interstate-95';
-  state.cityBuildings = String(asset.scene.children.length); state.cityModelSource = 'Sketchfab / 99.Miles';
-  state.rearCityBuildings = String(rearDistrict.count);
+  state.cityStatus = 'removed'; state.cityModel = 'none';
+  state.cityBuildings = '0'; state.rearCityBuildings = '0';
   return {
+    group: city,
     setNight(amount) {
-      sourceMaterials.forEach(material => { material.envMapIntensity = 1.05 - amount * .6; });
       appearance.setNight(amount);
       state.cityLightLevel = Number(amount).toFixed(4);
     },
@@ -72,7 +49,7 @@ export async function createModernCity(THREE, scene, loader) {
       scene.remove(city); geometry.forEach(item => item.dispose());
       appearance.destroy();
       const textures = new Set();
-      [...sourceMaterials.values(), ...roadMaterials].forEach(material => {
+      roadMaterials.forEach(material => {
         for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);
         material.dispose();
       });

@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {canopyDetailVisible,canopyTile} from '../3D/tree-billboards.js';
+import {createGpuTiming} from '../hero/gpu-timing.js';
+assert.equal(canopyDetailVisible(40**2,false),false);
+assert.equal(canopyDetailVisible(20**2,true),true);
+assert.equal(canopyDetailVisible(27**2,false),true);
+assert.equal(canopyDetailVisible(27**2,true),false,'LOD hysteresis prevents repeated switching at a boundary');
+for(let i=-100;i<=100;i++)assert(canopyTile(i, .12)>=0 && canopyTile(i,.12)<8);
+assert.equal(canopyTile(0,0),0); assert.equal(canopyTile(Math.PI*2,0),0);
+const bytes=fs.readFileSync(new URL('../3D/maple-canopy-atlas.webp',import.meta.url));
+assert.equal(bytes.subarray(0,4).toString(),'RIFF');assert.equal(bytes.subarray(8,12).toString(),'WEBP');
+let available=false,begin=0,end=0,removed=0,result=0;
+const gl={QUERY_RESULT_AVAILABLE:1,QUERY_RESULT:2,getExtension:()=>({TIME_ELAPSED_EXT:3,GPU_DISJOINT_EXT:4}),createQuery:()=>({}),beginQuery:()=>begin++,endQuery:()=>end++,getQueryParameter:(query,key)=>key===1?available:25e6,getParameter:()=>false,deleteQuery:()=>removed++};
+const timer=createGpuTiming(gl,value=>result=value,true);timer.begin(0);timer.end();timer.begin(100);timer.end();assert.equal(begin,1);assert.equal(end,1);available=true;timer.begin(200);assert.equal(result,25);assert.equal(removed,1);timer.destroy();
+const disabled=createGpuTiming(null,()=>{throw Error('Disabled profiler sampled');});disabled.begin();disabled.end();disabled.destroy();
+console.log('Passed: tree photo atlas, camera-angle wrapping, stable near/far LOD, non-blocking optional GPU timing.');

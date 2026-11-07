@@ -83,6 +83,13 @@ if (document.body.dataset.page === 'messages') {
       bubble.className = message.mine ? 'chat-bubble mine' : 'chat-bubble';
       bubble.textContent = message.text;
       bubble.dir = 'auto';
+      if (message.sentAt) {
+        const time = document.createElement('time');
+        time.className = 'chat-message-meta';
+        time.dateTime = message.sentAt;
+        time.textContent = new Intl.DateTimeFormat('ar-JO', { hour: '2-digit', minute: '2-digit' }).format(new Date(message.sentAt));
+        bubble.append(time);
+      }
       const row=document.createElement('div');row.className=message.mine?'chat-message-row mine':'chat-message-row';const sender=document.createElement('small');sender.className='chat-message-sender';sender.textContent=message.mine?'أنت':conversation.name;row.append(sender,bubble);get('chatMessages').append(row);
     });
     get('chatMessages').scrollTop = get('chatMessages').scrollHeight;
@@ -118,7 +125,7 @@ if (document.body.dataset.page === 'messages') {
     const text = get('messageInput').value.trim();
     get('messageInput').setCustomValidity(text ? '' : 'اكتب رسالة أولًا.');
     if (!get('messageForm').reportValidity()) return;
-    conversations[selected].messages.push({ mine: true, text });
+    conversations[selected].messages.push({ mine: true, text, sentAt: new Date().toISOString() });
     showConversation();
     get('messageStatus').textContent = 'أُضيفت رسالتك إلى المحادثة خلال هذه الزيارة. لا تُرسل إلى طرف آخر.';
     get('messageInput').focus();

@@ -113,8 +113,8 @@ body[data-section="academy"] .overview-learning .course-grid { grid-template-col
 .purchase-panel img { width: 100%; height: auto; aspect-ratio: 16/9; object-fit: cover; }
 .purchase-panel > strong { font-size: 28px; }
 .purchase-panel p { font-size: 11px; text-align: center; color: var(--text-muted); margin: 0; }
-.outcomes, .course-quiz { border: 1px solid var(--field-border); padding: 28px; background: var(--surface); border-radius: 8px; margin-bottom: 28px; }
-.outcomes h2, .course-quiz h2 { font-size: 22px; }
+.outcomes { border: 1px solid var(--field-border); padding: 28px; background: var(--surface); border-radius: 8px; margin-bottom: 28px; }
+.outcomes h2 { font-size: 22px; }
 .outcomes ul { list-style: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); padding: 0; gap: 16px 24px; font-size: 14px; }
 .outcomes p { font-size: 13px; color: var(--text-muted); margin-bottom: 0; }
 .classroom { display: grid; grid-template-columns: minmax(0,1fr) 310px; align-items: start; gap: 0; border: 1px solid var(--field-border); border-radius: 8px; overflow: hidden; margin-bottom: 28px; scroll-margin-top: 100px; }
@@ -146,10 +146,7 @@ body[data-section="academy"] .overview-learning .course-grid { grid-template-col
 .curriculum-lesson:hover, .curriculum-lesson[aria-current="step"] { background: #ff783d12; border-color: #ff783d35; }
 #completionBanner { background: #46b88f15; border: 1px solid #46b88f55; padding: 18px; margin-top: 24px; font-size: 13px; }
 #completionBanner p { margin: 10px 0 0; }
-#quizOptions { display: grid; gap: 10px; margin-bottom: 18px; }
-#quizOptions label { display: flex; gap: 10px; align-items: center; padding: 12px; border: 1px solid var(--field-border); border-radius: 6px; cursor: pointer; }
-#quizOptions input { width: auto; accent-color: #ff783d; }
-#quizResult, #lessonFeedback { font-size: 13px; color: var(--accent-text); }
+#lessonFeedback { font-size: 13px; color: var(--accent-text); }
 @media (max-width: 1199px) { [data-section="academy"] .course-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 991px) { .classroom { grid-template-columns: 1fr; } .curriculum { border-inline-start: 0; border-top: 1px solid var(--field-border); } .course-intro { grid-template-columns: minmax(0,1fr) 260px; padding: 24px; gap: 24px; } }
 @media (max-width: 767px) { [data-section="academy"] .workspace { grid-template-columns: 1fr; } .course-intro { grid-template-columns: 1fr; padding: 20px; } .outcomes ul { grid-template-columns: 1fr; } .learning-tabs button { padding: 12px; font-size: 12px; } .lecture-screen { padding: 16px; } .lecture-slide { padding-inline: 0; } [data-section="academy"] .featured-path { padding: 24px; } }

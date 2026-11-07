@@ -72,7 +72,58 @@ if (profileForm) {
       skills.append(tag);
     });
     document.getElementById('profileSkillCount').textContent = skills.children.length;
+    showPublicDocuments();
   }
+
+  function showPublicDocuments() {
+    const host = document.getElementById('profilePublicDocuments');
+    const app = window.OfoqFrontend;
+    const owner = !requestedUser;
+    const source = owner ? app.profile : profile;
+    host.replaceChildren();
+    for (const [kind, title, file, remote] of [
+      ['cv', 'السيرة الذاتية · CV', owner ? app.cvFile : null, source.resumeUrl],
+      ['portfolio', 'معرض الأعمال · Portfolio', null, source.portfolioUrl]
+    ]) {
+      const card = document.createElement('section');
+      const heading = document.createElement('h3');
+      heading.textContent = title;
+      card.append(heading);
+      const actions = document.createElement('div');
+      actions.className = 'profile-document-actions';
+      let url = file?.url;
+      if (!url && remote) {
+        try { const parsed = new URL(remote); if (['https:', 'http:'].includes(parsed.protocol)) url = parsed.href; } catch {}
+      }
+      if (url) {
+        const view = document.createElement('a');
+        view.textContent = kind === 'portfolio' && !file ? 'عرض الأعمال ↗' : 'عرض الملف ↗';
+        view.href = url; view.target = '_blank'; view.rel = 'noopener noreferrer';
+        actions.append(view);
+        if (file) {
+          const download = document.createElement('a');
+          download.textContent = 'تحميل ↓'; download.href = file.url; download.download = file.name;
+          actions.append(download);
+        }
+      } else {
+        const empty = document.createElement('p');
+        empty.textContent = kind === 'cv' ? 'لم تُرفق سيرة ذاتية بعد.' : 'لم يُضف رابط أعمال بعد.';
+        actions.append(empty);
+      }
+      if (owner) {
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.textContent = kind === 'cv' ? (file ? 'تغيير الملف' : 'إرفاق PDF') : (url ? 'تعديل الرابط' : 'إضافة رابط');
+        edit.addEventListener('click', () => {
+          if (kind === 'cv') document.getElementById('cvFile').click();
+          else { editButton.click(); document.getElementById('editPortfolioUrl').focus(); }
+        });
+        actions.append(edit);
+      }
+      card.append(actions); host.append(card);
+    }
+  }
+  window.addEventListener('saei:profile-documents', showPublicDocuments);
 
   function closeEditor() {
     profileForm.hidden = true;
@@ -87,6 +138,7 @@ if (profileForm) {
     document.getElementById('editLocation').value = profile.location;
     document.getElementById('editBio').value = profile.bio;
     document.getElementById('editSkills').value = profile.skills;
+    document.getElementById('editPortfolioUrl').value = window.OfoqFrontend.profile.portfolioUrl || '';
     profileForm.hidden = false;
     editButton.hidden = true;
     status.textContent = '';
@@ -99,6 +151,12 @@ if (profileForm) {
     profileForm.querySelectorAll('[required]').forEach(input => input.setCustomValidity(input.value.trim() ? '' : 'يرجى تعبئة هذا الحقل.'));
     document.getElementById('editName').setCustomValidity(document.getElementById('editName').value.trim().length >= 2 ? '' : 'اكتب اسمًا من حرفين على الأقل.');
     if (!profileForm.reportValidity()) return;
+    const portfolioUrl = document.getElementById('editPortfolioUrl').value.trim();
+    if (portfolioUrl) {
+      try { if (!['https:', 'http:'].includes(new URL(portfolioUrl).protocol)) throw new Error(); }
+      catch { const field = document.getElementById('editPortfolioUrl'); field.setCustomValidity('أدخل رابطًا يبدأ بـ https:// أو http://'); field.reportValidity(); return; }
+    }
+    profile.portfolioUrl = portfolioUrl;
     for (const [key, id] of Object.entries({name: 'editName', role: 'editRole', location: 'editLocation', bio: 'editBio', skills: 'editSkills'})) profile[key] = document.getElementById(id).value.trim();
     Object.assign(window.OfoqFrontend.profile, profile);
     showProfile(); closeEditor();

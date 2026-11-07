@@ -104,3 +104,14 @@
 #profileCV :is(.profile-tools-actions button,#cvForm .cv-save-row button){font-family:var(--profile-body-font);font-size:14px;font-weight:600;padding:13px 24px;border-radius:11px}
 @media(max-width:1050px){#mainContent.profile-organized .profile-identity .profile-overview{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}#mainContent.profile-organized .profile-overview>div{flex-direction:column;gap:6px}}
 @media(max-width:600px){#mainContent.profile-organized :is(.profile-section,.profile-activity-card,.portfolio-card),#profileCV :is(.cv-file-upload,.cv-editor-card){padding:20px 16px;border-radius:16px}#mainContent.profile-organized .account-heading{flex-wrap:wrap}#mainContent.profile-organized .account-heading h1{font-size:28px}#mainContent.profile-organized .profile-identity .profile-overview{gap:10px;padding:14px}#mainContent.profile-organized .profile-overview span{font-size:10px}}
+
+/* Documents use the same label and value layout as personal information. */
+.profile-public-documents { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; margin:22px 0 0; }
+.profile-public-documents>section { min-width:0; }
+.profile-public-documents h3 { color:var(--text-muted); font-size:12px; font-weight:500; line-height:1.7; margin:0 0 8px; }
+.profile-document-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; min-height:60px; padding:13px 14px; border:1px solid var(--field-border); border-radius:10px; background:var(--field-bg); font-size:13px; }
+.profile-document-actions p { margin:0; color:var(--text-muted); font-size:13px; }
+.profile-document-actions :is(a,button) { color:var(--accent-text); font:inherit; font-weight:600; text-decoration:none; background:none; border:0; padding:0; }
+.profile-document-actions button { margin-inline-start:auto; cursor:pointer; }
+.profile-document-actions :is(a,button):hover { text-decoration:underline; }
+@media(max-width:600px) { .profile-public-documents { grid-template-columns:1fr; gap:18px; } }

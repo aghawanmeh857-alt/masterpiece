@@ -244,7 +244,6 @@ const examples = {
       "id": "admin",
       "title": "أدمن سعي",
       "owner": "admin@example.com",
-      "category": "الإدارة",
       "role": "admin",
       "status": "published",
       "date": "2026-10-13",
@@ -254,7 +253,6 @@ const examples = {
       "id": "user-0",
       "title": "أحمد خالد",
       "owner": "member0@example.com",
-      "category": "مستقل",
       "role": "editor",
       "status": "published",
       "date": "2026-10-13",
@@ -264,7 +262,6 @@ const examples = {
       "id": "user-1",
       "title": "ليان عمر",
       "owner": "member1@example.com",
-      "category": "متعلّم",
       "role": "member",
       "status": "published",
       "date": "2026-10-13",
@@ -274,7 +271,6 @@ const examples = {
       "id": "user-2",
       "title": "سارة يوسف",
       "owner": "member2@example.com",
-      "category": "مستقل",
       "role": "member",
       "status": "published",
       "date": "2026-10-13",
@@ -284,7 +280,6 @@ const examples = {
       "id": "user-3",
       "title": "عمر علي",
       "owner": "member3@example.com",
-      "category": "متعلّم",
       "role": "member",
       "status": "published",
       "date": "2026-10-13",
@@ -294,7 +289,6 @@ const examples = {
       "id": "user-4",
       "title": "نور محمد",
       "owner": "member4@example.com",
-      "category": "مستقل",
       "role": "member",
       "status": "archived",
       "date": "2026-10-13",
@@ -390,7 +384,7 @@ function show(view, updateHash = true) {
   $('pageTitle').textContent = sections[current][0]; $('pageDescription').textContent = sections[current][2]; $('breadcrumb').textContent = sections[current][0];
   ['overview', 'records', 'settings', 'scene', 'logs'].forEach(key => $(key + 'View').hidden = key !== (model.data[current] || current === 'review' ? 'records' : current));
   document.querySelectorAll('#navigation button').forEach(button => { if (button.dataset.view === current) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
-  $('addButton').hidden = !model.data[current]; $('addButton').textContent = '+ إضافة ' + (current === 'users' ? 'مستخدم' : 'سجل');
+  $('addButton').hidden = !model.data[current]; $('addButton').textContent = '+ إضافة ' + (current === 'projects' ? 'مشروع' : current === 'events' ? 'فعالية' : current === 'courses' ? 'دورة' : current === 'users' ? 'مستخدم' : 'سجل');
   $('search').value = ''; $('statusFilter').value = ''; render();
   $('sidebar').classList.remove('open'); $('menuButton').setAttribute('aria-expanded', 'false');
   if (updateHash) history.replaceState(null, '', '#' + current);
@@ -408,6 +402,10 @@ function openEditor(section, id = null) {
   editing = { section, id }; const form = $('recordForm'); form.reset();
   for (const field of ['title', 'owner', 'category', 'description', 'status', 'role']) if (record) form.elements.namedItem(field).value = record[field] || '';
   $('editorTitle').textContent = (record ? 'تعديل · ' : 'إضافة · ') + sections[section][0]; $('roleLabel').hidden = section !== 'users';
+  const categoryField = form.elements.category;
+  categoryField.closest('label').hidden = section === 'users';
+  categoryField.disabled = section === 'users';
+  categoryField.required = section !== 'users';
   $('titleLabel').firstChild.textContent = section === 'users' ? 'الاسم' : 'العنوان'; $('ownerLabel').firstChild.textContent = section === 'users' ? 'البريد الإلكتروني' : 'المسؤول / الجهة';
   form.elements.description.required=contentKeys.includes(section);form.elements.description.minLength=contentKeys.includes(section)?10:0;
   window.OfoqPublishing.fill(form,record||{},section);
@@ -453,6 +451,7 @@ $('recordForm').addEventListener('submit',async event=>{
  try{
  const publishing=await window.OfoqPublishing.read(form);
  const updated={...old,...values,...publishing,publisherName:values.owner,publisherRole:old?.publisherRole||'admin',date:old?.date||new Date().toISOString().slice(0,10),id:old?.id||crypto.randomUUID()};
+ if(target.section==='users')delete updated.category;
  if(['jobs','internships'].includes(target.section))updated.company=values.owner;
  if(old)Object.assign(old,updated);else model.data[target.section].unshift(updated);window.OfoqFrontend.publishContent?.(target.section,updated);
  const source=(target.section==='jobs'?window.OfoqFrontend.companyJobs:target.section==='internships'?window.OfoqFrontend.companyInternships:null)?.find(row=>row.id===updated.id);if(source)Object.assign(source,updated);

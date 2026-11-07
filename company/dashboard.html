@@ -28,6 +28,8 @@
 
 
 
+      <button data-view="students"><span class="nav-icon" aria-hidden="true"></span>الطلاب المسجّلون</button>
+      <button data-view="employees"><span class="nav-icon" aria-hidden="true"></span>الموظفون</button>
       <button data-view="profile"><span class="nav-icon" aria-hidden="true">⚙</span>بيانات الشركة</button>
     </nav>
     <div class="sidebar-bottom"><span class="online-dot"></span> مساحة شركة تجريبية<a href="../hero/userHero.html">زيارة الموقع ↗</a><a href="../Account/Messages/messages.html">الرسائل ↗</a></div>
@@ -41,6 +43,7 @@
     <main id="main" tabindex="-1">
       <div class="page-heading"><div><h1 id="pageTitle">نظرة عامة</h1><p id="pageDescription">وظائفك وفرص التدريب والمتقدمون، في مساحة واحدة.</p></div><div class="heading-actions"><span id="today" hidden></span><button id="addButton" class="primary" hidden>+ إضافة</button></div></div>
 
+      <section id="companyPeopleView" hidden aria-label="الطلاب والموظفون"><label class="search"><input id="companyPeopleSearch" type="search" placeholder="ابحث بالاسم أو البريد أو الدورة…" aria-label="بحث في الطلاب أو الموظفين"></label><div id="companyPeopleList" class="company-people-list"></div></section>
       <section id="overviewView" aria-label="نظرة عامة">
         <div class="company-welcome"><div><span class="eyebrow">نحو أثر أكبر</span><h2>أهلًا، <span data-company-name>برايت لابز</span>.</h2><p>شاركوا خبرتكم، واجمعوا أصحاب الطموح حول فرص جديدة.</p></div><div class="welcome-actions"><button class="primary" data-company-open="jobs" data-company-create>+ وظيفة جديدة</button><button class="secondary" data-company-open="internships" data-company-create>+ فرصة تدريب</button></div></div>
         <div id="stats" class="stats-grid"></div>

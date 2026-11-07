@@ -74,21 +74,22 @@
             });
             return;
           }
-          const dialog = document.createElement('dialog'); dialog.className = 'learning-checkout';
+          const dialog = document.createElement('dialog'); dialog.className = 'learning-checkout payment-dialog';
           dialog.setAttribute('aria-label', 'إتمام الشراء التجريبي');
-          const heading = document.createElement('h2'); heading.textContent = 'خطوتك القادمة تبدأ هنا';
-          const notice = document.createElement('p'); notice.textContent = 'شراء تجريبي فقط. لا يُخصم أي مبلغ ولا نطلب بيانات بطاقة.';
+          const heading = document.createElement('h2'); heading.className = 'payment-heading'; heading.textContent = 'إتمام الدفع';
+          const notice = document.createElement('p'); notice.className = 'payment-notice'; notice.textContent = 'شراء تجريبي فقط. لا يُخصم أي مبلغ ولا نطلب بيانات بطاقة.';
           const list = document.createElement('ul');
           items.forEach(course => { const row = document.createElement('li'); row.textContent = course.title + ' — ' + (course.price ? '$'+course.price : 'مجاني'); list.append(row); });
-          const total = document.createElement('strong'); total.textContent = 'الإجمالي: $' + items.reduce((sum,item) => sum+item.price,0);
-          const methods = document.createElement('fieldset'); methods.innerHTML = '<legend>طريقة الدفع التجريبية</legend><label><input type="radio" name="demoMethod" value="card" checked> بطاقة بنكية</label><label><input type="radio" name="demoMethod" value="wallet"> محفظة إلكترونية</label>';
+          const total = document.createElement('strong'); total.className = 'payment-summary'; total.textContent = 'الإجمالي: $' + items.reduce((sum,item) => sum+item.price,0);
+          const methods = document.createElement('fieldset'); methods.innerHTML = '<legend>طريقة الدفع التجريبية</legend><label class="payment-method"><input type="radio" name="demoMethod" value="card" checked> بطاقة بنكية</label><label class="payment-method"><input type="radio" name="demoMethod" value="wallet"> محفظة إلكترونية</label>';
+          methods.className = 'payment-methods';
           const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = 'learn-primary'; confirm.textContent = 'تأكيد الشراء التجريبي';
           const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'learn-secondary'; cancel.textContent = 'إلغاء';
           confirm.addEventListener('click', () => { this.enroll(items.map(item => item.id)); dialog.close(); onComplete?.(); });
           cancel.addEventListener('click', () => dialog.close());
           const opener = document.activeElement;
           dialog.addEventListener('close', () => { dialog.remove(); opener?.focus(); }, {once:true});
-          dialog.append(heading,notice,list,total,methods,confirm,cancel); document.body.append(dialog); dialog.showModal();
+          dialog.append(heading,list,total,methods,notice,confirm,cancel); document.body.append(dialog); dialog.showModal();
         }
       };
       save(); return store;

@@ -1,6 +1,6 @@
 import { createScenicPlantings } from '../3D/scenic-plantings.js';
 import { mergeStaticMeshes } from './static-meshes.js';
-import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js';
+import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js?v=single-action-2';
 // المشهد ثلاثي الأبعاد يحتاج Three.js. بقية الشاشات لا تستخدم مكتبات.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -79,7 +79,7 @@ const readingStops = chapters.map((chapter, index) => {
   const label = document.createElement('p'); label.className = 'station-label'; label.textContent = String(index + 1).padStart(2, '0') + ' / ' + rooms[index].name;
   const title = document.createElement(index === 0 ? 'h1' : 'h2'); title.className = 'station-title'; title.innerHTML = data.title;
   const description = document.createElement('p'); description.className = 'station-description'; description.textContent = data.description;
-  const services = document.createElement('div'); services.className = 'room-sections'; renderRoomSections(services, index, window.siteThemeUrl);
+  const services = document.createElement('div'); renderRoomSections(services, index);
   const action = document.createElement('a'); action.className = 'btn btn-orange station-action';
   const destinations = ['../Auth/Register/register.html','../Freelance/freelance.html','../Academy/academy.html','../Internships/internships.html','../Jobs/jobs.html','../Events/events.html'];
   action.href = window.siteThemeUrl(destinations[index]); action.textContent = index === 0 ? 'إنشاء حساب ←' : rooms[index].action + ' ←';

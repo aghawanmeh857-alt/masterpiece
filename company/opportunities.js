@@ -7,7 +7,19 @@
   panel.innerHTML='<div class="company-opportunity-toolbar"><div><h2 id="companyOpportunityTitle"></h2><p id="companyOpportunitySummary"></p></div><button type="button" class="primary" id="newCompanyOpportunity">+ إضافة فرصة</button></div><div id="companyJobList" class="company-opportunity-grid"></div><div id="companyJobApplicants" class="company-applicant-list"></div>';
   const main=document.getElementById('main');main.insertBefore(panel,main.querySelector('footer'));
   const nav=document.getElementById('navigation');
-  for(const kind of Object.keys(labels)){const button=node('button',labels[kind]);button.type='button';button.dataset.companySection=kind;if(kind==='jobs')button.id='companyJobsTab';nav.insertBefore(button,nav.querySelector('[data-view="profile"]'));button.addEventListener('click',()=>show(kind));}
+  const navIcons = {
+    jobs: '<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V4h8v3M3 12a21 21 0 0 0 18 0M12 11v4"/>',
+    internships: '<path d="m2 8 10-5 10 5-10 5L2 8Zm4 2v7l6 4 6-4v-7M22 8v8"/>',
+    applicants: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9" r="2.5"/><path d="M8 17a4 4 0 0 1 8 0"/>'
+  };
+  for(const kind of Object.keys(labels)){
+    const button=node('button',labels[kind]);
+    const icon=node('span',undefined,'nav-icon');
+    icon.setAttribute('aria-hidden','true');
+    icon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+navIcons[kind]+'</svg>';
+    button.prepend(icon);
+    button.type='button';button.dataset.companySection=kind;if(kind==='jobs')button.id='companyJobsTab';nav.insertBefore(button,nav.querySelector('[data-view="profile"]'));button.addEventListener('click',()=>show(kind));
+  }
   const dialog=node('dialog');dialog.id='companyOpportunityEditor';dialog.className='company-opportunity-dialog';
   dialog.innerHTML=`<form id="companyJobForm"><div class="dialog-heading"><div><p class="eyebrow">إدارة فرص شركتك</p><h2 id="companyJobEditorTitle"></h2></div><button type="button" class="icon-button" data-company-close aria-label="إغلاق">×</button></div><input name="id" type="hidden"><input name="kind" type="hidden"><div class="company-editor-grid"><label>عنوان الفرصة<input name="title" required minlength="3" maxlength="140"></label><label>اسم الشركة<input name="company" required maxlength="100"></label><label>المجال<select name="category"><option value="development">برمجة وتطوير</option><option value="design">تصميم</option><option value="marketing">تسويق رقمي</option><option value="career">أخرى</option></select></label><label>نمط العمل<select name="location"><option value="remote">عن بُعد</option><option value="onsite">في الموقع</option><option value="hybrid">هجين</option></select></label><label><span id="companyContractLabel">نوع الدوام</span><select name="itemType"></select></label><label><span id="companyExtraLabel">الخبرة</span><select name="extra"></select></label><label>المقابل / الراتب<input name="offer" required maxlength="120" placeholder="مثال: 900 دينار / شهر"></label><label>آخر موعد للتقديم<input name="deadline" type="date" required></label><label class="company-field-wide">نبذة عن الفرصة<textarea name="description" required minlength="20" maxlength="3000" rows="3"></textarea></label><label class="company-field-wide">المتطلبات — كل متطلب بسطر<textarea name="requirements" required maxlength="3000" rows="3"></textarea></label></div><p id="companyJobStatus" role="status" class="form-error"></p><div class="dialog-actions"><button type="button" class="secondary" data-company-close>إلغاء</button><button type="submit" class="primary">نشر الفرصة</button></div></form>`;
   document.body.append(dialog);const form=dialog.querySelector('form'),status=dialog.querySelector('#companyJobStatus');window.OfoqPublishing.mount(form);
@@ -51,7 +63,22 @@
       for(const request of rows){const card=node('article',undefined,'panel company-applicant-card'),heading=node('div');heading.append(node('h3',app.profile.name),node('p',request.title),node('span',request.status,'company-label'));const actions=node('div',undefined,'row-actions');for(const decision of ['مقبول','مرفوض','قيد المراجعة']){const button=node('button',decision,'secondary');button.type='button';button.disabled=request.status===decision;button.addEventListener('click',()=>{request.status=decision;render();dispatchEvent(new Event('ofoq:company-content'));});actions.append(button);}card.append(heading,actions);requests.append(card);}
     }else{
       const rows=sources[current];document.getElementById('companyOpportunitySummary').textContent=rows.length?rows.length+' فرص · '+rows.filter(row=>row.status==='published').length+' منشورة':'';if(!rows.length)list.append(node('p','لا توجد فرص منشورة بعد.','company-empty'));
-      for(const row of rows){const card=node('article',undefined,'panel company-opportunity-card');card.append(node('span',row.status==='published'?'منشورة':'متوقفة','company-label'),node('h3',row.title),node('p',row.description));const info=node('dl');for(const [label,value]of [['الجهة',row.company],['المقابل',row.offer],['آخر موعد',row.deadline]]){const group=node('div');group.append(node('dt',label),node('dd',value));info.append(group);}card.append(info);attachment(row,card);const actions=node('div',undefined,'row-actions');const editButton=node('button','تعديل','secondary');editButton.type='button';editButton.addEventListener('click',()=>edit(current,row));const pause=node('button',row.status==='published'?'إيقاف النشر':'إعادة النشر','secondary');pause.type='button';pause.addEventListener('click',()=>{row.status=row.status==='published'?'paused':'published';app.publishContent(current,row);render();dispatchEvent(new Event('ofoq:company-content'));});actions.append(editButton,pause);card.append(actions);list.append(card);}
+      for(const row of rows){const card=node('article',undefined,'panel company-opportunity-card');card.append(node('span',row.status==='published'?'منشورة':'متوقفة','company-label'),node('h3',row.title),node('p',row.description));const info=node('dl');for(const [label,value]of [['الجهة',row.company],['المقابل',row.offer],['آخر موعد',row.deadline]]){const group=node('div');group.append(node('dt',label),node('dd',value));info.append(group);}card.append(info);attachment(row,card);const actions=node('div',undefined,'row-actions');const editButton=node('button','تعديل','secondary');editButton.type='button';editButton.addEventListener('click',()=>edit(current,row));const pause=node('button',row.status==='published'?'إيقاف النشر':'إعادة النشر','secondary');pause.type='button';pause.addEventListener('click',()=>{row.status=row.status==='published'?'paused':'published';app.publishContent(current,row);render();dispatchEvent(new Event('ofoq:company-content'));});const removeButton=node('button','حذف الفرصة','secondary company-delete-opportunity');
+        removeButton.type='button';
+        removeButton.setAttribute('aria-label','حذف الفرصة: '+row.title);
+        const kind=current;
+        removeButton.addEventListener('click',()=>{
+          if(!window.confirm('هل تريد حذف «'+row.title+'»؟ ستختفي من الفرص المنشورة.'))return;
+          const index=sources[kind].findIndex(item=>item.id===row.id);
+          if(index<0)return;
+          sources[kind].splice(index,1);
+          if(app.contentChanges?.[kind])app.contentChanges[kind]=app.contentChanges[kind].filter(item=>String(item.id)!==String(row.id));
+          const removed=((app.removedContent||={})[kind]||=[]);
+          if(!removed.some(id=>String(id)===String(row.id)))removed.push(row.id);
+          render();
+          dispatchEvent(new Event('ofoq:company-content'));
+        });
+        actions.append(editButton,pause,removeButton);card.append(actions);list.append(card);}
     }
   }
   addEventListener('hashchange',()=>{const kind=location.hash.slice(1);if(labels[kind])show(kind);});

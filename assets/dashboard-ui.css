@@ -53,3 +53,23 @@ body[data-section=company] .company-opportunity-card{display:flex;flex-direction
 body[data-dashboard=admin] .row-actions{gap:7px;flex-wrap:wrap}body[data-dashboard=admin] table td{vertical-align:top;padding-block:18px}
 @media(max-width:900px){body:is([data-section=company],[data-dashboard=admin]) #main{padding:20px}body:is([data-section=company],[data-dashboard=admin]) .sidebar{border-inline-end:0}.company-applicant-card{flex-direction:column;align-items:stretch}}
 @media(max-width:600px){body:is([data-section=company],[data-dashboard=admin]) #main{padding:18px 14px}body:is([data-section=company],[data-dashboard=admin]) dialog{padding:18px 16px}body:is([data-section=company],[data-dashboard=admin]) .publisher-fields [data-publisher-kind],.company-editor-grid{grid-template-columns:minmax(0,1fr)}body:is([data-section=company],[data-dashboard=admin]) .publisher-fields{padding:16px}.company-opportunity-toolbar{flex-direction:column;align-items:stretch}.company-opportunity-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Both management workspaces share the same bottom footer behavior. */
+body:is([data-section="company"],[data-dashboard="admin"]) .workspace {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+body:is([data-section="company"],[data-dashboard="admin"]) .workspace > #main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+body:is([data-section="company"],[data-dashboard="admin"]) #main > footer {
+  margin-top: auto;
+  padding-top: 20px;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+body:is([data-section="company"],[data-dashboard="admin"]) #main > section:not([hidden]):last-of-type { margin-bottom: 30px; }

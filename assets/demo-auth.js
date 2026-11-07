@@ -10,7 +10,9 @@
     if (menu.querySelector('[data-logout]')) return;
     const logout = document.createElement('button');
     logout.type = 'button'; logout.dataset.logout = ''; logout.dataset.auth = 'member';
-    logout.className = 'text-button'; logout.textContent = 'تسجيل الخروج'; menu.append(logout);
+    logout.className = 'text-button';
+    logout.innerHTML = '<svg class="account-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3H4v18h6M9 12h12m-4-4 4 4-4 4"/></svg>تسجيل الخروج';
+    menu.append(logout);
   });
   try { signedIn = window.OfoqFrontend.memory.getItem(key) === 'true'; } catch {}
   function sync() {

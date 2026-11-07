@@ -253,7 +253,7 @@ applicationForm.addEventListener('submit', event => {
     input.value = input.value.trim();
   });
   if (!applicationForm.reportValidity()) return;
-  window.OfoqFrontend.apply('job', record.id, record.title, location.href);
+  window.OfoqFrontend.apply('job', record.id, record.title, location.href, window.OfoqFrontend.applicationDetails?.(event.currentTarget) || {});
   applicationForm.reset();
   applicationForm.hidden = true;
   applicationStatus.textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';

@@ -58,6 +58,9 @@ function open(card) {
   const primary=card.querySelector('.project-offer>.btn,.listing-offer>.btn,.course-actions>.learn-primary');
   action.hidden=!primary;action.textContent=primary?.textContent||'';action.disabled=primary?.disabled||false;
   if(document.body.dataset.section==='internships' && Number(data.applicationFee||0)>0) action.textContent='التقديم والدفع · '+data.applicationFee+' دولار';
+  const applicationKind={internships:'internship',jobs:'job',freelance:'project'}[document.body.dataset.section];
+  const existingApplication=window.OfoqFrontend.applications.find(row=>row.kind===applicationKind&&String(row.id)===String(data.id)&&row.userKey===window.OfoqFrontend.person?.().userKey);
+  if(existingApplication){action.disabled=true;action.textContent='تم التقديم · '+existingApplication.status;}
   dialog.querySelector('.card-popup-download')?.remove();
   dialog.querySelector('.card-popup-cart')?.remove();
   const originalCart=card.querySelector('.course-add-cart');
@@ -119,6 +122,7 @@ function enhance(root=document) {
         if(saved)app.cartRecords=app.cartRecords.filter(row=>!(row.kind===kind&&String(row.id)===String(data.id)));
         else { const file={projects:'../Freelance/Project/project.html',jobs:'../Jobs/Job/job.html',events:'../Events/Event/event.html'}[kind];const href=new URL(file,location.href);href.searchParams.set('id',data.id);app.cartRecords.push({kind,id:data.id,title:data.title,company:data.company||data.owner||'',href:href.href,price:Number(data.price ?? data.reward ?? 0)}); }
       }
+      app.log?.('cart',(saved?'إزالة من السلة: ':'إضافة للسلة: ')+data.title);
       updateCart();
     });
     const supportsCart = kind !== 'projects' && kind !== 'jobs';
@@ -146,7 +150,7 @@ action.addEventListener('click',()=>{
     const fee = Number(data.applicationFee || 0);
     if (fee > 0 && window.OfoqPayment) {
       dialog.close();
-      window.OfoqPayment.open({title:data.title,amount:fee,kind:'رسوم التدريب',onComplete:()=>{
+      window.OfoqPayment.open({title:data.title,amount:fee,kind:'رسوم التدريب',items:[{kind:'internships',id:data.id,title:data.title,price:fee}],onComplete:()=>{
         const href=new URL('../Internships/Internship/internship.html',location.href);href.searchParams.set('id',data.id);
         window.OfoqFrontend.apply('internship',data.id,data.title,href.href);
         action.textContent='✓ تم التقديم';

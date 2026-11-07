@@ -47,9 +47,12 @@
         },
         toggle(list, id) {
           if (!['cart','wishlist'].includes(list) || !catalog.has(id) || (list === 'cart' && this.has(id))) return;
-          state[list] = state[list].includes(id) ? state[list].filter(value => value !== id) : [...state[list], id]; save();
+          const removing=state[list].includes(id);
+          state[list] = removing ? state[list].filter(value => value !== id) : [...state[list], id]; save();
+          window.OfoqFrontend.log?.(list==='cart'?'cart':'favorite',(removing?'إزالة من ':'إضافة إلى ')+(list==='cart'?'السلة: ':'المفضلة: ')+catalog.get(id).title);
         },
         enroll(ids) {
+          for (const id of validIds(ids)) window.OfoqFrontend.enrollCourse?.(catalog.get(id));
           state.enrolled = [...new Set([...state.enrolled, ...validIds(ids)])];
           state.cart = state.cart.filter(id => !state.enrolled.includes(id)); save();
         },
@@ -58,6 +61,9 @@
           if (!course || !this.has(id) || !Number.isInteger(index) || index < 0 || index >= course.syllabus.length) return;
           const values = new Set(state.progress[id]); done ? values.add(index) : values.delete(index);
           state.progress[id] = [...values]; save();
+          window.OfoqFrontend.log?.('progress',(done?'إكمال درس: ':'إلغاء إكمال درس: ')+course.title,String(index+1));
+          const enrollment=window.OfoqFrontend.enrollments?.find(row=>String(row.courseId)===String(id)&&row.userKey===window.OfoqFrontend.person?.().userKey);
+          if(enrollment){enrollment.status=values.size===course.syllabus.length?'مكتملة':'مسجّل';enrollment.progress=Math.round(values.size/course.syllabus.length*100);}
         },
         percent(id) { const course = catalog.get(id); return course && this.has(id) ? Math.round(state.progress[id].length / course.syllabus.length * 100) : 0; },
         remember(id, index) { const course = catalog.get(id); if (course && this.has(id) && Number.isInteger(index) && index >= 0 && index < course.syllabus.length) { state.current[id] = index; save(); } },
@@ -69,6 +75,7 @@
           if (window.OfoqPayment && amount > 0) {
             window.OfoqPayment.open({
               title: items.map(item => item.title).join('، '), amount,
+              items: items.map(item=>({kind:'courses',id:item.id,title:item.title,price:item.price})),
               kind: 'الدورات التعليمية',
               onComplete: () => { this.enroll(items.map(item => item.id)); onComplete?.(); }
             });

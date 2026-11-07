@@ -358,3 +358,9 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 }
 
 .logo-frame img[src*="saei-logo.svg"]{width:100%;height:100%;left:0;top:0;object-fit:contain}
+
+.user-activity-groups { display:grid; gap:20px; margin-top:22px; }
+.user-activity-groups h2 { font-size:19px; margin-bottom:18px; }
+.user-activity-groups .activity-row { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; padding:16px 0; border-top:1px solid var(--field-border); }
+.user-activity-groups .activity-row>div { min-width:0; overflow-wrap:anywhere; }
+.user-activity-groups .activity-row p { margin:6px 0 0; font-size:12px; }

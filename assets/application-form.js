@@ -89,7 +89,7 @@
     const app = window.OfoqFrontend;
     const selected = form.id === 'applicationForm' ? app.activeApplication : { kind: 'project', id: new URLSearchParams(location.search).get('id'), title: document.getElementById('detailTitle').textContent, href: location.href };
     if (!selected?.id) return;
-    app.apply(selected.kind, selected.id, selected.title, selected.href);
+    app.apply(selected.kind, selected.id, selected.title, selected.href, app.applicationDetails?.(form) || {});
     form.reset(); form.hidden = true;
     const success = document.querySelector('#applicationSuccess, #previewSuccess');
     review.hidden = true;

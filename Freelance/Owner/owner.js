@@ -59,17 +59,11 @@ const projects = [
 
 (function () {
 const statuses = { pending: 'جديد', shortlist: 'قائمة مختصرة', accepted: 'مقبول', rejected: 'مرفوض' };
-function createApplicants(project) {
-  const records = [
-    {id:'ahmad',name:'أحمد خالد',specialty:'تطوير واجهات ومواقع',experience:'4 سنوات',message:'أستطيع تنفيذ المشروع على مراحل واضحة، مع مراجعة كل مرحلة معك.',rating:'4.9',ratio:0.95,weeks:project.weeks,status:'pending'},
-    {id:'layan',name:'ليان عمر',specialty:'تصميم وتجربة المستخدم',experience:'3 سنوات',message:'أبدأ بفهم أهداف المشروع ثم أعرض تصورًا أوليًا قبل التنفيذ.',rating:'4.8',ratio:0.85,weeks:project.weeks+1,status:'shortlist'},
-    {id:'omar',name:'عمر يوسف',specialty:'تطوير منتجات رقمية',experience:'5 سنوات',message:'لدي خبرة بمشاريع مشابهة، ويمكننا مناقشة نطاق العمل في مقابلة قصيرة.',rating:'4.9',ratio:1,weeks:project.weeks,status:'pending'}
-  ].map(item=>({...item,price:Math.round(project.budget*item.ratio),skills:[...project.skills],meeting:null,messages:[]}));
-  return { records };
-}
+function createApplicants() { return {records:[]}; }
 function localDateTime(value) { const date=new Date(value); if(!Number.isFinite(date.getTime()))return ''; return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16); }
 const $=id=>document.getElementById(id),el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 const id=new URLSearchParams(location.search).get('id');
+if(window.OfoqFrontend.contentFor)projects.splice(0,projects.length,...window.OfoqFrontend.contentFor('projects',projects));
 const project=id===null?projects[0]:projects.find(p=>String(p.id)===id);
 const projectSelect=$('ownerProject');
 projects.forEach(item=>{const option=el('option',item.title);option.value=item.id;projectSelect.append(option);});
@@ -83,12 +77,16 @@ if(project){
  function notice(text){$('applicantStatus').textContent=text;}
  function button(text,action,record,cls='btn btn-small-outline'){const b=el('button',text,cls);b.type='button';b.dataset.applicant=record.id;b.dataset.action=action;return b;}
  function render(){
+  const app=window.OfoqFrontend;
+  const statusKeys={'قيد المراجعة':'pending','قائمة مختصرة':'shortlist','مقبول':'accepted','مرفوض':'rejected'};
+  const prior=new Map(model.records.map(row=>[row.id,row]));
+  model.records=app.applications.filter(row=>row.kind==='project'&&String(row.id)===String(project.id)).map(row=>({...prior.get(row.applicationId),id:row.applicationId,application:row,name:row.name,specialty:row.role||'متقدم للمشروع',experience:row.experience||'',message:row.message||'لم يرفق رسالة.',rating:'—',price:row.proposedAmount||project.budget,weeks:row.weeks||project.weeks,skills:String(row.skills||'').split(',').filter(Boolean),status:statusKeys[row.status]||'pending',meeting:prior.get(row.applicationId)?.meeting||null,messages:prior.get(row.applicationId)?.messages||[]}));
   const query=$('applicantSearch').value.trim().toLowerCase(),status=$('applicantFilter').value;
   const records=model.records.filter(r=>(!status||r.status===status)&&(r.name+' '+r.specialty+' '+r.skills.join(' ')).toLowerCase().includes(query));
-  $('applicantCount').textContent=model.records.length+' متقدمين توضيحيين';
+  $('applicantCount').textContent=model.records.length+' متقدمين';
   $('applicantList').replaceChildren(...records.map(r=>{
    const card=el('article',undefined,'applicant-card'),heading=el('div',undefined,'applicant-heading'),info=el('div'),avatar=el('span',r.name.slice(0,1),'candidate-avatar');
-   info.append(el('h3',r.name),el('p',r.specialty+' · '+r.experience),el('small','★ '+r.rating+' · تقييم توضيحي'));
+   info.append(el('h3',r.name),el('p',[r.specialty,r.experience,r.application.email].filter(Boolean).join(' · ')));
    heading.append(avatar,info,el('span',statuses[r.status],'candidate-state '+r.status));card.append(heading,el('p',r.message,'candidate-message'));
    const tags=el('div',undefined,'candidate-skills');r.skills.forEach(skill=>tags.append(el('span',skill)));card.append(tags,el('p','$'+r.price+' · '+r.weeks+' أسبوع','candidate-offer'));
    if(r.meeting){const meeting=el('div',undefined,'meeting-card');meeting.append(el('strong',(r.meeting.provider==='jitsi'?'Jitsi':'Zoom')+' · '+new Intl.DateTimeFormat('ar-JO',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Amman'}).format(new Date(r.meeting.date))));const join=el('a','فتح المقابلة ↗','details-link');join.href=window.siteThemeUrl(r.meeting.page);meeting.append(join,button('نسخ رابط المقابلة','copy',r));card.append(meeting);}
@@ -103,9 +101,9 @@ if(project){
  document.addEventListener('click',async event=>{
   const b=event.target.closest('button');if(!b)return;if(b.dataset.close)$ (b.dataset.close).close();if(!b.dataset.applicant)return;
   const r=model.records.find(item=>item.id===b.dataset.applicant);selected=r.id;
-  if(statuses[b.dataset.action]) { r.status=b.dataset.action;render();notice('تم تحديث حالة الطلب: '+statuses[r.status]); }
+  if(statuses[b.dataset.action]) { window.OfoqFrontend.reviewApplication(r.application.applicationId, b.dataset.action==='pending'?'قيد المراجعة':statuses[b.dataset.action], 'project', project.id);r.status=b.dataset.action;render();notice('تم تحديث حالة الطلب: '+statuses[r.status]); }
   if(b.dataset.action==='copy' && r.meeting) { try {await navigator.clipboard.writeText(r.meeting.page);notice('تم نسخ رابط المقابلة.');} catch {notice('تعذّر النسخ؛ يمكنك فتح المقابلة ونسخ الرابط.');} }
-  if(b.dataset.action==='profile'){$('candidateProfileName').textContent=r.name;$('candidateProfileBio').textContent=r.specialty+' · '+r.experience+' · '+r.skills.join('، ');$('candidatePortfolio').replaceChildren(...['نموذج واجهة تطبيق','تصور موقع متجاوب','لوحة متابعة'].map(title=>el('div',title,'portfolio-sample')));$('candidateProfile').showModal();}
+  if(b.dataset.action==='profile'){$('candidateProfileName').textContent=r.name;$('candidateProfileBio').textContent=r.specialty+' · '+r.experience+' · '+r.skills.join('، ');$('candidatePortfolio').replaceChildren();for(const [title,url]of [['السيرة الذاتية',r.application.resume?.url],['معرض الأعمال',r.application.portfolioUrl]]){if(!url)continue;if(title==='معرض الأعمال'&&!/^https?:\/\//i.test(url))continue;const link=el('a',title+' ↗','details-link');link.href=url;link.target='_blank';link.rel='noopener noreferrer';$('candidatePortfolio').append(link);}if(!$('candidatePortfolio').children.length)$('candidatePortfolio').append(el('p','لم يرفق المتقدم سيرة أو رابط أعمال.','demo-note'));$('candidateProfile').showModal();}
   if(b.dataset.action==='message'){$('messageRecipient').textContent='مراسلة '+r.name;$('privateMessageForm').reset();$('privateMessageStatus').textContent='';renderMessages();$('privateMessageDialog').showModal();}
   if(b.dataset.action==='meeting'){const form=$('meetingForm');form.reset();$('meetingError').textContent='';$('meetingCandidate').textContent='مقابلة '+r.name;for(const key of ['provider','date','url'])form.elements.namedItem(key).value=(key==='date'&&r.meeting?localDateTime(r.meeting.date):r.meeting?.[key])|| (key==='provider'?'jitsi':'');providerFields();$('meetingDialog').showModal();}
  });

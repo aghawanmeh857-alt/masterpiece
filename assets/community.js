@@ -41,11 +41,11 @@
         name.setCustomValidity(name.value.length >= 2 ? '' : 'اكتب اسمًا من حرفين على الأقل.');
         message.setCustomValidity(message.value ? '' : 'اكتب تعليقًا.');
         if (!commentForm.reportValidity()) return;
-        idea.comments.push({name: name.value, text: message.value}); message.value = ''; showComments();
+        idea.comments.push({name: name.value, text: message.value});app.log?.('comment','إضافة ملاحظة على مشروع: '+idea.title); message.value = ''; showComments();
         text(card, '.comment-status', 'أُضيف تعليقك.');
       });
       commentForm.addEventListener('input', event => event.target.setCustomValidity(''));
-      const edit=document.createElement('button');edit.type='button';edit.className='text-button';edit.textContent='تعديل مشروعي';edit.addEventListener('click',()=>{form.reset();editingId=idea.id;for(const [id,key]of [['postName','name'],['postTitle','title'],['postDescription','description'],['postCategory','category'],['postBudget','budget'],['postSkills','skills']])get(id).value=idea[key]||'';form.elements.weeks.value=idea.weeks||3;window.OfoqPublishing.fill(form,idea);bootstrap.Modal.getOrCreateInstance(get('postModal')).show();});card.append(edit);
+      const edit=document.createElement('button');edit.type='button';edit.className='text-button';edit.textContent='تعديل مشروعي';edit.addEventListener('click',()=>{form.reset();editingId=idea.id;for(const [id,key]of [['postName','name'],['postTitle','title'],['postDescription','description'],['postCategory','category'],['postBudget','budget'],['postSkills','skills']])get(id).value=idea[key]||'';form.elements.weeks.value=idea.weeks||3;window.OfoqPublishing.fill(form,idea);bootstrap.Modal.getOrCreateInstance(get('postModal')).show();});card.append(edit);const applicants=document.createElement('a');applicants.className='text-button';applicants.textContent='المتقدمون وإدارة الطلبات ←';applicants.href=new URL('Owner/owner.html?id='+encodeURIComponent(idea.id),location.href).href;card.append(applicants);
       const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'text-button'; remove.textContent = 'حذف منشوري';
       remove.addEventListener('click', () => {
         app.ideas = app.ideas.filter(row => row.id !== idea.id);
@@ -65,7 +65,7 @@
     let attachment;try{attachment=await window.OfoqPublishing.read(form);}catch{return;}
     const old=app.ideas.find(row=>row.id===editingId);
     const idea = {...attachment,weeks:Number(form.elements.weeks.value),id: old?.id||crypto.randomUUID(), name:get('postName').value, title:get('postTitle').value, description:get('postDescription').value, category:get('postCategory').value, budget:get('postBudget').value, skills:get('postSkills').value, comments:old?.comments||[]};
-    if(old)Object.assign(old,idea);else app.ideas.unshift(idea);publish(idea);render(); form.reset();
+    if(old)Object.assign(old,idea);else app.ideas.unshift(idea);publish(idea);app.log?.('project',(old?'تعديل مشروع: ':'نشر مشروع: ')+idea.title);render(); form.reset();
     const modal = bootstrap.Modal.getInstance(get('postModal'));
     get('postModal').addEventListener('hidden.bs.modal', () => get('idea-' + idea.id)?.focus(), {once:true});
     modal.hide();

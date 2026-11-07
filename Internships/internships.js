@@ -342,7 +342,7 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
     event.preventDefault();
     if (!get('previewForm').reportValidity()) return;
     if (!selectedItem) return;
-    window.OfoqFrontend.apply('internship', selectedItem.id, selectedItem.title, new URL('Internship/internship.html?id=' + selectedItem.id, location.href).href);
+    window.OfoqFrontend.apply('internship', selectedItem.id, selectedItem.title, new URL('Internship/internship.html?id=' + selectedItem.id, location.href).href, window.OfoqFrontend.applicationDetails?.(event.currentTarget) || {});
     get('previewSuccess').textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
     get('previewArea').hidden = true;
     get('previewSuccess').hidden = false;

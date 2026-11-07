@@ -4,6 +4,7 @@ document.querySelectorAll('form').forEach(form => form.autocomplete = 'off');
 const sections = {
   overview: ['نظرة عامة', '◫', 'المحتوى والنشاط في مساحة واحدة.'],
   users: ['المستخدمون', '♙', 'إدارة الحسابات والحالات والصلاحيات التوضيحية.'],
+  userActivity: ['نشاط المستخدمين', '↔', 'طلبات التقديم والتسجيل والالتحاق والطلبات المالية خلال هذه الزيارة.'],
   projects: ['العمل الحر', '▣', 'إدارة المشاريع ومراجعة تفاصيلها.'],
   jobs: ['الوظائف', '▤', 'فرص العمل والشركات وحالة النشر.'],
   internships: ['التدريب', '◇', 'إدارة فرص التدريب والجهات المقدّمة.'],
@@ -347,7 +348,7 @@ function sendScene(config) {
 const pageSize = 7;
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 3500); }
 function action(text, actionName, record, className = 'secondary') { const button = make('button', text, className); button.type = 'button'; button.dataset.action = actionName; button.dataset.id = record.id; button.dataset.section = record.section; return button; }
-function activityList(target, limit) { $(target).replaceChildren(...model.activity.slice(0, limit).map(item => { const row = make('div', undefined, 'activity-row'); const detail = make('div'); detail.append(make('strong', item.title), make('small', item.detail)); row.append(make('span', '', 'activity-dot'), detail); return row; })); }
+function activityList(target, limit) { $(target).replaceChildren(...[...(window.OfoqFrontend.activity||[]),...model.activity].slice(0,limit).map(item => { const row = make('div', undefined, 'activity-row'); const detail = make('div'); detail.append(make('strong', item.title), make('small', item.detail)); row.append(make('span', '', 'activity-dot'), detail); return row; })); }
 function overview() {
   const content = model.all(contentKeys), pending = content.filter(item => item.status === 'pending');
   const stats = [['المستخدمون', model.data.users.length, '♙', 'حسابات توضيحية'], ['الفرص', model.data.projects.length + model.data.jobs.length + model.data.internships.length, '▣', 'مشاريع ووظائف وتدريب'], ['الدورات والفعاليات', model.data.courses.length + model.data.events.length, '▦', 'تعلّم وتواصل'], ['بانتظار المراجعة', pending.length, '✓', 'سجلات تحتاج الموافقة']];
@@ -382,7 +383,7 @@ function records() {
 function show(view, updateHash = true) {
   current = sections[view] ? view : 'overview'; page = 1;
   $('pageTitle').textContent = sections[current][0]; $('pageDescription').textContent = sections[current][2]; $('breadcrumb').textContent = sections[current][0];
-  ['overview', 'records', 'settings', 'scene', 'logs'].forEach(key => $(key + 'View').hidden = key !== (model.data[current] || current === 'review' ? 'records' : current));
+  ['overview', 'records', 'settings', 'scene', 'logs', 'userActivity'].forEach(key => $(key + 'View').hidden = key !== (model.data[current] || current === 'review' ? 'records' : current));
   document.querySelectorAll('#navigation button').forEach(button => { if (button.dataset.view === current) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
   $('addButton').hidden = !model.data[current]; $('addButton').textContent = '+ إضافة ' + (current === 'projects' ? 'مشروع' : current === 'events' ? 'فعالية' : current === 'courses' ? 'دورة' : current === 'users' ? 'مستخدم' : 'سجل');
   $('search').value = ''; $('statusFilter').value = ''; render();
@@ -395,7 +396,46 @@ function show(view, updateHash = true) {
     } else scenePreview();
   } else sendScene({active: false});
 }
-function render() { overview(); if (model.data[current] || current === 'review') records(); activityList('fullActivity', model.activity.length); }
+function syncSessionContent() {
+ const session=window.OfoqFrontend;
+ for(const section of contentKeys){
+  const removed=(session.removedContent?.[section]||[]).map(String);
+  model.data[section]=model.data[section].filter(row=>!removed.includes(String(row.id)));
+  const rows=[...(session.catalogs?.[section]||[]),...(session.contentChanges?.[section]||[])];
+  for(const row of rows){if(removed.includes(String(row.id)))continue;const old=model.data[section].find(item=>String(item.id)===String(row.id));const record={...row,id:String(row.id),owner:row.owner||row.company||row.instructor||row.publisherName||'إدارة سعي',status:!row.status||row.status==='published'?'published':row.status==='pending'||row.status==='draft'?'pending':'archived'};if(old)Object.assign(old,record);else model.data[section].push(record);}
+ }
+ for(const person of session.knownUsers||[]){const id=person.userKey;if((session.removedContent?.users||[]).includes(id))continue;const row={id,title:person.name,owner:person.email,role:'member',status:'published',description:person.role||'',date:new Date().toISOString().slice(0,10)};const old=model.data.users.find(item=>item.id===id);if(old)Object.assign(old,{title:row.title,owner:row.owner,description:row.description});else model.data.users.push(row);}
+}
+function renderUserActivity() {
+  const app=window.OfoqFrontend,host=$('userActivityGroups'),query=$('userActivitySearch').value.trim().toLowerCase();host.replaceChildren();
+  const learning=app.learning||{cart:[],wishlist:[]};
+  let training=[];try{training=JSON.parse(app.memory.getItem('ofoq-internship-cart-v1')||'[]');}catch{}
+  const courseRows=ids=>(ids||[]).map(id=>({kind:'دورة',title:(app.courses||[]).find(row=>row.id===id)?.title||id}));
+  const groups=[
+    ['طلبات التقديم',app.applications.map(row=>({...row,details:[row.kind,row.status,row.email,row.phone,row.message].filter(Boolean).join(' · '),application:row}))],
+    ['الطلاب حسب الدورات',(app.enrollments||[]).map(row=>({...row,details:[row.email,row.status,(row.progress||0)+'% مكتمل'].join(' · ')}))],
+    ['تسجيلات الفعاليات',app.registrations.map(row=>({...row,details:[row.email,row.status].join(' · ')}))],
+    ['الطلبات والدفع التجريبي',(app.orders||[]).map(row=>({...row,name:row.person.name,details:row.amount+' دولار · '+row.method+' · '+row.status}))],
+    ['المفضلة',[...app.savedRecords,...courseRows(learning.wishlist)].map(row=>({...row,name:app.profile.name,details:row.kind}))],
+    ['سلة المشتريات',[...(app.cartRecords||[]),...training,...courseRows(learning.cart)].map(row=>({...row,name:app.profile.name,details:row.kind}))],
+    ['المحادثات',(app.conversations||[]).map(row=>({name:row.name,title:'محادثة',details:(row.messages?.length||0)+' رسائل'}))],
+    ['سجل نشاط الزيارة',(app.activity||[]).map(row=>({...row,name:row.person?.name,details:row.detail}))]
+  ];
+  for(const [title,rows] of groups){
+    const group=make('article',undefined,'panel');group.append(make('h2',title));
+    const filtered=rows.filter(row=>!query||[row.name,row.title,row.details].join(' ').toLowerCase().includes(query));
+    if(!filtered.length){if(query)continue;group.append(make('p','لا توجد سجلات بعد.','muted'));}
+    for(const row of filtered){
+      const item=make('div',undefined,'activity-row'),copy=make('div');copy.append(make('strong',[row.title,row.name].filter(Boolean).join(' — ')),make('p',row.details||'','muted'));item.append(copy);
+      if(row.application){const controls=make('div',undefined,'row-actions');for(const decision of ['مقبول','مرفوض','قيد المراجعة']){const button=make('button',decision,'secondary');button.type='button';button.disabled=row.application.status===decision;button.addEventListener('click',()=>{app.reviewApplication(row.application.applicationId,decision,'admin');renderUserActivity();});controls.append(button);}for(const [label,url]of [['السيرة الذاتية',row.application.resume?.url],['معرض الأعمال',row.application.portfolioUrl]]){if(!url)continue;if(label==='معرض الأعمال'&&!/^https?:\/\//i.test(url))continue;const link=make('a',label+' ↗','secondary');link.href=url;link.target='_blank';link.rel='noopener noreferrer';controls.append(link);}item.append(controls);}
+      group.append(item);
+    }
+    host.append(group);
+  }
+  if(!host.children.length)host.append(make('p','لا توجد نتائج مطابقة.','panel'));
+}
+$('userActivitySearch').addEventListener('input',renderUserActivity);
+function render() { syncSessionContent(); overview(); if (model.data[current] || current === 'review') records(); if(current==='userActivity')renderUserActivity(); activityList('fullActivity', model.activity.length+(window.OfoqFrontend.activity||[]).length); }
 function openEditor(section, id = null) {
   const record = id === null ? null : model.data[section]?.find(item => item.id === id); if (id !== null && !record) return;
   if(adminSaving)return;

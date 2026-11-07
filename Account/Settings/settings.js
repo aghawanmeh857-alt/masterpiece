@@ -78,6 +78,7 @@ if (document.body.dataset.page === 'settings') {
     app.profile.email = get('settingsEmail').value.trim();
     app.settings.availability = get('settingsAvailability').value;
     for (const id of ['projectUpdates', 'courseUpdates', 'communityUpdates']) app.settings[id] = get(id).checked;
+    app.log?.('settings','تحديث إعدادات الحساب');
     get('settingsStatus').textContent = 'تم تطبيق التفضيلات وتحديث بيانات ملفك خلال هذه الزيارة.';
   });
   form.addEventListener('input', event => event.target.setCustomValidity(''));

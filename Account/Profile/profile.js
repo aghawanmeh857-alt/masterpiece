@@ -159,6 +159,7 @@ if (profileForm) {
     profile.portfolioUrl = portfolioUrl;
     for (const [key, id] of Object.entries({name: 'editName', role: 'editRole', location: 'editLocation', bio: 'editBio', skills: 'editSkills'})) profile[key] = document.getElementById(id).value.trim();
     Object.assign(window.OfoqFrontend.profile, profile);
+    window.OfoqFrontend.log?.('profile','تحديث المعلومات الشخصية');
     showProfile(); closeEditor();
     status.textContent = 'تم تحديث ملفك خلال هذه الزيارة.';
   });

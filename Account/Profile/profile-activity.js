@@ -10,7 +10,9 @@
       } catch { return null; }
     };
     const labels = {job: 'طلب وظيفة', internship: 'طلب تدريب', project: 'طلب مشروع'};
-    const rows = (app.applications || []).map(item => ({
+    const userKey=String(app.profile?.userKey||app.profile?.email||'').toLowerCase();
+    const belongs=item=>!userKey||!item.userKey||item.userKey===userKey;
+    const rows = (app.applications || []).filter(belongs).map(item => ({
       title: item.title, type: item.kind, label: labels[item.kind] || 'طلب تقديم',
       status: item.status || 'قيد المراجعة', href: url(item.href)
     }));
@@ -23,8 +25,8 @@
       rows.push({title: course.title, type: 'course', label: 'دورة',
         status: percent === 100 ? 'مكتملة' : 'مسجّل', format:'path', percent, href: url('Academy/Course/course.html?id=' + encodeURIComponent(id))});
     }
-    for (const item of app.registrations || []) rows.push({title: item.title, type: 'event', label: 'فعالية', status: 'تم التسجيل', href: url(item.href)});
-    for (const item of app.ideas || []) rows.push({title: item.title, type: 'post', label: 'منشور مشروع', status: 'منشور', href: url('Freelance/freelance.html#idea-' + encodeURIComponent(item.id))});
+    for (const item of (app.registrations || []).filter(belongs)) rows.push({title: item.title, type: 'event', label: 'فعالية', status: 'تم التسجيل', href: url(item.href)});
+    for (const item of app.ideas || []) rows.push({title: item.title, type: 'post', label: 'منشور مشروع', status: 'منشور', href: url('Freelance/Owner/owner.html?id=' + encodeURIComponent(item.id))});
     return rows;
   }
   if (typeof module !== 'undefined' && module.exports) { module.exports = {activityRows}; return; }
@@ -40,6 +42,7 @@
     return element;
   };
   const definitions=[
+    ['activity','كل نشاطي','التقديم والتسجيل والشراء وتحديث حالات طلباتك خلال هذه الزيارة.','Account/Dashboard/dashboard.html',()=>true],
     ['courses','دوراتي','الدورات التي اشتريتها أو التحقت بها، مع متابعة تقدّمك.','Academy/academy.html',row=>row.type==='course'],
     ['jobs','طلبات الوظائف','الوظائف التي قدّمت عليها وحالة كل طلب.','Jobs/jobs.html',row=>row.type==='job'],
     ['internships','طلبات التدريب','فرص التدريب التي قدّمت عليها وحالة الطلبات.','Internships/internships.html',row=>row.type==='internship'],
@@ -57,7 +60,9 @@
   function render(){
     const rows=activityRows(window.OfoqFrontend,root.href,document.documentElement.dataset.theme||'light');
     for(const entry of panels){
-      const items=rows.filter(entry.matches);entry.section.dataset.count=String(items.length);entry.count.textContent=items.length===1?'عنصر واحد':items.length+' عناصر';entry.list.replaceChildren();
+      const app=window.OfoqFrontend;
+      const key=String(app.profile.userKey||app.profile.email||'').toLowerCase();
+      const items=entry.id==='activity'?(app.activity||[]).filter(row=>!row.person?.userKey||row.person.userKey===key).map(row=>({title:row.title,label:row.date?new Intl.DateTimeFormat('ar-JO',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Amman'}).format(new Date(row.date)):'نشاط',status:row.detail||'تم'})):rows.filter(entry.matches);entry.section.dataset.count=String(items.length);entry.count.textContent=items.length===1?'عنصر واحد':items.length+' عناصر';entry.list.replaceChildren();
       if(!items.length){const empty=node('div',undefined,'profile-section-empty');empty.append(node('span','◇','profile-empty-icon'),node('h3','لا توجد عناصر في هذا القسم بعد'),node('p','عندما تتفاعل مع هذا القسم ستظهر بياناتك هنا.'));const link=node('a','استكشف القسم ←','btn btn-orange');link.href=new URL(entry.href,root).href;empty.append(link);entry.list.append(empty);continue;}
       for(const item of items){const card=node('article',undefined,'profile-activity-card');card.append(node('small',item.label),node('h3',item.title),node('p',item.status,'profile-activity-state'));if(item.percent!==undefined){const progress=node('progress');progress.max=100;progress.value=item.percent;progress.setAttribute('aria-label','تقدّم '+item.title);card.append(progress,node('p',item.percent+'% مكتمل'));}if(item.href){const link=node('a',item.type==='course'?'متابعة التعلّم ←':'عرض التفاصيل ←','details-link');link.href=item.href;card.append(link);}entry.list.append(card);}
     }

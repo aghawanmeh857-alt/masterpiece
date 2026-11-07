@@ -126,6 +126,7 @@ if (document.body.dataset.page === 'messages') {
     get('messageInput').setCustomValidity(text ? '' : 'اكتب رسالة أولًا.');
     if (!get('messageForm').reportValidity()) return;
     conversations[selected].messages.push({ mine: true, text, sentAt: new Date().toISOString() });
+    window.OfoqFrontend.log?.('message','إضافة رسالة إلى '+conversations[selected].name);
     showConversation();
     get('messageStatus').textContent = 'أُضيفت رسالتك إلى المحادثة خلال هذه الزيارة. لا تُرسل إلى طرف آخر.';
     get('messageInput').focus();

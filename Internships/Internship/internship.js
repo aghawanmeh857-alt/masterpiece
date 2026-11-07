@@ -238,7 +238,8 @@ if (!record) {
 if(record&&Number(record.applicationFee||0)>0&&window.OfoqPayment){
   get('previewForm').hidden=true;
   const pay=document.createElement('button');pay.type='button';pay.className='btn btn-orange';pay.textContent='التقديم والدفع · '+record.applicationFee+' دولار';
-  pay.addEventListener('click',()=>window.OfoqPayment.open({title:record.title,amount:Number(record.applicationFee),kind:'رسوم التدريب',onComplete:()=>{window.OfoqFrontend.apply('internship',record.id,record.title,location.href);pay.textContent='✓ تم التقديم';pay.disabled=true;}}));
+  pay.addEventListener('click',()=>window.OfoqPayment.open({title:record.title,amount:Number(record.applicationFee),kind:'رسوم التدريب',items:[{kind:'internships',id:record.id,title:record.title,price:Number(record.applicationFee)}],onComplete:()=>{window.OfoqFrontend.apply('internship',record.id,record.title,location.href);pay.textContent='✓ تم التقديم';pay.disabled=true;}}));
+  const existing=window.OfoqFrontend.applications.find(row=>row.kind==='internship'&&String(row.id)===String(record.id)&&row.userKey===window.OfoqFrontend.person?.().userKey);if(existing){pay.disabled=true;pay.textContent='تم التقديم · '+existing.status;}
   get('previewForm').before(pay);
 }
 get('previewForm').addEventListener('input', event => event.target.setCustomValidity(''));
@@ -249,7 +250,7 @@ get('previewForm').addEventListener('submit', event => {
     input.setCustomValidity(input.value.trim() ? '' : 'يرجى إدخال نص.');
   });
   if (!form.reportValidity()) return;
-  window.OfoqFrontend.apply('internship', record.id, record.title, location.href);
+  window.OfoqFrontend.apply('internship', record.id, record.title, location.href, window.OfoqFrontend.applicationDetails?.(event.currentTarget) || {});
   form.reset();
   form.hidden = true;
   get('previewSuccess').querySelector('h3') && (get('previewSuccess').querySelector('h3').textContent = 'تم تقديم الطلب');

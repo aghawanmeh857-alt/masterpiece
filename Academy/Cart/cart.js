@@ -114,7 +114,7 @@
       selected.clear();paying=false;render();get('cartStatus').textContent='اكتمل طلب '+chosen.length+' عناصر تجريبيًا دون خصم مبلغ.';get('purchaseSuccess').focus();
     };
     if(amount===0){complete();return;}
-    if(window.OfoqPayment){window.OfoqPayment.open({title:chosen.map(row=>row.title).join('، '),amount,kind:'عناصر سلتك المختارة',onComplete:complete});}
+    if(window.OfoqPayment){window.OfoqPayment.open({title:chosen.map(row=>row.title).join('، '),amount,kind:'عناصر سلتك المختارة',items:chosen.map(row=>({kind:row.kind,id:row.id,title:row.title,price:row.price})),onComplete:complete});}
     else if(chosen.every(row=>row.kind==='courses'))store.checkout(chosen.map(row=>row.id),complete);
     else get('cartStatus').textContent='تعذّر فتح الدفع. حدّث الصفحة وحاول مجددًا.';
   });

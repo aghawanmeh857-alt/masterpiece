@@ -276,7 +276,7 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
     });
     if (!get('previewForm').reportValidity()) return;
     if (!selectedItem) return;
-    window.OfoqFrontend.apply('job', selectedItem.id, selectedItem.title, new URL('Job/job.html?id=' + selectedItem.id, location.href).href);
+    window.OfoqFrontend.apply('job', selectedItem.id, selectedItem.title, new URL('Job/job.html?id=' + selectedItem.id, location.href).href, window.OfoqFrontend.applicationDetails?.(event.currentTarget) || {});
     get('previewSuccess').textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
     get('previewForm').reset();
     get('previewArea').hidden = true;

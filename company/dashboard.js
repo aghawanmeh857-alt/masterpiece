@@ -79,6 +79,7 @@
   const views = {
     students: ['الطلاب المسجّلون', 'الطلاب مجمّعون حسب الدورة التابعة لشركتك.'],
     employees: ['الموظفون', 'فريق الشركة والطلبات الوظيفية المقبولة خلال هذه الزيارة.'],
+    companyActivity: ['التسجيلات والطلبات', 'التسجيلات والطلبات المالية المرتبطة بخدمات شركتك فقط.'],
     overview: ['نظرة عامة', 'وظائفك وفرص التدريب والمتقدمون، في مساحة واحدة.'],
     events: ['الفعاليات', 'أنشئ فعاليات شركتك، وحدّث تفاصيلها وتحكّم بنشرها.'],
     courses: ['دروس الأكاديمية', 'شارك خبرة شركتك من خلال دروس ووحدات تعليمية.'],
@@ -90,8 +91,8 @@
   const button = (text, action, id, className = 'secondary') => `<button class="${className}" data-action="${action}" data-id="${id}">${text}</button>`;
   function toast(text) { $('toast').textContent = text; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 4000); }
   function show(view, updateHash = true) {
-    current = ['overview','profile','students','employees'].includes(view) ? view : 'overview';
-    $('companyPeopleView').hidden = !['students','employees'].includes(current);
+    current = ['overview','profile','students','employees','companyActivity'].includes(view) ? view : 'overview';
+    $('companyPeopleView').hidden = !['students','employees','companyActivity'].includes(current);
     $('companyPeopleSearch').value = '';
     for (const [id, active] of [['overviewView', 'overview'], ['contentView', ['events', 'courses']], ['applicantsView', 'applicants'], ['profileView', 'profile']]) $(id).hidden = Array.isArray(active) ? !active.includes(current) : current !== active;
     $('pageTitle').textContent = $('breadcrumb').textContent = views[current][0];
@@ -108,7 +109,7 @@
   }
   function renderOverview() {
     const owned=[...(window.OfoqFrontend.companyJobs||[]),...(window.OfoqFrontend.companyInternships||[])];
-    const requests=window.OfoqFrontend.applications.filter(row=>owned.some(item=>item.id===row.id));
+    const requests=window.OfoqFrontend.companyApplications();
     const stats=[['الوظائف',window.OfoqFrontend.companyJobs?.length||0],['فرص التدريب',window.OfoqFrontend.companyInternships?.length||0],['الفرص المنشورة',owned.filter(row=>row.status==='published').length],['المتقدمون',requests.length]];
     $('stats').innerHTML=stats.map(([title,total])=>'<article class="stat"><div class="stat-top">'+title+'</div><strong>'+total+'</strong><small>خلال هذه الزيارة</small></article>').join('');
     $('recentContent').replaceChildren();
@@ -149,7 +150,7 @@
     labelTable('applicantRows');
   }
   addEventListener('ofoq:company-content',renderOverview);
-  function render() { renderOverview(); if (['events', 'courses'].includes(current)) renderContent(); if (current === 'applicants') renderApplications(); if (['students','employees'].includes(current)) renderPeople(); }
+  function render() { renderOverview(); if (['events', 'courses'].includes(current)) renderContent(); if (current === 'applicants') renderApplications(); if (['students','employees','companyActivity'].includes(current)) renderPeople(); }
   function renderPeople() {
     const app = window.OfoqFrontend;
     const list = $('companyPeopleList');
@@ -162,17 +163,20 @@
       const detail = document.createElement('span'); detail.textContent = [row.email, row.title].filter(Boolean).join(' · '); detail.dir = 'auto';
       item.append(name, detail); target.append(item);
     }
-    if (current === 'students') {
+    if (current === 'companyActivity') {
+      const groups=[['تسجيلات فعاليات الشركة',app.registrations.filter(row=>app.companyOwns('events',row.id)).map(row=>({...row,title:row.title}))],['طلبات خدمات الشركة',(app.orders||[]).flatMap(order=>(order.items||[]).filter(row=>app.companyOwns(row.kind,row.id)).map(row=>({...order.person,title:row.title+' · '+(row.price||0)+' دولار · '+order.status})))]];
+      for(const [heading,rows] of groups){const group=document.createElement('article');group.className='panel';const title=document.createElement('h2');title.textContent=heading;group.append(title);const people=document.createElement('div');for(const row of rows)person(row,people);if(!people.children.length){if(query)continue;const empty=document.createElement('p');empty.className='muted';empty.textContent='لا توجد سجلات بعد.';people.append(empty);}group.append(people);list.append(group);}
+    } else if (current === 'students') {
       const courses = new Map(model.content.filter(row => row.type === 'course').map(row => [String(row.id), row]));
-      for (const row of app.contentChanges?.courses || []) if (row.publisherRole === 'company') courses.set(String(row.id), row);
+      for (const row of [...(app.catalogs.courses||[]),...(app.contentChanges?.courses||[])]) if (app.companyOwns('courses',row.id)) courses.set(String(row.id), row);
       for (const course of courses.values()) {
         if ((app.removedContent?.courses || []).some(id => String(id) === String(course.id))) continue;
         const group = document.createElement('article'); group.className = 'panel';
         const heading = document.createElement('h2'); heading.textContent = course.title;
-        const rows = model.applications.filter(row => row.contentId === course.id && row.status === 'accepted');
+        const rows = (app.enrollments || []).filter(row => String(row.courseId) === String(course.id));
         if ((app.learning?.enrolled || []).some(id => String(id) === String(course.id)) && !rows.some(row => row.email === app.profile.email)) rows.push({name: app.profile.name, email: app.profile.email});
         const people = document.createElement('div');
-        for (const row of rows) person({...row, courseTitle: course.title}, people);
+        for (const row of rows) person({...row, title:(row.status||'مسجّل')+' · '+(row.progress||0)+'% مكتمل',courseTitle: course.title}, people);
         if (!people.children.length) { if (query) continue; const empty = document.createElement('p'); empty.className = 'muted'; empty.textContent = 'لا يوجد طلاب مسجّلون في هذه الدورة بعد.'; people.append(empty); }
         const count = document.createElement('small'); count.textContent = rows.length + ' طلاب مسجّلين';
         group.append(heading, count, people); list.append(group);
@@ -184,7 +188,7 @@
       if (staff.children.length === 1 && !query) { const empty = document.createElement('p'); empty.className = 'muted'; empty.textContent = 'لا يوجد موظفون مسجّلون بعد.'; staff.append(empty); }
       if (staff.children.length > 1) list.append(staff);
       const jobs = app.companyJobs || [];
-      const accepted = app.applications.filter(row => row.kind === 'job' && ['accepted','مقبول'].includes(row.status) && jobs.some(job => String(job.id) === String(row.id)));
+      const accepted = app.companyApplications().filter(row => row.kind === 'job' && row.status === 'مقبول');
       if (accepted.length) {
         const group = document.createElement('article'); group.className = 'panel';
         const heading = document.createElement('h2'); heading.textContent = 'طلبات وظائف مقبولة'; group.append(heading);
@@ -197,7 +201,7 @@
     if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'panel muted'; empty.textContent = query ? 'لا توجد نتائج تطابق بحثك.' : 'لا توجد سجلات لعرضها حاليًا.'; list.append(empty); }
   }
   $('companyPeopleSearch').addEventListener('input', renderPeople);
-  window.addEventListener('ofoq:company-content', () => { if (['students','employees'].includes(current)) renderPeople(); });
+  window.addEventListener('ofoq:company-content', () => { if (['students','employees','companyActivity'].includes(current)) renderPeople(); });
   function openEditor() { toast('الدورات والورش والفعاليات يديرها أدمن الموقع.'); }
   function openApplication(id) {
     const application = model.applications.find(item => item.id === id);

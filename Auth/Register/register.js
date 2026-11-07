@@ -52,6 +52,7 @@ form.addEventListener('submit', event => {
   window.OfoqFrontend.memory.setItem('ofoq-demo-signed-in', 'true');
   window.OfoqFrontend.profile.name = fullName.value.trim();
   window.OfoqFrontend.profile.email = form.querySelector('input[type="email"]').value.trim();
+  window.OfoqFrontend.log?.('account','إنشاء حساب');
   // Clear passwords immediately after previewing the form.
   form.reset();
   checkPasswords();

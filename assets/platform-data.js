@@ -34,6 +34,7 @@
     const list = (app.contentChanges ||= {})[kind] ||= [];
     const old = list.find(item => String(item.id) === String(row.id));
     if (old) Object.assign(old,row); else list.push({...row});
+    app.log?.('publish',(old?'تعديل محتوى: ':'نشر محتوى: ')+row.title,kind);
     if (app.removedContent?.[kind]) app.removedContent[kind] = app.removedContent[kind].filter(id => String(id) !== String(row.id));
   };
 })();

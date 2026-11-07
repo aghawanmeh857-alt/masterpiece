@@ -46,21 +46,25 @@
   const get = id => dialog.querySelector('#' + id);
   let opener = null;
   let completion = null;
+  let orderRecorded = false;
+  let orderItems = [];
   window.OfoqPayment = {
-    open({title, amount, kind = 'رسوم المشاركة', onComplete}) {
+    open({title, amount, kind = 'رسوم المشاركة', onComplete, items = []}) {
       const trigger = document.createElement('button');
       trigger.dataset.paymentAmount = String(amount);
       trigger.dataset.paymentTitle = title;
       trigger.dataset.paymentKind = kind;
-      openPayment(trigger, onComplete);
+      openPayment(trigger, onComplete, items);
     }
   };
 
-  function openPayment(trigger, onComplete = null) {
+  function openPayment(trigger, onComplete = null, items = []) {
     const amount = Number(trigger.dataset.paymentAmount);
     if (!Number.isFinite(amount) || amount <= 0) return;
     opener = trigger;
     completion = onComplete;
+    orderRecorded = false;
+    orderItems = items;
     dialog.querySelector('.payment-continue').disabled = false;
     dialog.querySelector('.payment-continue').textContent = 'تأكيد الدفع التجريبي';
     dialog.querySelector('.payment-cancel').textContent = 'إلغاء';
@@ -96,6 +100,7 @@
   dialog.querySelector('.payment-continue').addEventListener('click', () => {
     if (dialog.querySelector('.payment-continue').disabled) return;
     const card = dialog.querySelector('[value="card"]').checked;
+    if(!orderRecorded){window.OfoqFrontend.recordOrder?.({title:opener.dataset.paymentTitle,amount:Number(opener.dataset.paymentAmount),method:card?'card':'wallet',items:orderItems.length?orderItems:[{kind:'events',id:opener.closest('[data-item]')?.dataset.item || new URLSearchParams(location.search).get('id')}]});orderRecorded=true;}
     if (completion) {
       const finish = completion; completion = null;
       dialog.close(); finish(); return;

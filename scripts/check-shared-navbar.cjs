@@ -9,10 +9,10 @@ function render(mode, query = '?theme=dark') {
   return result;
 }
 const site=render('site');
-assert.equal((site.innerHTML.match(/data-section-link=/g)||[]).length,7);
+assert.equal((site.innerHTML.match(/data-section-link=/g)||[]).length,6);
 assert.equal((site.innerHTML.match(/class="shopping-cart-link"/g)||[]).length,1);
 assert.equal((site.innerHTML.match(/class="project-favorites-link"/g)||[]).length,1);
-assert(site.innerHTML.includes('format=workshop&amp;') || site.innerHTML.includes('format=workshop&theme=dark'));
+assert(!site.innerHTML.includes('data-section-link="workshops"'));
 assert(!/\/Admin\/|\/company\//.test(site.innerHTML),'User navigation must not link to management');
 assert(site.innerHTML.includes('https://example.test/site/Account/Favorites/favorites.html?theme=dark'));
 const hero=render('hero');
@@ -23,4 +23,4 @@ const auth=render('auth');
 assert(auth.innerHTML.includes('auth-home-link'));
 assert(!auth.innerHTML.includes('header-actions')&&!auth.innerHTML.includes('section-nav'));
 assert(render('site','?theme=light').innerHTML.includes('theme=light'));
-console.log('Passed: shared public navbar, seven destinations, six tour anchors, nested deployment paths, theme, one cart/favorites link, auth layout and management separation.');
+console.log('Passed: shared public navbar, six destinations, six tour anchors, nested deployment paths, theme, one cart/favorites link, auth layout and management separation.');

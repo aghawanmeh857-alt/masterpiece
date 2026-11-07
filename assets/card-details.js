@@ -9,7 +9,7 @@ const content = dialog.querySelector('.card-popup-content'), pdf = dialog.queryS
 let source = null, activeTitle = '', activeSections = [];
 
 let publisherPDF = null;
-const labels = {development:'برمجة وتطوير',design:'تصميم',marketing:'تسويق رقمي',career:'مهارات مهنية',beginner:'مبتدئ',intermediate:'متوسط',advanced:'متقدم',path:'مسار تعلّم',workshop:'ورشة عمل','full-time':'دوام كامل','part-time':'دوام جزئي',contract:'عقد مؤقت',remote:'عن بُعد',hybrid:'هجين',onsite:'في الموقع',junior:'مبتدئ',mid:'متوسط الخبرة',senior:'خبير',fixed:'سعر ثابت',ongoing:'مشروع مستمر','2-months':'شهران','3-months':'3 أشهر','6-months':'6 أشهر',paid:'بمقابل مالي',unpaid:'دون مقابل مالي',free:'مجاني',meetup:'لقاء',talk:'جلسة حوارية'};
+const labels = {development:'برمجة وتطوير',design:'تصميم',marketing:'تسويق رقمي',career:'مهارات مهنية',beginner:'مبتدئ',intermediate:'متوسط',advanced:'متقدم',path:'مسار تعلّم',workshop:'ورشة عمل','full-time':'دوام كامل','part-time':'دوام جزئي',contract:'عقد مؤقت',remote:'عن بُعد',hybrid:'هجين',onsite:'في الموقع',junior:'مبتدئ',mid:'متوسط الخبرة',senior:'خبير',fixed:'سعر ثابت',ongoing:'مشروع مستمر','2-months':'شهران','3-months':'3 أشهر','6-months':'6 أشهر',fee:'برسوم على المتدرّب',paid:'بمكافأة للمتدرّب',unpaid:'دون مقابل مالي',free:'مجاني',meetup:'لقاء',talk:'جلسة حوارية'};
 const node = (tag,text) => { const el=document.createElement(tag); if(text!==undefined)el.textContent=String(text); return el; };
 function dataFor(card) {
   if(card.ofoqDetails)return card.ofoqDetails;
@@ -57,6 +57,7 @@ function open(card) {
   const attachment=node('section');attachment.append(node('h3','ملف PDF من الناشر'),node('p',publisherPDF?publisherPDF.name:'لم يرفق الناشر ملف PDF حتى الآن.'));content.append(attachment);
   const primary=card.querySelector('.project-offer>.btn,.listing-offer>.btn,.course-actions>.learn-primary');
   action.hidden=!primary;action.textContent=primary?.textContent||'';action.disabled=primary?.disabled||false;
+  if(document.body.dataset.section==='internships' && Number(data.applicationFee||0)>0) action.textContent='التقديم والدفع · '+data.applicationFee+' دولار';
   dialog.querySelector('.card-popup-download')?.remove();
   dialog.querySelector('.card-popup-cart')?.remove();
   const originalCart=card.querySelector('.course-add-cart');
@@ -74,7 +75,8 @@ function enhance(root=document) {
     add('المجال',labels[data.category]||data.category);
     if(data.budget!==undefined)add('الميزانية',data.budget+' دولار');
     else if(data.price!==undefined)add('السعر',data.price?data.price+' دولار':'مجاني');
-    else add('العرض',data.offer);
+    else if(document.body.dataset.section==='internships' && Number(data.applicationFee||0)>0) add('رسوم التدريب',data.applicationFee+' دولار');
+    else add(document.body.dataset.section==='internships'?'المكافأة':'العرض',data.offer);
     if(data.weeks)add('مدة التنفيذ',data.weeks===1?'أسبوع واحد':data.weeks===2?'أسبوعان':data.weeks+' أسابيع');
     else if(data.hours)add('مدة التعلّم',data.hours+' ساعة');
     else add(data.eventTime?'الموعد':'نمط العمل',data.eventTime||labels[data.location]||data.location);
@@ -112,10 +114,10 @@ function enhance(root=document) {
         window.dispatchEvent(new Event('pageshow'));
       } else if(kind==='internships') {
         let items=[];try{items=JSON.parse(app.memory.getItem('ofoq-internship-cart-v1')||'[]');}catch{}
-        app.memory.setItem('ofoq-internship-cart-v1',JSON.stringify(saved?items.filter(row=>String(row.id)!==String(data.id)):[...items,{id:String(data.id),title:data.title,company:data.company}]));
+        app.memory.setItem('ofoq-internship-cart-v1',JSON.stringify(saved?items.filter(row=>String(row.id)!==String(data.id)):[...items,{id:String(data.id),title:data.title,company:data.company,applicationFee:Number(data.applicationFee||0)}]));
       } else {
         if(saved)app.cartRecords=app.cartRecords.filter(row=>!(row.kind===kind&&String(row.id)===String(data.id)));
-        else { const file={projects:'../Freelance/Project/project.html',jobs:'../Jobs/Job/job.html',events:'../Events/Event/event.html'}[kind];const href=new URL(file,location.href);href.searchParams.set('id',data.id);app.cartRecords.push({kind,id:data.id,title:data.title,company:data.company||data.owner||'',href:href.href}); }
+        else { const file={projects:'../Freelance/Project/project.html',jobs:'../Jobs/Job/job.html',events:'../Events/Event/event.html'}[kind];const href=new URL(file,location.href);href.searchParams.set('id',data.id);app.cartRecords.push({kind,id:data.id,title:data.title,company:data.company||data.owner||'',href:href.href,price:Number(data.price ?? data.reward ?? 0)}); }
       }
       updateCart();
     });
@@ -144,7 +146,7 @@ action.addEventListener('click',()=>{
     const fee = Number(data.applicationFee || 0);
     if (fee > 0 && window.OfoqPayment) {
       dialog.close();
-      window.OfoqPayment.open({title:data.title,amount:fee,kind:'رسوم التقديم على التدريب',onComplete:()=>{
+      window.OfoqPayment.open({title:data.title,amount:fee,kind:'رسوم التدريب',onComplete:()=>{
         const href=new URL('../Internships/Internship/internship.html',location.href);href.searchParams.set('id',data.id);
         window.OfoqFrontend.apply('internship',data.id,data.title,href.href);
         action.textContent='✓ تم التقديم';

@@ -21,7 +21,8 @@ for (const [file,kind,variable] of [
  const data = vm.runInNewContext(source.slice(start,end)+'\n'+variable, {window});
  const records = Array.isArray(data)?data:data.items;
  const html = fs.readFileSync(file+'.html','utf8');
- assert(html.indexOf('assets/publishers.js') < html.indexOf('src="'+path.basename(file)+'.js"'));
+ const pageScript = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].find(match => match[1].split('?')[0] === path.basename(file)+'.js');
+ assert(pageScript && html.indexOf('assets/publishers.js') < pageScript.index, 'Publisher data must load before the page script, including versioned URLs');
  for (const record of records) {
   const account=window.OfoqPublishers.forRecord(kind,record);
   assert(account,`${file}: Missing publisher for ${record.id}`);

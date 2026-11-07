@@ -69,7 +69,7 @@
           if (window.OfoqPayment && amount > 0) {
             window.OfoqPayment.open({
               title: items.map(item => item.title).join('، '), amount,
-              kind: 'الدورات والورش التدريبية',
+              kind: 'الدورات التعليمية',
               onComplete: () => { this.enroll(items.map(item => item.id)); onComplete?.(); }
             });
             return;

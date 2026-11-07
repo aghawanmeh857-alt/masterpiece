@@ -1,215 +1,126 @@
 (() => {
   const get = id => document.getElementById(id);
-  const money = value => new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(value);
+  const app = window.OfoqFrontend;
   const courses = window.OfoqCourses;
+  const money = value => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(value);
+  const trainingKey = 'ofoq-internship-cart-v1';
   let store = OfoqLearning.create(courses);
-  let selected = new Set(store.state.cart);
+  let selected = null;
+  let paying = false;
   const checkboxes = new Map();
-  const trainingSection = get('trainingCart');
-  const sharedSection = get('sharedCart');
-  function renderSharedCart() {
-    const app=window.OfoqFrontend;
-    app.cartRecords=(app.cartRecords||[]).filter(item=>item.kind!=='projects'&&item.kind!=='jobs');
-    const items=app.cartRecords;
-    sharedSection.hidden=!items.length;sharedSection.replaceChildren();
-    if(!items.length)return;
-    sharedSection.append(node('h2','الفعاليات في سلتك'),node('p','تابع تفاصيل الفعاليات والتسجيل فيها من هنا. لا تدخل هذه العناصر في إجمالي شراء الدورات.','training-cart-description'));
-    const labels={projects:'مشروع',jobs:'وظيفة',events:'فعالية'};
-    for(const item of items) {
-      const row=node('article',undefined,'favorite-row'),info=node('div');info.append(node('small',labels[item.kind]||'فرصة'),node('h3',item.title));
-      const controls=node('div',undefined,'favorite-controls'),link=node('a','عرض التفاصيل ←','learn-primary');
-      const url=new URL(item.href,location.href);url.searchParams.set('theme',document.documentElement.dataset.theme||'light');link.href=url.href;
-      const remove=action('إزالة من السلة',()=>{app.cartRecords=app.cartRecords.filter(record=>!(record.kind===item.kind&&String(record.id)===String(item.id)));render();get('cartStatus').textContent='أُزيلت «'+item.title+'» من السلة.';});
-      controls.append(link,remove);row.append(info,controls);sharedSection.append(row);
-    }
-    get('emptyCart').hidden=true;
-  }
-  function renderTrainingCart() {
-    let items = [];
-    try { const value = JSON.parse(window.OfoqFrontend.memory.getItem('ofoq-internship-cart-v1') || '[]'); if (Array.isArray(value)) items = value.filter(item => item && typeof item.id === 'string' && typeof item.title === 'string'); } catch {}
-    trainingSection.hidden = !items.length;
-    const heading = node('div', undefined, 'training-cart-heading');
-    const headingCopy = node('div');
-    headingCopy.append(node('p', 'سعي / خطوتك المهنية القادمة', 'eyebrow'), node('h2', 'فرص التدريب في سلتك'));
-    heading.append(headingCopy, node('span', items.length + ' فرص محفوظة', 'training-cart-count'));
-    trainingSection.replaceChildren(heading, node('p', 'راجع فرصك المفضلة وتابع تفاصيل التقديم. هذه الفرص لا تدخل في إجمالي شراء الدورات.', 'training-cart-description'));
-    const list = node('div', undefined, 'training-cart-list');
-    trainingSection.append(list);
-    for (const item of items) {
-      const row = node('article', undefined, 'training-cart-row');
-      const link = node('a', item.title, 'training-cart-title');
-      const url = new URL('../../Internships/Internship/internship.html', location.href);
-      url.searchParams.set('id', item.id);
-      url.searchParams.set('theme', document.documentElement.dataset.theme || 'light');
-      link.href = url.href;
-      const cover = node('a', undefined, 'training-cart-cover');
-      cover.href = url.href;
-      cover.setAttribute('aria-label', 'تفاصيل ' + item.title);
-      const image = node('img');
-      image.src = '../../assets/project-covers/dashboard.svg';
-      image.alt = ''; image.width = 800; image.height = 450;
-      cover.append(image);
-      const info = node('div', undefined, 'training-cart-info');
-      const title = node('h3'); title.append(link);
-      info.append(node('span', 'فرصة تدريب', 'training-cart-badge'), title, node('p', typeof item.company === 'string' ? item.company : ''));
-      const controls = node('div', undefined, 'training-cart-actions');
-      const details = node('a', 'عرض الفرصة ↗', 'learn-primary');
-      details.href = url.href;
-      const remove = action('إزالة من السلة', () => {
-        try { window.OfoqFrontend.memory.setItem('ofoq-internship-cart-v1', JSON.stringify(items.filter(entry => entry.id !== item.id))); }
-        catch { get('cartStatus').textContent = 'تعذّرت إزالة الفرصة. حاول مجددًا.'; return; }
-        render();
-        get('cartStatus').textContent = 'أُزيلت «' + item.title + '» من السلة.';
-      });
-      remove.setAttribute('aria-label', 'إزالة من السلة: ' + item.title);
-      controls.append(details, remove);
-      row.append(cover, info, controls);
-      list.append(row);
-    }
-    if (items.length) get('emptyCart').hidden = true;
-  }
-
+  const labels = {courses:'دورة', internships:'فرصة تدريب', events:'فعالية'};
   function node(tag, text, className) {
     const element = document.createElement(tag);
     if (text !== undefined) element.textContent = text;
     if (className) element.className = className;
     return element;
   }
-
-  function themedLink(link) {
-    const url = new URL(link.href, location.href);
-    if (url.origin === location.origin) {
-      url.searchParams.set('theme', document.documentElement.dataset.theme);
-      link.href = url.href;
+  function trainingItems() {
+    try { const rows = JSON.parse(app.memory.getItem(trainingKey) || '[]'); return Array.isArray(rows) ? rows.filter(row => row && row.id != null) : []; } catch { return []; }
+  }
+  function href(kind, id, original) {
+    const routes = {internships:'../../Internships/Internship/internship.html',events:'../../Events/Event/event.html'};
+    const url = new URL(original || routes[kind], location.href);
+    url.searchParams.set('id', id);
+    url.searchParams.set('theme', document.documentElement.dataset.theme || 'light');
+    return url.href;
+  }
+  function items() {
+    const result = store.cartSummary([]).items.map(course => ({...course, kind:'courses', key:course.id, href:OfoqLearning.url(course.id)}));
+    for (const row of trainingItems()) {
+      const current = (app.catalogs?.internships || []).find(item => String(item.id) === String(row.id));
+      const fee = current?.applicationFee ?? row.applicationFee;
+      result.push({...row, kind:'internships', key:'internships:'+row.id, price:fee == null ? null : Number(fee), href:href('internships',row.id)});
     }
+    app.cartRecords = (app.cartRecords || []).filter(row => !['jobs','projects'].includes(row.kind));
+    for (const row of app.cartRecords) {
+      if (row.kind !== 'events') continue;
+      const current = (app.catalogs?.events || []).find(item => String(item.id) === String(row.id));
+      const price = current?.price ?? current?.reward ?? row.price;
+      result.push({...row, key:'events:'+row.id, price:price == null ? null : Number(price), href:href('events',row.id,row.href)});
+    }
+    return result.map(row => ({...row, price:Number.isFinite(row.price) && row.price >= 0 ? row.price : null}));
   }
-
-  function setTheme(theme) {
-    document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light';
-    document.documentElement.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-    const toggle = document.querySelector('.theme-toggle');
-    toggle.textContent = theme === 'dark' ? '☀ الوضع النهاري' : '☾ الوضع الليلي';
-    toggle.setAttribute('aria-label', theme === 'dark' ? 'التبديل إلى الوضع النهاري' : 'التبديل إلى الوضع الليلي');
-    const url = new URL(location.href);
-    url.searchParams.set('theme', document.documentElement.dataset.theme);
-    history.replaceState(null, '', url);
-    document.querySelectorAll('a[href]').forEach(themedLink);
+  function remove(item) {
+    if (item.kind === 'courses') store.toggle('cart',item.id);
+    else if (item.kind === 'internships') app.memory.setItem(trainingKey,JSON.stringify(trainingItems().filter(row => String(row.id) !== String(item.id))));
+    else app.cartRecords = app.cartRecords.filter(row => !(row.kind === item.kind && String(row.id) === String(item.id)));
+    selected.delete(item.key);
   }
-
+  function action(text, handler) { const button=node('button',text,'learn-text');button.type='button';button.addEventListener('click',handler);return button; }
   function summary() {
-    const result = store.cartSummary([...selected]);
-    selected = new Set(result.chosen.map(course => course.id));
-    get('fullCartTotal').textContent = money(result.total);
-    get('unselectedTotal').textContent = money(result.unselectedTotal);
-    get('selectedTotal').textContent = money(result.selectedTotal);
-    get('selectionCount').textContent = result.chosen.length + ' من ' + result.items.length + ' مختارة';
-    get('selectedCount').textContent = result.chosen.length + ' دورات';
-    get('cartDescription').textContent = result.items.length + ' دورات في سلتك. اختر ما تريد تعلّمه الآن.';
-    get('selectedItems').replaceChildren(...result.chosen.map(course => {
-      const item = node('li');
-      item.append(node('span', course.title), node('strong', money(course.price)));
-      return item;
-    }));
-    if (!result.chosen.length) get('selectedItems').append(node('li', 'لم تختر أي دورة للشراء بعد.', 'nothing-selected'));
-    get('checkoutSelected').disabled = result.chosen.length === 0;
-    get('checkoutSelected').textContent = result.chosen.length ? 'إتمام الشراء · ' + money(result.selectedTotal) : 'اختر دورة للمتابعة';
-    get('selectAll').checked = result.items.length > 0 && result.chosen.length === result.items.length;
-    get('selectAll').indeterminate = result.chosen.length > 0 && result.chosen.length < result.items.length;
-    get('selectAll').disabled = !result.items.length;
-    for (const [id, checkbox] of checkboxes) checkbox.checked = selected.has(id);
-    get('shoppingLayout').hidden = !result.items.length;
-    get('emptyCart').hidden = result.items.length > 0 || !get('purchaseSuccess').hidden;
+    const all = items();
+    selected = new Set([...selected].filter(key => all.some(row => row.key === key && row.price !== null)));
+    const chosen = all.filter(row => selected.has(row.key));
+    const total = all.reduce((sum,row) => sum+(row.price || 0),0);
+    const amount = chosen.reduce((sum,row) => sum+row.price,0);
+    get('fullCartTotal').textContent=money(total);
+    get('unselectedTotal').textContent=money(total-amount);
+    get('selectedTotal').textContent=money(amount);
+    get('selectionCount').textContent=chosen.length+' من '+all.length+' مختارة';
+    get('selectedCount').textContent=chosen.length+' عناصر';
+    get('cartDescription').textContent=all.length+' عناصر في سلتك المشتركة من أقسام المنصة.';
+    get('selectedItems').replaceChildren(...chosen.map(row => {const item=node('li');item.append(node('span',row.title),node('strong',money(row.price)));return item;}));
+    if (!chosen.length) get('selectedItems').append(node('li','لم تختر عناصر للمتابعة بعد.','nothing-selected'));
+    get('checkoutSelected').disabled=!chosen.length || paying;
+    get('checkoutSelected').textContent=chosen.length ? 'إتمام الطلب · '+money(amount) : 'اختر عناصر للمتابعة';
+    const available=all.filter(row=>row.price!==null);
+    get('selectAll').checked=available.length>0 && chosen.length===available.length;
+    get('selectAll').indeterminate=chosen.length>0 && chosen.length<available.length;
+    get('selectAll').disabled=!available.length;
+    for(const [key, checkbox] of checkboxes)checkbox.checked=selected.has(key);
+    get('shoppingLayout').hidden=!all.length;
+    get('emptyCart').hidden=all.length>0 || !get('purchaseSuccess').hidden;
   }
-
-  function action(text, handler) {
-    const button = node('button', text, 'learn-text');
-    button.type = 'button';
-    button.addEventListener('click', handler);
-    return button;
-  }
-
   function render() {
+    const all=items();
+    if(selected===null)selected=new Set(all.filter(row=>row.price!==null).map(row=>row.key));
     checkboxes.clear();
-    const rows = store.cartSummary([...selected]).items.map(course => {
-      const row = node('article', undefined, 'shopping-course');
-      row.dataset.course = course.id;
-      const checkbox = node('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = selected.has(course.id);
-      checkbox.setAttribute('aria-label', 'اختيار ' + course.title + ' للشراء');
-      checkbox.addEventListener('change', () => {
-        checkbox.checked ? selected.add(course.id) : selected.delete(course.id);
-        summary();
-      });
-      checkboxes.set(course.id, checkbox);
-      const cover = node('a', undefined, 'shopping-cover');
-      cover.href = OfoqLearning.url(course.id);
-      cover.setAttribute('aria-label', 'تفاصيل ' + course.title);
-      const image = node('img');
-      image.src = OfoqLearning.cover(course.id);
-      image.alt = ''; image.width = 800; image.height = 450;
-      cover.append(image);
-      const info = node('div', undefined, 'shopping-info');
-      const title = node('h2');
-      const titleLink = node('a', course.title);
-      titleLink.href = cover.href; title.append(titleLink);
-      const instructor = node('p', 'بواسطة ' + course.instructor);
-      const details = node('p', course.hours + ' ساعة في المسار · ' + course.syllabus.length + ' دروس تفاعلية · ' + (course.level === 'beginner' ? 'مبتدئ' : 'متوسط'));
-      const badge = node('span', 'وصول للدورة كاملة', 'learning-badge');
-      info.append(title, instructor, details, badge);
-      const controls = node('div', undefined, 'shopping-actions');
-      controls.append(action('إزالة', () => {
-        store.toggle('cart', course.id); selected.delete(course.id); render();
-        get('cartStatus').textContent = 'أُزيلت «' + course.title + '» من السلة.';
+    get('cartItems').replaceChildren(...all.map(item=>{
+      const row=node('article',undefined,'shopping-course');row.dataset.kind=item.kind;
+      const checkbox=node('input');checkbox.type='checkbox';checkbox.checked=selected.has(item.key);checkbox.disabled=item.price===null;
+      checkbox.setAttribute('aria-label','اختيار '+item.title);
+      checkbox.addEventListener('change',()=>{checkbox.checked?selected.add(item.key):selected.delete(item.key);summary();});checkboxes.set(item.key,checkbox);
+      const cover=node('a',undefined,'shopping-cover');cover.href=item.href;cover.setAttribute('aria-label','تفاصيل '+item.title);
+      const image=node('img');image.src=item.kind==='courses'?OfoqLearning.cover(item.id):'../../assets/project-covers/dashboard.svg';image.alt='';image.width=800;image.height=450;cover.append(image);
+      const info=node('div',undefined,'shopping-info'),title=node('h2'),link=node('a',item.title);link.href=item.href;title.append(link);
+      info.append(title,node('p',item.instructor || item.company || ''),node('p',item.kind==='courses'?item.hours+' ساعة · '+item.syllabus.length+' دروس':item.kind==='internships'?'رسوم التدريب على المتدرّب':'رسوم التسجيل بالفعالية'),node('span',labels[item.kind],'learning-badge'));
+      const controls=node('div',undefined,'shopping-actions');
+      controls.append(action('إزالة',()=>{remove(item);render();get('cartStatus').textContent='أُزيلت «'+item.title+'» من السلة.';}));
+      controls.append(action('حفظ في المفضلة',()=>{
+        if(item.kind==='courses'){if(!store.state.wishlist.includes(item.id))store.toggle('wishlist',item.id);}
+        else if(!app.savedRecords.some(row=>row.kind===item.kind&&String(row.id)===String(item.id)))app.toggleFavorite(item.kind,item,item.href);
+        remove(item);render();get('cartStatus').textContent='حُفظت «'+item.title+'» في المفضلة.';
       }));
-      controls.append(action('حفظ في المفضلة', () => {
-        if (!store.state.wishlist.includes(course.id)) store.toggle('wishlist', course.id);
-        store.toggle('cart', course.id); selected.delete(course.id); render();
-        get('cartStatus').textContent = 'حُفظت «' + course.title + '» في المفضلة.';
-      }));
-      const price = node('strong', money(course.price), 'shopping-price');
-      row.append(checkbox, cover, info, controls, price);
-      return row;
-    });
-    get('cartItems').replaceChildren(...rows);
+      const price=node('strong',item.price===null?'راجع التفاصيل':item.price===0?'دون رسوم':money(item.price),'shopping-price');
+      row.append(checkbox,cover,info,controls,price);return row;
+    }));
+    get('trainingCart').hidden=true;get('sharedCart').hidden=true;
     summary();
-    renderTrainingCart();
-    renderSharedCart();
-    let trainingCount=0;try{trainingCount=JSON.parse(window.OfoqFrontend.memory.getItem("ofoq-internship-cart-v1")||"[]").length;}catch{}
-    const totalItems=store.state.cart.length+trainingCount+(window.OfoqFrontend.cartRecords||[]).length;
-    get("cartDescription").textContent=totalItems+" عناصر في سلتك المشتركة من أقسام المنصة.";
   }
-
-  get('selectAll').addEventListener('change', () => {
-    selected = new Set(get('selectAll').checked ? store.state.cart : []);
-    summary();
+  get('selectAll').addEventListener('change',()=>{selected=new Set(get('selectAll').checked?items().filter(row=>row.price!==null).map(row=>row.key):[]);summary();});
+  get('checkoutSelected').addEventListener('click',()=>{
+    const chosen=items().filter(row=>selected.has(row.key));if(!chosen.length||paying)return;
+    const amount=chosen.reduce((sum,row)=>sum+row.price,0);
+    const complete=()=>{
+      const courseIds=chosen.filter(row=>row.kind==='courses').map(row=>row.id);store.enroll(courseIds);
+      for(const item of chosen){
+        if(item.kind==='internships')app.apply('internship',item.id,item.title,item.href);
+        if(item.kind==='events')app.register(item.id,item.title,item.href);
+        if(item.kind!=='courses')remove(item);
+      }
+      get('purchaseSuccess').hidden=false;
+      get('purchasedCourses').replaceChildren(...chosen.map(item=>{const link=node('a',(item.kind==='courses'?'ابدأ ':'عرض ')+item.title+' ←','learn-primary');link.href=item.href;return link;}));
+      selected.clear();paying=false;render();get('cartStatus').textContent='اكتمل طلب '+chosen.length+' عناصر تجريبيًا دون خصم مبلغ.';get('purchaseSuccess').focus();
+    };
+    if(amount===0){complete();return;}
+    if(window.OfoqPayment){window.OfoqPayment.open({title:chosen.map(row=>row.title).join('، '),amount,kind:'عناصر سلتك المختارة',onComplete:complete});}
+    else if(chosen.every(row=>row.kind==='courses'))store.checkout(chosen.map(row=>row.id),complete);
+    else get('cartStatus').textContent='تعذّر فتح الدفع. حدّث الصفحة وحاول مجددًا.';
   });
-  get('checkoutSelected').addEventListener('click', () => {
-    const ids = store.cartSummary([...selected]).chosen.map(course => course.id);
-    if (!ids.length) return;
-    store.checkout(ids, () => {
-      get('purchaseSuccess').hidden = false;
-      get('purchasedCourses').replaceChildren(...ids.map(id => {
-        const course = courses.find(item => item.id === id);
-        const link = node('a', 'ابدأ ' + course.title + ' ←', 'learn-primary');
-        link.href = OfoqLearning.url(id); return link;
-      }));
-      selected.clear(); render();
-      get('cartStatus').textContent = 'اكتمل شراء ' + ids.length + ' دورات تجريبيًا.';
-      get('purchaseSuccess').focus();
-    });
-  });
-  document.querySelector('.theme-toggle').addEventListener('click', () => {
-    setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-  });
-  const refresh = () => {
-    store = OfoqLearning.create(courses);
-    selected = new Set([...selected].filter(id => store.state.cart.includes(id)));
-    render();
-  };
-  addEventListener('pageshow', refresh);
-  addEventListener('storage', event => { if (['ofoq-learning-v1', 'ofoq-internship-cart-v1', null].includes(event.key)) refresh(); });
-  get('year').textContent = new Date().getFullYear();
-  setTheme(new URLSearchParams(location.search).get('theme'));
-  render();
+  function setTheme(theme){document.documentElement.dataset.theme=theme==='dark'?'dark':'light';document.documentElement.style.colorScheme=document.documentElement.dataset.theme;const toggle=document.querySelector('.theme-toggle');toggle.textContent=theme==='dark'?'☀ الوضع النهاري':'☾ الوضع الليلي';const url=new URL(location.href);url.searchParams.set('theme',document.documentElement.dataset.theme);history.replaceState(null,'',url);document.querySelectorAll('a[href]').forEach(link=>{const target=new URL(link.href,location.href);if(target.origin===location.origin){target.searchParams.set('theme',document.documentElement.dataset.theme);link.href=target.href;}});}
+  document.querySelector('.theme-toggle').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+  const refresh=()=>{store=OfoqLearning.create(courses);render();};
+  addEventListener('pageshow',refresh);addEventListener('storage',event=>{if(['ofoq-learning-v1',trainingKey,null].includes(event.key))refresh();});
+  get('year').textContent=new Date().getFullYear();setTheme(new URLSearchParams(location.search).get('theme'));render();
 })();

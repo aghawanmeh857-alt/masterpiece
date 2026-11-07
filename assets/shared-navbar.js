@@ -12,8 +12,7 @@
     ['academy','الأكاديمية','Academy/academy.html'],
     ['internships','فرص التدريب','Internships/internships.html'],
     ['jobs','الوظائف','Jobs/jobs.html'],
-    ['events','الفعاليات','Events/events.html'],
-    ['workshops','الورش التدريبية','Academy/academy.html?format=workshop']
+    ['events','الفعاليات','Events/events.html']
   ];
   const brand = `<a class="brand" href="${hero?'#lobby':url('hero/userHero.html')}" aria-label="سعي | SAEI الرئيسية"><span class="ofoq-brand"><img class="ofoq-logo" src="${new URL('assets/branding/saei-logo.svg',root).href}" alt="سعي | SAEI" width="116" height="50"></span></a>`;
   const header = document.createElement('header');

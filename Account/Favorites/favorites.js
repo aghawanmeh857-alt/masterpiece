@@ -1,6 +1,6 @@
 (() => {
   const app = window.OfoqFrontend;
-  const labels = {all:'الكل',projects:'المشاريع',courses:'الدورات',workshops:'الورش',jobs:'الوظائف',internships:'التدريب',events:'الفعاليات'};
+  const labels = {all:'الكل',projects:'المشاريع',courses:'الدورات',jobs:'الوظائف',internships:'التدريب',events:'الفعاليات'};
   const legacy = {projects:'ofoq-project-favorites-v1',internships:'ofoq-saved-internships-v1'};
   let filter = 'all';
   const read = (key, fallback) => { try { return JSON.parse(app.memory.getItem(key)) || fallback; } catch { return fallback; } };
@@ -18,7 +18,7 @@
     const learning = read('ofoq-learning-v1', {});
     for (const record of window.OfoqCourses || []) {
       if (!(learning.wishlist || []).includes(record.id)) continue;
-      rows.push({kind:record.format==='workshop'?'workshops':'courses',id:record.id,title:record.title,href:'../../Academy/Course/course.html?id='+encodeURIComponent(record.id),key:'ofoq-learning-v1'});
+      rows.push({kind:'courses',id:record.id,title:record.title,href:'../../Academy/Course/course.html?id='+encodeURIComponent(record.id),key:'ofoq-learning-v1'});
     }
     return rows.filter((row,index)=>rows.findIndex(other=>other.kind===row.kind&&String(other.id)===String(row.id))===index);
   }

@@ -20,7 +20,7 @@ const pageData = {
   "extras": [
     [
       "paid",
-      "مدفوع"
+      "بمكافأة للمتدرّب"
     ],
     [
       "unpaid",
@@ -35,9 +35,10 @@ const pageData = {
       "category": "design",
       "location": "hybrid",
       "itemType": "3-months",
-      "extra": "paid",
-      "reward": 350,
-      "offer": "350 دولار / شهر",
+      "extra": "fee",
+      "reward": 0,
+      "applicationFee": 75,
+      "offer": "75 دولار · رسوم التدريب",
       "date": "2026-10-10",
       "deadline": "2026-11-02",
       "symbol": "◈",
@@ -219,7 +220,7 @@ if (!record) {
     addFact('الجهة', record.company);
     addFact('نمط العمل', record.location);
     addFact('مدة التدريب', record.itemType);
-    addFact('المقابل', record.offer);
+    addFact(Number(record.applicationFee || 0) > 0 ? 'رسوم التدريب' : 'المكافأة', record.offer);
     addFact(kind === 'event' ? 'تاريخ الفعالية' : 'آخر موعد للتقديم', new Intl.DateTimeFormat('ar-JO', {dateStyle:'medium', timeZone:'UTC'}).format(new Date(record.deadline+'T12:00:00Z')));
     showList('detailTasks', record.details);
     showList('detailRequirements', record.requirements);
@@ -236,8 +237,8 @@ if (!record) {
 
 if(record&&Number(record.applicationFee||0)>0&&window.OfoqPayment){
   get('previewForm').hidden=true;
-  const pay=document.createElement('button');pay.type='button';pay.className='btn btn-orange';pay.textContent='التقديم على التدريب ←';
-  pay.addEventListener('click',()=>window.OfoqPayment.open({title:record.title,amount:Number(record.applicationFee),kind:'رسوم التقديم على التدريب',onComplete:()=>{window.OfoqFrontend.apply('internship',record.id,record.title,location.href);pay.textContent='✓ تم التقديم';pay.disabled=true;}}));
+  const pay=document.createElement('button');pay.type='button';pay.className='btn btn-orange';pay.textContent='التقديم والدفع · '+record.applicationFee+' دولار';
+  pay.addEventListener('click',()=>window.OfoqPayment.open({title:record.title,amount:Number(record.applicationFee),kind:'رسوم التدريب',onComplete:()=>{window.OfoqFrontend.apply('internship',record.id,record.title,location.href);pay.textContent='✓ تم التقديم';pay.disabled=true;}}));
   get('previewForm').before(pay);
 }
 get('previewForm').addEventListener('input', event => event.target.setCustomValidity(''));

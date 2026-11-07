@@ -42,7 +42,7 @@ form.addEventListener('submit', event => {
   if (!form.reportValidity()) return;
 
   const companyAccount = document.getElementById("accountType").value === "company";
-  const services = {freelance:'Freelance/freelance.html',jobs:'Jobs/jobs.html',internships:'Internships/internships.html',academy:'Academy/academy.html',workshops:'Academy/academy.html?format=workshop',events:'Events/events.html',profile:'Account/Profile/profile.html'};
+  const services = {freelance:'Freelance/freelance.html',jobs:'Jobs/jobs.html',internships:'Internships/internships.html',academy:'Academy/academy.html',events:'Events/events.html',profile:'Account/Profile/profile.html'};
   let nextPage = new URL('../../' + services[serviceType.value], location.href).href;
   const requestedNext = new URLSearchParams(location.search).get('next');
   if (requestedNext && !serviceChanged) {

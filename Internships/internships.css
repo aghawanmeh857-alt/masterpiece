@@ -522,13 +522,6 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 [data-theme="dark"] .listing-offer .internship-cart-button { color: #f3f6fb; }
 .internship-cart-button:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .listing-offer .internship-cart-button { transition: none; } }
-.opportunity-shortcuts .internship-cart-shortcut {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  min-height: 56px; padding: 12px 20px; border: 1px solid #ffffff55;
-  border-radius: 10px; background: #ffffff0d; color: #fff;
-  font-weight: 700; text-decoration: none; transition: background .18s ease;
-}
-.opportunity-shortcuts .internship-cart-shortcut:hover { background: #ffffff20; }
-.internship-cart-shortcut span { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding-inline: 6px; border-radius: 50%; background: #ff783d; color: #14263d; }
-.internship-cart-shortcut:focus-visible { outline: 3px solid #ff783d; outline-offset: 3px; }
-@media (prefers-reduced-motion: reduce) { .opportunity-shortcuts .internship-cart-shortcut { transition: none; } }
+
+.opportunity-shortcuts { display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+.opportunity-shortcuts > .btn { display:inline-flex; align-items:center; justify-content:center; width:auto; min-height:46px; padding:12px 20px; align-self:center; }

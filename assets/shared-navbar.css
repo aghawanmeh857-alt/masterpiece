@@ -62,3 +62,36 @@ html body[data-section=hero] .shared-navbar.hero-navbar{grid-template-columns:mi
 html body[data-section=hero] .shared-navbar .header-actions{grid-column:1/-1;grid-row:2;justify-content:space-between}
 html body[data-section=hero] .shared-navbar .header-actions .navbar-login{flex:1;max-width:170px}
 }
+
+/* Contain page-specific button, icon and form styles inside one navbar design. */
+html body .shared-navbar .header-actions > :is(a,button),
+html body .shared-navbar .account-menu > summary {
+  height:40px;
+  min-width:0;
+  max-width:none;
+  width:auto;
+  box-shadow:none;
+  letter-spacing:normal;
+  text-transform:none;
+}
+html body .shared-navbar .header-actions svg { display:block; width:20px; height:20px; flex:0 0 20px; margin:0; }
+html body .shared-navbar .header-actions > a > span { font:inherit; color:inherit; background:none; padding:0; border:0; }
+html body .shared-navbar .account-menu > summary { list-style:none; }
+html body .shared-navbar .account-menu > summary::-webkit-details-marker { display:none; }
+html body .shared-navbar .account-menu > summary::after { content:'▾'; font-size:10px; color:var(--accent-text); }
+@media(max-width:600px) {
+  html body .shared-navbar .header-actions > :is(a,button),
+  html body .shared-navbar .account-menu > summary { height:36px; }
+  html body .shared-navbar .header-actions { flex-wrap:wrap; row-gap:7px; }
+}
+
+/* Keep the navigation geometry stable between pages and active sections. */
+html:has(.shared-navbar) { scrollbar-gutter: stable; }
+html body .shared-navbar :is(.section-nav,.room-nav)>a { box-sizing:border-box; font-weight:700; letter-spacing:0; transform:none; }
+html body .shared-navbar :is(.section-nav,.room-nav)>a:hover:not([aria-current]):not(.active) { background:#ff783d08; border-color:transparent; color:var(--text-main); }
+@media(min-width:992px) {
+  html body .site-header.shared-navbar .header-inner { width:100%; max-width:1440px; min-height:88px; margin-inline:auto; }
+  html body .site-header.shared-navbar .site-navigation { flex:1 1 0; }
+  html body .site-header.shared-navbar .section-nav { display:flex; justify-content:flex-start; gap:4px!important; width:auto; }
+  html body .site-header.shared-navbar .section-nav>a { flex:0 0 auto; width:auto; height:40px; min-height:40px; padding-inline:10px; }
+}

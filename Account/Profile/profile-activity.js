@@ -20,8 +20,8 @@
       if (!course) continue;
       const completed = new Set((learning.progress?.[id] || []).filter(index => Number.isInteger(index) && index >= 0 && index < course.syllabus.length)).size;
       const percent = course.syllabus.length ? Math.round(completed / course.syllabus.length * 100) : 0;
-      rows.push({title: course.title, type: 'course', label: course.format === 'workshop' ? 'ورشة تدريبية' : 'دورة',
-        status: percent === 100 ? 'مكتملة' : 'مسجّل', format:course.format, percent, href: url('Academy/Course/course.html?id=' + encodeURIComponent(id))});
+      rows.push({title: course.title, type: 'course', label: 'دورة',
+        status: percent === 100 ? 'مكتملة' : 'مسجّل', format:'path', percent, href: url('Academy/Course/course.html?id=' + encodeURIComponent(id))});
     }
     for (const item of app.registrations || []) rows.push({title: item.title, type: 'event', label: 'فعالية', status: 'تم التسجيل', href: url(item.href)});
     for (const item of app.ideas || []) rows.push({title: item.title, type: 'post', label: 'منشور مشروع', status: 'منشور', href: url('Freelance/freelance.html#idea-' + encodeURIComponent(item.id))});
@@ -40,8 +40,7 @@
     return element;
   };
   const definitions=[
-    ['courses','دوراتي','الدورات التي اشتريتها أو التحقت بها، مع متابعة تقدّمك.','Academy/academy.html',row=>row.type==='course'&&row.format!=='workshop'],
-    ['workshops','ورشي التدريبية','الورش التي سجلت فيها ومتابعة التعلّم.','Academy/academy.html?format=workshop',row=>row.type==='course'&&row.format==='workshop'],
+    ['courses','دوراتي','الدورات التي اشتريتها أو التحقت بها، مع متابعة تقدّمك.','Academy/academy.html',row=>row.type==='course'],
     ['jobs','طلبات الوظائف','الوظائف التي قدّمت عليها وحالة كل طلب.','Jobs/jobs.html',row=>row.type==='job'],
     ['internships','طلبات التدريب','فرص التدريب التي قدّمت عليها وحالة الطلبات.','Internships/internships.html',row=>row.type==='internship'],
     ['applications','طلبات المشاريع','المشاريع التي قدّمت لتنفيذها.','Freelance/freelance.html',row=>row.type==='project'],

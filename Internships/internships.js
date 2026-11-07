@@ -17,10 +17,10 @@ const pageData = {
       "6 أشهر"
     ]
   ],
-  "extras": [
+  "extras": [["fee", "برسوم على المتدرّب"],
     [
       "paid",
-      "مدفوع"
+      "بمكافأة للمتدرّب"
     ],
     [
       "unpaid",
@@ -35,9 +35,10 @@ const pageData = {
       "category": "design",
       "location": "hybrid",
       "itemType": "3-months",
-      "extra": "paid",
-      "reward": 350,
-      "offer": "350 دولار / شهر",
+      "extra": "fee",
+      "reward": 0,
+      "applicationFee": 75,
+      "offer": "75 دولار · رسوم التدريب",
       "date": "2026-10-10",
       "deadline": "2026-11-02",
       "symbol": "◈",
@@ -141,23 +142,6 @@ async function startListings() {
     try { const value = JSON.parse(window.OfoqFrontend.memory.getItem(cartKey) || '[]'); internshipCart = Array.isArray(value) ? value.filter(item => item && typeof item.id === 'string') : []; } catch { internshipCart = []; }
   };
   readCart();
-  const cartShortcut = document.createElement('a');
-  cartShortcut.className = 'internship-cart-shortcut';
-  cartShortcut.href = '../Academy/Cart/cart.html' + location.search;
-  const cartCount = document.createElement('span');
-  cartShortcut.append('عرض السلة ', cartCount);
-  document.getElementById('savedShortcut').after(cartShortcut);
-  function updateCartCount() {
-    let courseCount = 0;
-    try {
-      const learning = JSON.parse(window.OfoqFrontend.memory.getItem('ofoq-learning-v1') || '{}');
-      if (Array.isArray(learning?.cart)) courseCount = new Set(learning.cart).size;
-    } catch {}
-    const count = internshipCart.length + courseCount;
-    cartCount.textContent = count;
-    cartShortcut.setAttribute('aria-label', 'عرض سلة المشتريات، ' + count + ' عناصر');
-  }
-  updateCartCount();
   if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
   await window.componentsReady;
 if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('internships', pageData.items);
@@ -305,11 +289,10 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
         window.OfoqFrontend.navigate(url.href);
         return;
       }
-      const next = [...internshipCart, {id: item.id, title: item.title, company: item.company}];
+      const next = [...internshipCart, {id: item.id, title: item.title, company: item.company, applicationFee: Number(item.applicationFee || 0)}];
       try { window.OfoqFrontend.memory.setItem(cartKey, JSON.stringify(next)); }
       catch { get('savedNotice').hidden = false; get('savedNotice').textContent = 'تعذّر حفظ الفرصة في السلة. يرجى السماح بالتخزين في المتصفح والمحاولة مجددًا.'; return; }
       internshipCart = next;
-      updateCartCount();
       cartButton.textContent = '✓ في السلة · عرض السلة';
       cartButton.setAttribute('aria-pressed', 'true');
       cartButton.setAttribute('aria-label', 'عرض السلة: ' + item.title);
@@ -351,8 +334,8 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
     savedOnly = true; renderItems();
     get('internshipResults').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   });
-  addEventListener('pageshow', () => { readCart(); updateCartCount(); readSaved(); renderItems(); });
-  addEventListener('storage', event => { if ([cartKey, 'ofoq-learning-v1', null].includes(event.key)) { readCart(); updateCartCount(); renderItems(); } });
+  addEventListener('pageshow', () => { readCart(); readSaved(); renderItems(); });
+  addEventListener('storage', event => { if ([cartKey, 'ofoq-learning-v1', null].includes(event.key)) { readCart(); renderItems(); } });
   addEventListener('storage', event => { if (event.key === savedKey) { readSaved(); renderItems(); } });
 
   get('previewForm').addEventListener('submit', event => {

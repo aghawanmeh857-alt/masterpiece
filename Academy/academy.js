@@ -6,27 +6,8 @@ const courses = window.OfoqCourses;
 (function () {
   let store = OfoqLearning.create(courses);
   const get = id => document.getElementById(id);
-  const labels = {development:'التطوير',design:'التصميم',marketing:'التسويق',career:'المهارات المهنية',beginner:'مبتدئ',intermediate:'متوسط',path:'مسار تعلّم',workshop:'ورشة'};
+  const labels = {development:'التطوير',design:'التصميم',marketing:'التسويق',career:'المهارات المهنية',beginner:'مبتدئ',intermediate:'متوسط',path:'مسار تعلّم'};
   const requestedLibrary = new URLSearchParams(location.search).get('library');
-  const workshopMode = new URLSearchParams(location.search).get('format') === 'workshop';
-  if (workshopMode) {
-    get('format').value = 'workshop';
-    document.title = 'الورش التدريبية — سعي';
-    document.body.dataset.page = 'workshops';
-    document.querySelector('.page-heading h1, main h1').innerHTML = 'ورش تدريبية.<br><em>تعلّم بالتطبيق.</em>';
-    document.querySelector('.page-heading .eyebrow').textContent = 'الورش التدريبية / مهارات عملية';
-    document.querySelector('.page-heading .intro').textContent = 'ورش تطبيقية لتطوير مهاراتك، مع تفاصيل واضحة للمحتوى والمدة وطريقة المشاركة.';
-    document.querySelector('.breadcrumb-item.active').textContent = 'الورش التدريبية';
-    get('trainingCoursesTitle').textContent = 'الورش التدريبية المتاحة';
-    document.querySelector('.featured-copy .eyebrow').textContent = 'التعلّم بالممارسة';
-    get('featuredTitle').innerHTML = 'طوّر مهاراتك.<br>بالتجربة والتطبيق.';
-    document.querySelector('.featured-copy > p:not(.eyebrow)').textContent = 'استكشف الورش المتاحة، واقرأ محاورها ومتطلباتها قبل الالتحاق.';
-    document.querySelector('.featured-meta').replaceChildren(...['ورش تطبيقية','مهارات متنوعة','تعلّم عملي'].map(text=>{const span=document.createElement('span');span.textContent=text;return span;}));
-    get('featuredCourse').textContent = 'استكشف الورش التدريبية ↓';
-    get('searchQuery').placeholder = 'ابحث عن ورشة أو مهارة…';
-    get('format').disabled = true;
-    document.querySelector('[data-section-link="workshops"]')?.setAttribute('aria-current', 'page');
-  }
   let library = ['overview', 'enrolled', 'wishlist'].includes(requestedLibrary) ? requestedLibrary : 'all';
   function node(tag,text,className) { const element=document.createElement(tag);if(text!==undefined)element.textContent=text;if(className)element.className=className;return element; }
   function button(text,action,className='learn-primary') { const element=node('button',text,className);element.type='button';element.addEventListener('click',action);return element; }
@@ -99,13 +80,13 @@ const courses = window.OfoqCourses;
     get('academyOverview').hidden = library !== 'overview';
     get('catalogWorkspace').hidden = library === 'overview';
     if (library === 'overview') renderOverview();
-    const query=get('searchQuery').value.trim().toLowerCase(),category=get('category').value,level=get('level').value,format=workshopMode ? 'workshop' : get('format').value,price=get('price').value;
+    const query=get('searchQuery').value.trim().toLowerCase(),category=get('category').value,level=get('level').value,format=get('format').value,price=get('price').value;
     const items=courses.filter(course=>{
       if(library==='enrolled'&&!store.has(course.id))return false;if(library==='wishlist'&&!store.state.wishlist.includes(course.id))return false;
       return (!query||[course.title,course.description,course.instructor,...course.syllabus].join(' ').toLowerCase().includes(query))&&(!category||course.category===category)&&(!level||course.level===level)&&(!format||course.format===format)&&(price!=='free'||course.price===0)&&(price!=='paid'||course.price>0);
     });
     if(get('sortBy').value==='duration')items.sort((a,b)=>a.hours-b.hours);if(get('sortBy').value==='price')items.sort((a,b)=>a.price-b.price);
-    get('courseList').replaceChildren(...items.map(card));get('emptyState').hidden=items.length>0;get('resultCount').textContent=items.length+(workshopMode?' ورش تدريبية':' دورات');
+    get('courseList').replaceChildren(...items.map(card));get('emptyState').hidden=items.length>0;get('resultCount').textContent=items.length+' دورات';
     get('learningCount').textContent=store.state.enrolled.length;get('wishCount').textContent=store.state.wishlist.length;get('cartCount').textContent=store.state.cart.length;
     get('academyCartCount').textContent = store.state.cart.length;
     get('featuredWishCount').textContent = store.state.wishlist.length;

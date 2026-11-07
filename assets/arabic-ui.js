@@ -3,7 +3,7 @@
   const sharedScript = [...document.scripts].find(script => script.src.endsWith('/assets/arabic-ui.js'));
   if (sharedScript) {
     if (!/\/Auth\//i.test(location.pathname)) document.querySelectorAll('a[href*="Auth/Register/register.html"]').forEach(link => {
-      const url = new URL(link.href); url.searchParams.set('next',location.href); url.searchParams.set('service',new URLSearchParams(location.search).get('format') === 'workshop' ? 'workshops' : document.body.dataset.section || 'profile'); link.href = url.href;
+      const url = new URL(link.href); url.searchParams.set('next',location.href); url.searchParams.set('service',document.body.dataset.section || 'profile'); link.href = url.href;
     });
     // User navigation contains user destinations only. Company tools live in
     // their dedicated dashboard, reached through a company sign-in.
@@ -18,9 +18,8 @@
   desktop.addEventListener('change', syncNavigation);
 
   const section = document.body.dataset.section;
-  const workshopPage = section === 'academy' && new URLSearchParams(location.search).get('format') === 'workshop';
   document.querySelectorAll('.section-nav a[data-section-link]').forEach(link => {
-    const active = link.dataset.sectionLink === (workshopPage ? 'workshops' : section);
+    const active = link.dataset.sectionLink === section;
     if (active) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });

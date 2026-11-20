@@ -109,6 +109,31 @@
   width: 100%;
 }
 
+.profile-publisher-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-follow-button {
+  min-height: 44px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.profile-follow-button:hover,
+.profile-follow-button[aria-pressed="true"] {
+  border-color: var(--accent-text);
+  background: #ff783d15;
+  color: var(--accent-text);
+}
+
+.profile-follow-button:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+
 .profile-dashboard-link {
   display: block;
   color: var(--accent-text);

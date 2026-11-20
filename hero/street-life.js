@@ -20,7 +20,7 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
   const characters = [], ownedMaterials = new Set();
   const palette = ['#24445b', '#514d63', '#5b6b61', '#6b5149', '#344969', '#66717b'];
   const point = new THREE.Vector3(), tangent = new THREE.Vector3();
-  const bounds = new THREE.Box3();
+  const assetBounds = new Map();
 
   function character(asset, index, moving) {
     const holder = new THREE.Group();
@@ -28,9 +28,14 @@ export function createStreetLife(THREE, scene, { boss, woman, colleague, clone, 
     const model = clone(asset.scene);
     const mixer = new THREE.AnimationMixer(model);
     const clip = moving ? asset.animations.find(clip => /\|Walk$/.test(clip.name)) : asset.animations.find(clip => /Idle1$/.test(clip.name)) || asset.animations[0];
-    if (clip) { mixer.clipAction(clip).play(); mixer.setTime(index * .31); }
-    model.updateMatrixWorld(true);
-    bounds.setFromObject(model, true);
+    if (clip) { mixer.clipAction(clip).play(); mixer.setTime(0); }
+    // Clones share their source mesh. Size each asset once in its starting pose.
+    if (!assetBounds.has(asset)) {
+      model.updateMatrixWorld(true);
+      assetBounds.set(asset, new THREE.Box3().setFromObject(model, true));
+    }
+    const bounds = assetBounds.get(asset);
+    if (clip) mixer.setTime(index * .31);
     const size = bounds.getSize(new THREE.Vector3());
     const center = bounds.getCenter(new THREE.Vector3());
     const scale = (1.68 + (index % 5) * .045) / Math.max(.01, size.y);

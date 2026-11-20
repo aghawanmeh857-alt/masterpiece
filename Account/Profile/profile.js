@@ -43,7 +43,32 @@ if (profileForm) {
     message.className = 'btn btn-orange';
     message.href = window.OfoqPublishers.url('Messages', publisher.id);
     message.textContent = 'مراسلة ↗';
-    editButton.after(message);
+    const app = window.OfoqFrontend;
+    const following = app.followingRecords ||= [];
+    const viewerKey = app.person().userKey;
+    const follow = document.createElement('button');
+    follow.type = 'button';
+    follow.className = 'btn profile-follow-button';
+    function refreshFollow() {
+      const isFollowing = following.some(record => record.userKey === viewerKey && record.publisherId === publisher.id);
+      follow.textContent = isFollowing ? '✓ متابَع' : '+ متابعة';
+      follow.setAttribute('aria-pressed', String(isFollowing));
+      follow.setAttribute('aria-label', (isFollowing ? 'إلغاء متابعة ' : 'متابعة ') + publisher.name);
+    }
+    follow.addEventListener('click', () => {
+      const index = following.findIndex(record => record.userKey === viewerKey && record.publisherId === publisher.id);
+      if (index >= 0) following.splice(index, 1);
+      else following.push({userKey: viewerKey, publisherId: publisher.id});
+      refreshFollow();
+      const title = (index >= 0 ? 'إلغاء متابعة ' : 'متابعة ') + publisher.name;
+      app.log('follow', title);
+      status.textContent = title + ' خلال هذه الزيارة.';
+    });
+    refreshFollow();
+    const actions = document.createElement('div');
+    actions.className = 'profile-publisher-actions';
+    actions.append(follow, message);
+    editButton.after(actions);
     document.querySelector('.availability').textContent = 'ناشر على سعي';
   }
 

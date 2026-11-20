@@ -23,6 +23,7 @@ for (const fps of [30, 60, 144]) {
   assert(Math.abs(run(fps, 36, 27, 3) - 27) < .01, 'Reverse scrolling must converge');
 }
 assert(Math.abs(run(30, 0, 27, 1) - run(144, 0, 27, 1)) < .1, 'Motion stays consistent across frame rates');
+assert(Math.abs(run(10, 0, 27, 1) - run(60, 0, 27, 1)) < .1, 'Slow render frames must not leave the scroll camera behind');
 assert.equal(advanceTour(5, 20, 0), 5);
 assert.equal(roomAtTourTime(0), 0);
 assert.equal(roomAtTourTime(27), 1);

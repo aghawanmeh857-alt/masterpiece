@@ -1,0 +1,414 @@
+// AspNetUsers is managed by ASP.NET Core Identity; included here for diagram relationships only.
+Table AspNetUsers {
+  Id nvarchar(450) [pk]
+  Note: 'من النظام: ASP.NET Core Identity؛ مرجع للرسم فقط'
+}
+
+Table UserDocuments {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  DocumentType nvarchar(50)
+  FileName nvarchar(250)
+  FileUrl nvarchar(1000)
+  FileType nvarchar(100)
+  FileSizeBytes int
+  UploadedAt datetime
+}
+
+Table Companies {
+  Id int [pk]
+  OwnerUserId nvarchar(450) [not null]
+  Name nvarchar(200)
+  Description nvarchar(max)
+  LogoUrl nvarchar(1000)
+  Email nvarchar(254)
+  Phone nvarchar(30)
+  WebsiteUrl nvarchar(1000)
+  Address nvarchar(300)
+}
+
+Table Courses {
+  Id int [pk]
+  AdminUserId nvarchar(450)
+  CompanyId int
+  Title nvarchar(250)
+  Description nvarchar(max)
+  ImageUrl nvarchar(1000)
+  DetailsPdfUrl nvarchar(1000)
+  Price decimal(10,2)
+  Category nvarchar(100)
+  Skills nvarchar(1000)
+  InstructorName nvarchar(150)
+  Level nvarchar(50)
+  DurationMinutes int
+  Capacity int
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table CourseLessons {
+  Id int [pk]
+  CourseId int [not null]
+  Title nvarchar(250)
+  Content nvarchar(max)
+  VideoUrl nvarchar(1000)
+  AttachmentUrl nvarchar(1000)
+  SortOrder int
+  DurationMinutes int
+}
+
+Table Projects {
+  Id int [pk]
+  OwnerUserId nvarchar(450) [not null]
+  Title nvarchar(250)
+  Description nvarchar(max)
+  Requirements nvarchar(max)
+  ImageUrl nvarchar(1000)
+  DetailsPdfUrl nvarchar(1000)
+  Category nvarchar(100)
+  ProjectType nvarchar(50)
+  Skills nvarchar(1000)
+  Budget decimal(10,2)
+  DurationDays int
+  Deadline datetime
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table Jobs {
+  Id int [pk]
+  CompanyId int [not null]
+  Title nvarchar(250)
+  Description nvarchar(max)
+  Requirements nvarchar(max)
+  ImageUrl nvarchar(1000)
+  DetailsPdfUrl nvarchar(1000)
+  Category nvarchar(100)
+  Skills nvarchar(1000)
+  WorkMode nvarchar(50)
+  EmploymentType nvarchar(50)
+  ExperienceLevel nvarchar(50)
+  Location nvarchar(200)
+  Salary decimal(10,2)
+  Deadline datetime
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table Internships {
+  Id int [pk]
+  CompanyId int [not null]
+  Title nvarchar(250)
+  Description nvarchar(max)
+  Requirements nvarchar(max)
+  ImageUrl nvarchar(1000)
+  DetailsPdfUrl nvarchar(1000)
+  Category nvarchar(100)
+  Skills nvarchar(1000)
+  WorkMode nvarchar(50)
+  Location nvarchar(200)
+  DurationMonths int
+  Price decimal(10,2)
+  MonthlyStipend decimal(10,2)
+  Deadline datetime
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table Events {
+  Id int [pk]
+  AdminUserId nvarchar(450)
+  CompanyId int
+  Title nvarchar(250)
+  Description nvarchar(max)
+  ImageUrl nvarchar(1000)
+  DetailsPdfUrl nvarchar(1000)
+  Category nvarchar(100)
+  Location nvarchar(250)
+  MeetingUrl nvarchar(1000)
+  StartsAt datetime
+  EndsAt datetime
+  Price decimal(10,2)
+  Capacity int
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table Orders {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  TotalAmount decimal(10,2)
+  Status nvarchar(50)
+  CreatedAt datetime
+}
+
+Table OrderItems {
+  Id int [pk]
+  OrderId int [not null]
+  CourseId int
+  EventId int
+  InternshipId int
+  Title nvarchar(250)
+  Price decimal(10,2)
+  REFERENCES int
+}
+
+Table Payments {
+  Id int [pk]
+  OrderId int [not null]
+  Amount decimal(10,2)
+  PaymentMethod nvarchar(50)
+  TransactionReference nvarchar(200)
+  Status nvarchar(50)
+  PaidAt datetime
+}
+
+Table CourseEnrollments {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  CourseId int [not null]
+  OrderItemId int
+  Status nvarchar(50)
+  EnrolledAt datetime
+  CompletedAt datetime
+  indexes {
+    (UserId, CourseId) [unique]
+  }
+}
+
+Table LessonProgress {
+  Id int [pk]
+  EnrollmentId int [not null]
+  LessonId int [not null]
+  IsCompleted bit
+  PlaybackSeconds int
+  Notes nvarchar(max)
+  UpdatedAt datetime
+  indexes {
+    (EnrollmentId, LessonId) [unique]
+  }
+}
+
+Table ProjectApplications {
+  Id int [pk]
+  ProjectId int [not null]
+  UserId nvarchar(450) [not null]
+  FullName nvarchar(150)
+  Email nvarchar(254)
+  Phone nvarchar(30)
+  CoverLetter nvarchar(max)
+  Experience nvarchar(max)
+  PortfolioUrl nvarchar(1000)
+  ResumeUrl nvarchar(1000)
+  ProposedAmount decimal(10,2)
+  Status nvarchar(50)
+  ReviewedByUserId nvarchar(450)
+  ReviewedAt datetime
+  AppliedAt datetime
+  indexes {
+    (UserId, ProjectId) [unique]
+  }
+}
+
+Table JobApplications {
+  Id int [pk]
+  JobId int [not null]
+  UserId nvarchar(450) [not null]
+  FullName nvarchar(150)
+  Email nvarchar(254)
+  Phone nvarchar(30)
+  Location nvarchar(200)
+  ExperienceYears decimal(4,1)
+  CoverLetter nvarchar(max)
+  PortfolioUrl nvarchar(1000)
+  ResumeUrl nvarchar(1000)
+  Status nvarchar(50)
+  ReviewedByUserId nvarchar(450)
+  ReviewedAt datetime
+  AppliedAt datetime
+  indexes {
+    (UserId, JobId) [unique]
+  }
+}
+
+Table InternshipApplications {
+  Id int [pk]
+  InternshipId int [not null]
+  UserId nvarchar(450) [not null]
+  OrderItemId int
+  FullName nvarchar(150)
+  Email nvarchar(254)
+  Phone nvarchar(30)
+  CoverLetter nvarchar(max)
+  Experience nvarchar(max)
+  PortfolioUrl nvarchar(1000)
+  ResumeUrl nvarchar(1000)
+  Status nvarchar(50)
+  ReviewedByUserId nvarchar(450)
+  ReviewedAt datetime
+  AppliedAt datetime
+  REFERENCES int
+  indexes {
+    (UserId, InternshipId) [unique]
+  }
+}
+
+Table Registrations {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  EventId int [not null]
+  OrderItemId int
+  Status nvarchar(50)
+  RegisteredAt datetime
+  indexes {
+    (UserId, EventId) [unique]
+  }
+}
+
+Table CartItems {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  CourseId int
+  EventId int
+  InternshipId int
+  AddedAt datetime
+  REFERENCES int
+}
+
+Table Favorites {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  CourseId int
+  ProjectId int
+  JobId int
+  InternshipId int
+  EventId int
+  AddedAt datetime
+  REFERENCES int
+}
+
+Table Conversations {
+  Id int [pk]
+  FirstUserId nvarchar(450) [not null]
+  SecondUserId nvarchar(450) [not null]
+  ProjectId int
+  CreatedAt datetime
+}
+
+Table Messages {
+  Id int [pk]
+  ConversationId int [not null]
+  SenderUserId nvarchar(450) [not null]
+  Body nvarchar(max)
+  AttachmentUrl nvarchar(1000)
+  MessageType nvarchar(50)
+  CallStatus nvarchar(50)
+  CallRoomUrl nvarchar(1000)
+  CallDurationSeconds int
+  SentAt datetime
+  ReadAt datetime
+}
+
+Table Follows {
+  Id int [pk]
+  FollowerUserId nvarchar(450) [not null]
+  FollowedUserId nvarchar(450) [not null]
+  CreatedAt datetime
+  indexes {
+    (FollowerUserId, FollowedUserId) [unique]
+  }
+}
+
+Table UserActivities {
+  Id int [pk]
+  UserId nvarchar(450) [not null]
+  ActorUserId nvarchar(450)
+  ActivityType nvarchar(50)
+  Title nvarchar(250)
+  Description nvarchar(max)
+  PreviousStatus nvarchar(50)
+  NewStatus nvarchar(50)
+  ProjectId int
+  JobId int
+  InternshipId int
+  CourseId int
+  EventId int
+  LessonId int
+  ProjectApplicationId int
+  JobApplicationId int
+  InternshipApplicationId int
+  EnrollmentId int
+  RegistrationId int
+  OrderId int
+  ConversationId int
+  CreatedAt datetime
+  REFERENCES int
+  REFERENCES int
+}
+
+Ref: UserDocuments.UserId > AspNetUsers.Id
+Ref: Companies.OwnerUserId > AspNetUsers.Id
+Ref: Courses.AdminUserId > AspNetUsers.Id
+Ref: Courses.CompanyId > Companies.Id
+Ref: CourseLessons.CourseId > Courses.Id
+Ref: Projects.OwnerUserId > AspNetUsers.Id
+Ref: Jobs.CompanyId > Companies.Id
+Ref: Internships.CompanyId > Companies.Id
+Ref: Events.AdminUserId > AspNetUsers.Id
+Ref: Events.CompanyId > Companies.Id
+Ref: Orders.UserId > AspNetUsers.Id
+Ref: OrderItems.OrderId > Orders.Id
+Ref: OrderItems.CourseId > Courses.Id
+Ref: OrderItems.EventId > Events.Id
+Ref: OrderItems.InternshipId > Internships.Id
+Ref: Payments.OrderId > Orders.Id
+Ref: CourseEnrollments.UserId > AspNetUsers.Id
+Ref: CourseEnrollments.CourseId > Courses.Id
+Ref: CourseEnrollments.OrderItemId > OrderItems.Id
+Ref: LessonProgress.EnrollmentId > CourseEnrollments.Id
+Ref: LessonProgress.LessonId > CourseLessons.Id
+Ref: ProjectApplications.ProjectId > Projects.Id
+Ref: ProjectApplications.UserId > AspNetUsers.Id
+Ref: ProjectApplications.ReviewedByUserId > AspNetUsers.Id
+Ref: JobApplications.JobId > Jobs.Id
+Ref: JobApplications.UserId > AspNetUsers.Id
+Ref: JobApplications.ReviewedByUserId > AspNetUsers.Id
+Ref: InternshipApplications.InternshipId > Internships.Id
+Ref: InternshipApplications.UserId > AspNetUsers.Id
+Ref: InternshipApplications.OrderItemId > OrderItems.Id
+Ref: InternshipApplications.ReviewedByUserId > AspNetUsers.Id
+Ref: Registrations.UserId > AspNetUsers.Id
+Ref: Registrations.EventId > Events.Id
+Ref: Registrations.OrderItemId > OrderItems.Id
+Ref: CartItems.UserId > AspNetUsers.Id
+Ref: CartItems.CourseId > Courses.Id
+Ref: CartItems.EventId > Events.Id
+Ref: CartItems.InternshipId > Internships.Id
+Ref: Favorites.UserId > AspNetUsers.Id
+Ref: Favorites.CourseId > Courses.Id
+Ref: Favorites.ProjectId > Projects.Id
+Ref: Favorites.JobId > Jobs.Id
+Ref: Favorites.InternshipId > Internships.Id
+Ref: Favorites.EventId > Events.Id
+Ref: Conversations.FirstUserId > AspNetUsers.Id
+Ref: Conversations.SecondUserId > AspNetUsers.Id
+Ref: Conversations.ProjectId > Projects.Id
+Ref: Messages.ConversationId > Conversations.Id
+Ref: Messages.SenderUserId > AspNetUsers.Id
+Ref: Follows.FollowerUserId > AspNetUsers.Id
+Ref: Follows.FollowedUserId > AspNetUsers.Id
+Ref: UserActivities.UserId > AspNetUsers.Id
+Ref: UserActivities.ActorUserId > AspNetUsers.Id
+Ref: UserActivities.ProjectId > Projects.Id
+Ref: UserActivities.JobId > Jobs.Id
+Ref: UserActivities.InternshipId > Internships.Id
+Ref: UserActivities.CourseId > Courses.Id
+Ref: UserActivities.EventId > Events.Id
+Ref: UserActivities.LessonId > CourseLessons.Id
+Ref: UserActivities.ProjectApplicationId > ProjectApplications.Id
+Ref: UserActivities.JobApplicationId > JobApplications.Id
+Ref: UserActivities.InternshipApplicationId > InternshipApplications.Id
+Ref: UserActivities.EnrollmentId > CourseEnrollments.Id
+Ref: UserActivities.RegistrationId > Registrations.Id
+Ref: UserActivities.OrderId > Orders.Id
+Ref: UserActivities.ConversationId > Conversations.Id

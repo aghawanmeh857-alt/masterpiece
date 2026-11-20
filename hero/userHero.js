@@ -13,6 +13,7 @@ import { createStreetLife, createCityAircraft } from './street-life.js';
 import { createCityTraffic } from './city-traffic.js';
 import { createAccessRoads } from './access-roads.js';
 import { createBeachLife } from './beach-life.js';
+import { createDescentClouds } from './descent-clouds.js';
 import { HEADQUARTERS_MODEL, placeHeadquartersModel } from '../3D/model-layout.js';
 import { createAutumnWalk } from '../3D/autumn-walk.js';
 import { createPlazaFountain } from '../3D/plaza-fountain.js';
@@ -69,9 +70,12 @@ let currentRoom = -1;
 let sceneApi = null;
 let renderedTourTime = 0;
 const receptionTime = 19;
+let skipOpening = reducedMotion;
 
 
 const chapters = [...document.querySelectorAll('.chapter')];
+const tourEnd = document.getElementById('journeyEnd');
+let tourEndTop = 0;
 const buttons = [...document.querySelectorAll('[data-room]')];
 const readingStops = chapters.map((chapter, index) => {
   const data = ROOM_SECTIONS[index];
@@ -91,7 +95,7 @@ function refreshReadingPanels() {
   readingStops.forEach((stop, index) => {
     const local = scrollY - stop.top;
     const readingLocal = local - (stop.opening || 0);
-    const active = index === currentRoom && readingLocal >= -20 && readingLocal < stop.reading && (index !== 0 || renderedTourTime >= receptionTime - .5);
+    const active = index === currentRoom && readingLocal >= -20 && readingLocal < stop.reading && (index !== 0 || skipOpening || renderedTourTime >= receptionTime - .5);
     const fadeDistance = Math.max(1, Math.min(180, stop.reading * .3));
     const remaining = Math.max(0, Math.min(1, (stop.reading - readingLocal) / fadeDistance));
     const opacity = remaining * remaining * (3 - 2 * remaining);
@@ -120,19 +124,21 @@ function refreshReadingPanels() {
   });
 }
 function measureReadingStops() {
+  const heights = readingStops.map(stop => stop.article.offsetHeight);
   readingStops.forEach((stop, index) => {
-    stop.opening = index === 0 ? innerHeight * 1.8 : 0;
+    stop.opening = index === 0 && !skipOpening ? innerHeight * (innerWidth < 768 ? 2 : 2.6) : 0;
     // Hold the panel in place first, then leave a longer reading window before travel.
     stop.hold = innerHeight * .25;
-    stop.reading = stop.hold + Math.max(innerHeight * 1.75, stop.article.offsetHeight - innerHeight + 380);
+    stop.reading = stop.hold + Math.max(innerHeight * 1.75, heights[index] - innerHeight + 380);
     stop.travel = index === 5 ? innerHeight * .35 : innerHeight * 1.15;
     stop.chapter.style.setProperty('--station-height', (stop.opening + stop.reading + stop.travel) + 'px');
   });
   // Measure once after layout changes, never while animating the camera.
-  readingStops.forEach(stop => {
+  readingStops.forEach((stop, index) => {
     stop.top = stop.chapter.offsetTop;
-    stop.exitDistance = stop.article.offsetHeight + (innerWidth < 768 ? 130 : 150);
+    stop.exitDistance = heights[index] + (innerWidth < 768 ? 130 : 150);
   });
+  tourEndTop = tourEnd.offsetTop;
 }
 measureReadingStops();
 const readingResizeObserver = new ResizeObserver(() => { measureReadingStops(); progressAtScroll(); });
@@ -205,7 +211,6 @@ document.querySelector('.brand').addEventListener(
 const mobileTour = matchMedia('(max-width: 767px)');
 const tourFooter = document.querySelector('.tour-footer');
 const tourCaption = document.querySelector('.scene-caption');
-const tourEnd = document.getElementById('journeyEnd');
 let tourEndVisible = false;
 const mobileRoomLabelDuration = 3500;
 let mobileOverlayExpired = false;
@@ -240,27 +245,33 @@ document.querySelector('.journey-end-brand').addEventListener('click', event => 
 });
 
 function progressAtScroll() {
-  tourEndVisible = !adminPreview && scrollY + innerHeight > tourEnd.offsetTop + 60;
-  document.documentElement.classList.toggle('tour-at-end', tourEndVisible);
-  tourEnd.inert = !tourEndVisible;
-  tourEnd.setAttribute('aria-hidden', String(!tourEndVisible));
-  syncMobileTourOverlay();
+  const endVisible = !adminPreview && scrollY + innerHeight > tourEndTop + 60;
+  if (tourEndVisible !== endVisible) {
+    tourEndVisible = endVisible;
+    document.documentElement.classList.toggle('tour-at-end', endVisible);
+    tourEnd.inert = !endVisible;
+    tourEnd.setAttribute('aria-hidden', String(!endVisible));
+    syncMobileTourOverlay();
+  }
   refreshReadingPanels();
   if (adminPreview) return;
   let index = 0;
   for (let i = 1; i < readingStops.length; i++) if (scrollY >= readingStops[i].top) index = i;
   const stop = readingStops[index];
-  const local = scrollY - stop.chapter.offsetTop;
+  const local = scrollY - stop.top;
   const travel = Math.max(0, Math.min(1, (local - stop.opening - stop.reading) / stop.travel));
   const raw = index === 5 ? 5 : index + (travel === 0 ? 0 : .12 + .76 * travel);
   if (!sceneApi) setRoom(Math.min(5, Math.floor(raw + .12)));
-  $('progress').style.width = raw / 5 * 100 + '%';
   if (index === 0) {
-    const approach = Math.max(0, Math.min(1, local / stop.opening));
-    const eased = approach * approach * (3 - 2 * approach);
-    const journeyTime = local < stop.opening ? receptionTime * eased : receptionTime + (TOUR_STOPS[1] - receptionTime) * travel * travel * (3 - 2 * travel);
+    // The first wheel or touch movement should already carry the camera through the sky.
+    const approach = stop.opening ? Math.max(0, Math.min(1, local / stop.opening)) : 1;
+    const journeyTime = receptionTime * approach + (TOUR_STOPS[1] - receptionTime) * travel * travel * (3 - 2 * travel);
     sceneApi?.moveToTime(journeyTime);
-  } else sceneApi?.move(raw);
+    $('progress').style.width = journeyTime / TOUR_STOPS[5] * 100 + '%';
+  } else {
+    sceneApi?.move(raw);
+    $('progress').style.width = tourTarget(raw, reducedMotion) / TOUR_STOPS[5] * 100 + '%';
+  }
 }
 let pendingScrollFrame = null;
 addEventListener('scroll', () => {
@@ -321,6 +332,9 @@ initScene().catch(error => {
   document.querySelector('.day-night-controls').hidden = true;
   $('status').textContent = 'تعذّر عرض المشهد، يمكنك فتح الأقسام من القائمة.';
   document.documentElement.dataset.sceneReady = 'false';
+  skipOpening = true;
+  measureReadingStops();
+  progressAtScroll();
   if (adminPreview) parent.postMessage({type: 'ofoq-preview-error'}, location.origin);
 });
 
@@ -625,21 +639,6 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
     moon.add(crater);
   }
 
-  const clouds = new THREE.Group();
-  const cloudMaterial = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .65, fog: false });
-  for (const [x, y, z] of [[-120, 65, -80], [-40, 85, -125], [70, 80, -120]]) {
-    const cloud = new THREE.Group();
-    cloud.position.set(x, y, z);
-    for (let i = 0; i < 4; i++) {
-      const puff = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 8), cloudMaterial);
-      puff.position.set(i * 7 - 10, i % 2 * 2, 0);
-      puff.scale.set(1.4, .6, .9);
-      cloud.add(puff);
-    }
-    clouds.add(cloud);
-  }
-  scene.add(clouds);
-
   const starsGeometry = new THREE.BufferGeometry();
   const starPositions = [];
   for (let i = 0; i < 180; i++) {
@@ -699,7 +698,6 @@ async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, 
     }
     moonLight.intensity = .8 * amount;
     moonLight.position.copy(moon.position);
-    cloudMaterial.opacity = .65 * daylight;
     stars.material.opacity = amount;
     ambient.intensity = THREE.MathUtils.lerp(1.65, .45, amount);
     ambient.color.copy(dayAmbient).lerp(nightAmbient, amount);
@@ -828,6 +826,8 @@ async function createBuildingTour(container, {
   renderer.shadowMap.needsUpdate = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.append(renderer.domElement);
+  const descentClouds = createDescentClouds(THREE, scene);
+  descentClouds.setNight(document.documentElement.dataset.theme === 'dark' ? 1 : 0);
   const ambient = new THREE.HemisphereLight('#d5e6ff', '#747568', 1.65);
   scene.add(ambient);
   const sun = new THREE.DirectionalLight('#fff0d9', 3.5);
@@ -1294,6 +1294,7 @@ async function createBuildingTour(container, {
   let coastal = {
     update() {},
     setNight(night) {
+      descentClouds.setNight(night ? 1 : 0);
       sun.intensity = night ? .35 : 3.5;
       ambient.intensity = night ? .45 : 1.65;
       scene.background.set(night ? '#080f20' : '#87ceeb');
@@ -1302,21 +1303,16 @@ async function createBuildingTour(container, {
   };
 
   const keys = [
-    [0, [50, 36, 78],
-      [0, 29, -8]
-    ],
-    [4, [0, 3.1, 35],
-      [0, 3.2, 14]
-    ],
-    [7, [0, 3.0, 17],
-      [0, 2.7, 0]
-    ],
-    [11, [0, 1.9, 6],
-      [0, 1.9, -6]
-    ],
-    [15, [0, 1.95, -2],
-      [5, 1.7, -8]
-    ],
+    // Bank towards the tower from above the marine layer, level out over the
+    // promenade, then cross the centre of the glass doors at eye height.
+    [0,    [26, 112, 109],    [12, 77, 41]],
+    [2.6,  [21, 91, 96],      [7, 62, 29]],
+    [5,    [14, 63, 78],      [0, 44, 0]],
+    [7.5,  [7, 34, 59],       [0, 25, -2]],
+    [9.5,  [2, 12, 42],       [0, 11, 0]],
+    [11.5, [0, 3.3, 28],      [0, 5, 1]],
+    [13.5, [0, 2, 13],        [0, 2.3, 0]],
+    [16.6, [0, 1.85, 2.05],   [0, 1.85, -7]],
     [19, [1, 2.1, -6],
       [5, 1.4, -9]
     ],
@@ -1406,7 +1402,8 @@ async function createBuildingTour(container, {
     cameraPath.getPoint(point, camera.position);
     lookPath.getPoint(point, lookTarget);
     camera.lookAt(lookTarget);
-    const fov = THREE.MathUtils.lerp(innerWidth < 768 ? 76 : 54, 64, smooth(Math.max(0, Math.min(1, (time - 5) / 4))));
+    descentClouds.update(camera);
+    const fov = THREE.MathUtils.lerp(innerWidth < 768 ? 70 : 55, 64, smooth(Math.max(0, Math.min(1, (time - 9.5) / 7))));
     if (camera.fov !== fov) {
       camera.fov = fov;
       camera.updateProjectionMatrix();
@@ -1418,15 +1415,12 @@ async function createBuildingTour(container, {
   function move(raw) {
     targetTime = tourTarget(raw, reducedMotion);
     document.documentElement.dataset.tourTarget = targetTime.toFixed(2);
-    roomJump = null;
+    if (roomJump?.target !== targetTime) roomJump = null;
     if (reducedMotion) seek(targetTime);
   }
 
   function resize() {
     camera.aspect = innerWidth / innerHeight;
-    if (innerWidth < 768) {
-      camera.fov = time < 7 ? 76 : 64;
-    } else camera.fov = time < 7 ? 54 : 64;
     camera.updateProjectionMatrix();
     renderScale = Math.min(renderScale, maxPixelRatio());
     renderer.setPixelRatio(renderScale);
@@ -1453,7 +1447,7 @@ async function createBuildingTour(container, {
     if (preview?.playing) {
       preview.elapsed = Math.min(preview.duration, preview.elapsed + dt);
       // Follow the entrance portion of the existing tour, including the sliding doors.
-      targetTime = 15 * preview.elapsed / preview.duration;
+      targetTime = receptionTime * preview.elapsed / preview.duration;
       if (preview.elapsed === preview.duration) preview.playing = false;
     }
     if (roomJump) {
@@ -1461,7 +1455,7 @@ async function createBuildingTour(container, {
       seek(THREE.MathUtils.lerp(roomJump.start, roomJump.target, smooth(progress)));
       if (progress === 1) roomJump = null;
     } else if (Math.abs(targetTime - time) > .0001) {
-      seek(reducedMotion ? targetTime : advanceTour(time, targetTime, dt, cameraSmoothness));
+      seek(reducedMotion ? targetTime : advanceTour(time, targetTime, elapsedMs / 1000, cameraSmoothness));
     }
     screenBrightness = THREE.MathUtils.damp(screenBrightness, requestedNight ? 0 : 1, 3.5, dt);
     logoMaterials.forEach(material => {
@@ -1538,10 +1532,11 @@ async function createBuildingTour(container, {
     for (const group of deskGroups) group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
     for (const group of interiorProps) group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
     // Stop invisible ocean geometry updates after entering the building.
-    coastal.update(dt, camera, time < 7, previewPeople && !requestedNight);
-    autumnWalk?.update(dt, time < 15, camera);
-    scenicPlantings?.update(camera, previewCity && time < 15, Number(document.documentElement.dataset.dayNightProgress ?? (requestedNight ? 1 : 0)));
-    plazaFountain?.update(dt, time < 15);
+    coastal.update(dt, camera, camera.position.z > 12, previewPeople && !requestedNight);
+    const outsideEntrance = camera.position.z > 1.85;
+    autumnWalk?.update(dt, outsideEntrance, camera);
+    scenicPlantings?.update(camera, previewCity && outsideEntrance, Number(document.documentElement.dataset.dayNightProgress ?? (requestedNight ? 1 : 0)));
+    plazaFountain?.update(dt, outsideEntrance);
     // Two nearby local lights keep the night lighting affordable on integrated GPUs.
     if (localLights.length && now >= nextLightSelection) {
       nextLightSelection = now + 100;
@@ -1553,15 +1548,14 @@ async function createBuildingTour(container, {
     renderer.render(scene, camera);
     document.documentElement.dataset.activePeople = String(activePeople);
     // Lower resolution only after sustained slow frames, ignoring loading stalls.
-    if (document.documentElement.dataset.modelLoad === 'ready' && elapsedMs > 0 && elapsedMs < 1000) {
+    if (elapsedMs > 0 && elapsedMs < 1000) {
       sampleTime += elapsedMs; sampleFrames++;
-      if (sampleTime >= 1500) {
+      if (sampleTime >= 1500 && sampleFrames >= 4) {
         const averageFrameMs = sampleTime / sampleFrames;
         const nextScale = nextRenderScale(renderScale, averageFrameMs, innerWidth * innerHeight);
         if (nextScale !== renderScale) {
           renderScale = nextScale;
           renderer.setPixelRatio(renderScale);
-          renderer.setSize(innerWidth, innerHeight);
         }
         document.documentElement.dataset.renderScale = renderScale.toFixed(2);
         sampleTime = 0; sampleFrames = 0;
@@ -1599,6 +1593,7 @@ async function createBuildingTour(container, {
       const outdoor = createOutdoorFacilities(THREE, scene);
       const setOutdoorNight = outdoor.userData.setNight;
       outdoor.userData.setNight = amount => {
+        descentClouds.setNight(amount);
         cityLightLevel = amount;
         if (typeof setOutdoorNight === 'function') setOutdoorNight(amount);
         city?.setNight(amount);
@@ -1677,7 +1672,21 @@ async function createBuildingTour(container, {
         scene.add(wrapper);
       }
     
+      const poseBounds = new Map();
+      function boundsForPose(clip, model) {
+        if (!poseBounds.has(clip)) {
+          model.updateMatrixWorld(true);
+          poseBounds.set(clip, new THREE.Box3().setFromObject(model, true));
+        }
+        return poseBounds.get(clip);
+      }
+      let sliceStart = performance.now();
       for (let n = 0; n < people.length; n++) {
+        if (performance.now() - sliceStart > 8) {
+          await new Promise(resolve => requestAnimationFrame(resolve));
+          if (disposed) return;
+          sliceStart = performance.now();
+        }
         const holder = people[n],
           seated = holder.userData.seated,
           asset = seated || n % 2 === 0 ? boss : woman;
@@ -1687,17 +1696,16 @@ async function createBuildingTour(container, {
         const idle = asset.animations.find(a => a.name.endsWith('Idle1')) || asset.animations[0];
         const idleAction = mixer.clipAction(idle).play();
         mixer.setTime(0);
-        model.updateMatrixWorld(true);
-        const standing = new THREE.Box3().setFromObject(model, true),
+        const standing = boundsForPose(idle, model),
           scale = 1.82 / standing.getSize(new THREE.Vector3()).y;
+        const restClip = seated ? asset.animations.find(a => a.name.endsWith('SitIdle1')) : idle;
         if (seated) {
           idleAction.stop();
-          mixer.clipAction(asset.animations.find(a => a.name.endsWith('SitIdle1'))).play();
+          mixer.clipAction(restClip).play();
           mixer.setTime(0);
           holder.rotation.y += Math.PI;
         }
-        model.updateMatrixWorld(true);
-        const b = new THREE.Box3().setFromObject(model, true),
+        const b = boundsForPose(restClip, model),
           center = b.getCenter(new THREE.Vector3());
         model.scale.setScalar(scale);
         model.position.set(-center.x * scale, -b.min.y * scale, -center.z * scale);
@@ -1718,7 +1726,7 @@ async function createBuildingTour(container, {
         holder.add(model);
         holder.userData.mixer = mixer;
         holder.userData.idleAction = idleAction;
-        holder.userData.restAction = seated ? mixer.clipAction(asset.animations.find(a => a.name.endsWith('SitIdle1'))) : idleAction;
+        holder.userData.restAction = mixer.clipAction(restClip);
         holder.userData.home = { position: holder.position.clone(), rotation: holder.rotation.y, modelPosition: model.position.clone() };
         const standingCenter = standing.getCenter(new THREE.Vector3());
         holder.userData.standingPosition = new THREE.Vector3(-standingCenter.x * scale, -standing.min.y * scale, -standingCenter.z * scale);
@@ -1828,11 +1836,17 @@ async function createBuildingTour(container, {
       coastal.setNight(night, immediate);
     },
     move,
-    moveToTime(value) { roomJump = null; targetTime = Math.max(0, Math.min(68, value)); if (reducedMotion) seek(targetTime); },
+    moveToTime(value) {
+      const target = Math.max(0, Math.min(68, value));
+      if (roomJump?.target !== target) roomJump = null;
+      targetTime = target;
+      document.documentElement.dataset.tourTarget = target.toFixed(2);
+      if (reducedMotion) seek(targetTime);
+    },
     seek(value) { roomJump = null; targetTime = value; seek(value); },
     goToRoom(index) {
       if (!Number.isInteger(index) || index < 0 || index >= stops.length || disposed) return;
-      targetTime = stops[index];
+      targetTime = index === 0 && skipOpening ? receptionTime : stops[index];
       roomJump = { start: time, target: targetTime, started: performance.now() };
       if (reducedMotion) { seek(targetTime); roomJump = null; }
     },
@@ -1841,6 +1855,7 @@ async function createBuildingTour(container, {
       if (renderFrame !== null) cancelAnimationFrame(renderFrame);
       removeEventListener('resize', resize);
       coastal.destroy?.();
+      descentClouds.destroy();
       autumnWalk?.destroy();
       scenicPlantings?.destroy();
       plazaFountain?.destroy();

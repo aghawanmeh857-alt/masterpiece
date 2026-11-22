@@ -1,26 +1,8 @@
-import { createScenicPlantings } from '../3D/scenic-plantings.js';
-import { mergeStaticMeshes } from './static-meshes.js';
 import { ROOM_SECTIONS, renderRoomSections } from './room-sections.js?v=single-action-2';
-// المشهد ثلاثي الأبعاد يحتاج Three.js. بقية الشاشات لا تستخدم مكتبات.
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { clone } from 'three/addons/utils/SkeletonUtils.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { TOUR_STOPS, TOUR_END, RECEPTION_TIME as receptionTime, stationTourTime, advanceTour, roomAtTourTime, createTourPath, nextRenderScale } from './tour-motion.js';
-import { doorProximity, advanceDoor } from './door-motion.js';
-import { createStreetLife, createCityAircraft } from './street-life.js';
-import { createCityTraffic } from './city-traffic.js';
-import { createAccessRoads } from './access-roads.js';
-import { createBeachLife } from './beach-life.js';
-import { createDescentClouds } from './descent-clouds.js';
-import { HEADQUARTERS_MODEL, placeHeadquartersModel } from '../3D/model-layout.js';
-import { createHeadquartersLighting } from '../3D/headquarters-lighting.js';
-import { createAutumnWalk } from '../3D/autumn-walk.js';
-import { createPlazaFountain } from '../3D/plaza-fountain.js';
-import { loadRealisticFurniture } from '../3D/realistic-furniture.js';
-import { createTourInterior, INTERIOR_FLOOR } from '../3D/tour-interior.js';
-const adminPreview = new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
+import { TOUR_STOPS, RECEPTION_TIME as receptionTime, stationTourTime } from './tour-motion.js';
+
+const adminPreview =
+  new URLSearchParams(location.search).get('preview') === 'admin' && parent !== window;
 if (adminPreview) document.documentElement.classList.add('admin-scene-preview');
 // 1. الوضع النهاري والليلي وروابط الصفحات، دون تخزين.
 window.siteThemeUrl = function (href) {
@@ -32,47 +14,53 @@ window.setSiteTheme = function (value) {
   const dark = value === 'dark';
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   document.documentElement.classList.add('theme-transition');
-  document.querySelector('.theme-toggle').textContent = dark ? '☀ الوضع النهاري' : '☾ الوضع الليلي';
-  document.querySelector('.theme-toggle').setAttribute('aria-label', dark ? 'التبديل إلى الوضع النهاري' : 'التبديل إلى الوضع الليلي');
+  document.querySelector('.theme-toggle').textContent = dark
+    ? '☀ الوضع النهاري'
+    : '☾ الوضع الليلي';
+  document
+    .querySelector('.theme-toggle')
+    .setAttribute('aria-label', dark ? 'التبديل إلى الوضع النهاري' : 'التبديل إلى الوضع الليلي');
   const url = new URL(location.href);
   url.searchParams.set('theme', dark ? 'dark' : 'light');
   history.replaceState(null, '', url);
   document.querySelectorAll('a[href]').forEach(function (link) {
     const target = new URL(link.href);
-    if (target.origin === location.origin && target.pathname.endsWith('.html')) link.href = window.siteThemeUrl(link.href);
+    if (target.origin === location.origin && target.pathname.endsWith('.html'))
+      link.href = window.siteThemeUrl(link.href);
   });
 };
 window.setSiteTheme(new URLSearchParams(location.search).get('theme'));
 document.querySelector('.theme-toggle').addEventListener('click', function () {
-  const dark = document.documentElement.dataset.theme === 'dark';
-  if (sceneApi) document.getElementById(dark ? 'dayMode' : 'nightMode').click();
-  else window.setSiteTheme(dark ? 'light' : 'dark');
+  setTimeOfDay(document.documentElement.dataset.theme !== 'dark');
 });
 
 // 2. أزرار الصفحة والتنقل بالسكرول.
 
-
 // بيانات الغرف والفرص التجريبية.
 const rooms = [
-  {id:'lobby',name:'الرئيسية',caption:'أهلًا بك',action:'ابدأ رحلتك'},
-  {id:'freelance',name:'العمل الحر',caption:'اصنع طريقك',action:'استكشف المشاريع'},
-  {id:'academy',name:'الأكاديمية',caption:'واصل التعلّم',action:'تصفّح المسارات'},
-  {id:'internships',name:'فرص التدريب',caption:'خطوتك الأولى',action:'اكتشف التدريبات'},
-  {id:'jobs',name:'الوظائف',caption:'ابحث عن مكانك',action:'تصفّح الوظائف'},
-  {id:'events',name:'الفعاليات',caption:'ننجز معًا',action:'استكشف الفعاليات'}
+  { id: 'lobby', name: 'الرئيسية', caption: 'أهلًا بك', action: 'ابدأ رحلتك' },
+  { id: 'freelance', name: 'العمل الحر', caption: 'اصنع طريقك', action: 'استكشف المشاريع' },
+  { id: 'academy', name: 'الأكاديمية', caption: 'واصل التعلّم', action: 'تصفّح المسارات' },
+  { id: 'internships', name: 'فرص التدريب', caption: 'خطوتك الأولى', action: 'اكتشف التدريبات' },
+  { id: 'jobs', name: 'الوظائف', caption: 'ابحث عن مكانك', action: 'تصفّح الوظائف' },
+  { id: 'events', name: 'الفعاليات', caption: 'ننجز معًا', action: 'استكشف الفعاليات' }
 ];
 
-const $ = id => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-const reducedMotion = matchMedia(
-  '(prefers-reduced-motion: reduce)'
-).matches;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let currentRoom = -1;
 let sceneApi = null;
 let renderedTourTime = 0;
 let skipOpening = reducedMotion;
 
+function setTimeOfDay(night, immediate = false) {
+  window.setSiteTheme(night ? 'dark' : 'light');
+  sceneApi?.setNight(night, immediate);
+  $('dayMode').setAttribute('aria-pressed', String(!night));
+  $('nightMode').setAttribute('aria-pressed', String(night));
+}
 
 const chapters = [...document.querySelectorAll('.chapter')];
 const tourEnd = document.getElementById('journeyEnd');
@@ -80,27 +68,54 @@ let tourEndTop = 0;
 const buttons = [...document.querySelectorAll('[data-room]')];
 const readingStops = chapters.map((chapter, index) => {
   const data = ROOM_SECTIONS[index];
-  const article = document.createElement('article'); article.className = 'station-content';
-  const label = document.createElement('p'); label.className = 'station-label'; label.textContent = String(index + 1).padStart(2, '0') + ' / ' + rooms[index].name;
-  const title = document.createElement(index === 0 ? 'h1' : 'h2'); title.className = 'station-title'; title.innerHTML = data.title;
-  const description = document.createElement('p'); description.className = 'station-description'; description.textContent = data.description;
-  const services = document.createElement('div'); renderRoomSections(services, index);
-  const action = document.createElement('a'); action.className = 'btn btn-orange station-action';
-  const destinations = ['../Auth/Register/register.html','../Freelance/freelance.html','../Academy/academy.html','../Internships/internships.html','../Jobs/jobs.html','../Events/events.html'];
-  action.href = window.siteThemeUrl(destinations[index]); action.textContent = index === 0 ? 'إنشاء حساب ←' : rooms[index].action + ' ←';
-  const hint = document.createElement('p'); hint.className = 'station-scroll-hint'; hint.textContent = index === 5 ? 'تابع التمرير للوصول إلى ختام الجولة ↓' : 'تابع التمرير للانتقال إلى القسم التالي ↓';
-  article.append(label, title, description, services, action, hint); chapter.append(article);
+  const article = document.createElement('article');
+  article.className = 'station-content';
+  const label = document.createElement('p');
+  label.className = 'station-label';
+  label.textContent = String(index + 1).padStart(2, '0') + ' / ' + rooms[index].name;
+  const title = document.createElement(index === 0 ? 'h1' : 'h2');
+  title.className = 'station-title';
+  title.innerHTML = data.title;
+  const description = document.createElement('p');
+  description.className = 'station-description';
+  description.textContent = data.description;
+  const services = document.createElement('div');
+  renderRoomSections(services, index);
+  const action = document.createElement('a');
+  action.className = 'btn btn-orange station-action';
+  const destinations = [
+    '../Auth/Register/register.html',
+    '../Freelance/freelance.html',
+    '../Academy/academy.html',
+    '../Internships/internships.html',
+    '../Jobs/jobs.html',
+    '../Events/events.html'
+  ];
+  action.href = window.siteThemeUrl(destinations[index]);
+  action.textContent = index === 0 ? 'إنشاء حساب ←' : rooms[index].action + ' ←';
+  const hint = document.createElement('p');
+  hint.className = 'station-scroll-hint';
+  hint.textContent =
+    index === 5
+      ? 'تابع التمرير للوصول إلى ختام الجولة ↓'
+      : 'تابع التمرير للانتقال إلى القسم التالي ↓';
+  article.append(label, title, description, services, action, hint);
+  chapter.append(article);
   return { chapter, article, reading: 0, travel: 0 };
 });
 function refreshReadingPanels() {
   readingStops.forEach((stop, index) => {
     const local = scrollY - stop.top;
     const readingLocal = local - (stop.opening || 0);
-    const active = index === currentRoom && readingLocal >= -20 && readingLocal < stop.reading && (index !== 0 || skipOpening || renderedTourTime >= receptionTime - .5);
-    const fadeDistance = Math.max(1, Math.min(180, stop.reading * .3));
+    const active =
+      index === currentRoom &&
+      readingLocal >= -20 &&
+      readingLocal < stop.reading &&
+      (index !== 0 || skipOpening || renderedTourTime >= receptionTime - 0.5);
+    const fadeDistance = Math.max(1, Math.min(180, stop.reading * 0.3));
     const remaining = Math.max(0, Math.min(1, (stop.reading - readingLocal) / fadeDistance));
     const opacity = remaining * remaining * (3 - 2 * remaining);
-    const inert = !active || opacity < .15;
+    const inert = !active || opacity < 0.15;
     if (stop.active !== active) {
       stop.article.classList.toggle('station-active', active);
       stop.active = active;
@@ -112,7 +127,10 @@ function refreshReadingPanels() {
     }
     if (!active) return;
     const nextOpacity = opacity.toFixed(3);
-    const movement = Math.max(0, Math.min(1, (readingLocal - stop.hold) / (stop.reading - stop.hold)));
+    const movement = Math.max(
+      0,
+      Math.min(1, (readingLocal - stop.hold) / (stop.reading - stop.hold))
+    );
     const nextOffset = (movement * stop.exitDistance).toFixed(1) + 'px';
     if (stop.opacity !== nextOpacity) {
       stop.article.style.setProperty('--station-opacity', nextOpacity);
@@ -125,14 +143,17 @@ function refreshReadingPanels() {
   });
 }
 function measureReadingStops() {
-  const heights = readingStops.map(stop => stop.article.offsetHeight);
+  const heights = readingStops.map((stop) => stop.article.offsetHeight);
   readingStops.forEach((stop, index) => {
     stop.opening = index === 0 && !skipOpening ? innerHeight * (innerWidth < 768 ? 2 : 2.6) : 0;
     // Hold the panel in place first, then leave a longer reading window before travel.
-    stop.hold = innerHeight * .25;
+    stop.hold = innerHeight * 0.25;
     stop.reading = stop.hold + Math.max(innerHeight * 1.2, heights[index] - innerHeight + 380);
-    stop.travel = index === 5 ? innerHeight * .35 : innerHeight * 1.15;
-    stop.chapter.style.setProperty('--station-height', (stop.opening + stop.reading + stop.travel) + 'px');
+    stop.travel = index === 5 ? innerHeight * 0.35 : innerHeight * 1.15;
+    stop.chapter.style.setProperty(
+      '--station-height',
+      stop.opening + stop.reading + stop.travel + 'px'
+    );
   });
   // Measure once after layout changes, never while animating the camera.
   readingStops.forEach((stop, index) => {
@@ -152,9 +173,8 @@ function scheduleReadingLayout() {
   });
 }
 const readingResizeObserver = new ResizeObserver(scheduleReadingLayout);
-readingStops.forEach(stop => readingResizeObserver.observe(stop.article));
+readingStops.forEach((stop) => readingResizeObserver.observe(stop.article));
 document.fonts.ready.then(scheduleReadingLayout);
-
 
 // تحديث واجهة القسم الحالي.
 function setRoom(index) {
@@ -164,11 +184,9 @@ function setRoom(index) {
   refreshReadingPanels();
 
   const room = rooms[index];
-  $('counter').textContent =
-    `${String(index + 1).padStart(2, '0')} / 06`;
+  $('counter').textContent = `${String(index + 1).padStart(2, '0')} / 06`;
 
-  $('sceneCaption').textContent =
-    `${room.name} / ${room.caption}`;
+  $('sceneCaption').textContent = `${room.name} / ${room.caption}`;
 
   buttons.forEach((button, i) => {
     button.classList.toggle('active', i === index);
@@ -198,8 +216,8 @@ function jumpTo(index) {
   }
 }
 
-buttons.forEach(button => {
-  button.addEventListener('click', event => {
+buttons.forEach((button) => {
+  button.addEventListener('click', (event) => {
     event.preventDefault();
     jumpTo(Number(button.dataset.room));
     const navigation = button.closest('.hero-navigation');
@@ -210,13 +228,10 @@ buttons.forEach(button => {
   });
 });
 
-document.querySelector('.brand').addEventListener(
-  'click',
-  event => {
-    event.preventDefault();
-    jumpTo(0);
-  }
-);
+document.querySelector('.brand').addEventListener('click', (event) => {
+  event.preventDefault();
+  jumpTo(0);
+});
 
 const mobileTour = matchMedia('(max-width: 767px)');
 const tourFooter = document.querySelector('.tour-footer');
@@ -249,7 +264,7 @@ mobileTour.addEventListener('change', showMobileRoomOverlay);
 setRoom(0);
 document.getElementById('tourFooterYear').textContent = new Date().getFullYear();
 document.getElementById('restartTour').addEventListener('click', () => jumpTo(0));
-document.querySelector('.journey-end-brand').addEventListener('click', event => {
+document.querySelector('.journey-end-brand').addEventListener('click', (event) => {
   event.preventDefault();
   jumpTo(0);
 });
@@ -275,20 +290,24 @@ function progressAtScroll() {
   const journeyTime = stationTourTime(index, approach, reading, travel, reducedMotion);
   if (!sceneApi) setRoom(index);
   sceneApi?.moveToTime(journeyTime);
-  $('progress').style.width = Math.min(100, journeyTime / TOUR_STOPS[5] * 100) + '%';
+  $('progress').style.width = Math.min(100, (journeyTime / TOUR_STOPS[5]) * 100) + '%';
 }
 let pendingScrollFrame = null;
-addEventListener('scroll', () => {
-  if (pendingScrollFrame !== null) return;
-  pendingScrollFrame = requestAnimationFrame(() => {
-    pendingScrollFrame = null;
-    progressAtScroll();
-  });
-}, { passive: true });
+addEventListener(
+  'scroll',
+  () => {
+    if (pendingScrollFrame !== null) return;
+    pendingScrollFrame = requestAnimationFrame(() => {
+      pendingScrollFrame = null;
+      progressAtScroll();
+    });
+  },
+  { passive: true }
+);
 addEventListener('resize', scheduleReadingLayout);
 
 function restoreRoom() {
-  const index = rooms.findIndex(r => location.hash === '#' + r.id);
+  const index = rooms.findIndex((r) => location.hash === '#' + r.id);
   if (index >= 0) {
     scrollTo({
       top: index === 0 ? 0 : chapters[index].offsetTop,
@@ -300,38 +319,45 @@ function restoreRoom() {
 addEventListener('hashchange', restoreRoom);
 restoreRoom();
 async function initScene() {
-
+  const { createBuildingTour } = await import('./building-tour.js?v=realistic-coastal-tour');
   sceneApi = await createBuildingTour($('scene'), {
     reducedMotion,
+    adminPreview,
     onRoomChange: setRoom,
-    onTourProgress: value => { renderedTourTime = value; refreshReadingPanels(); }
+    onTourProgress: (value) => {
+      renderedTourTime = value;
+      refreshReadingPanels();
+    }
   });
   document.documentElement.dataset.sceneReady = 'true';
-  function setTimeOfDay(night, immediate = false) {
-    window.setSiteTheme(night ? 'dark' : 'light');
-    sceneApi.setNight(night, immediate);
-    $('dayMode').setAttribute('aria-pressed', String(!night));
-    $('nightMode').setAttribute('aria-pressed', String(night));
-  }
   setTimeOfDay(document.documentElement.dataset.theme === 'dark', true);
   document.querySelector('.theme-toggle').disabled = false;
   $('dayMode').disabled = false;
   $('nightMode').disabled = false;
   $('dayMode').addEventListener('click', () => setTimeOfDay(false));
   $('nightMode').addEventListener('click', () => setTimeOfDay(true));
-  $('status').textContent = 'مرحبًا بك في SAEI';
   restoreRoom();
+  sceneApi.ready.then(() => {
+    $('status').textContent = 'مرحبًا بك في SAEI';
+    $('sceneLoader').hidden = true;
+  });
   if (adminPreview) {
-    addEventListener('message', event => {
-      if (event.source !== parent || event.origin !== location.origin || event.data?.type !== 'ofoq-preview-config') return;
+    addEventListener('message', (event) => {
+      if (
+        event.source !== parent ||
+        event.origin !== location.origin ||
+        event.data?.type !== 'ofoq-preview-config'
+      )
+        return;
       sceneApi.configurePreview(event.data);
     });
-    parent.postMessage({type: 'ofoq-preview-ready'}, location.origin);
+    parent.postMessage({ type: 'ofoq-preview-ready' }, location.origin);
   }
 }
-initScene().catch(error => {
+initScene().catch((error) => {
   console.error('SAEI 3D:', error);
   document.body.classList.add('fallback');
+  $('sceneLoader').hidden = true;
   document.querySelector('.theme-toggle').disabled = false;
   document.querySelector('.day-night-controls').hidden = true;
   $('status').textContent = 'تعذّر عرض المشهد، يمكنك فتح الأقسام من القائمة.';
@@ -339,1612 +365,8 @@ initScene().catch(error => {
   skipOpening = true;
   measureReadingStops();
   progressAtScroll();
-  if (adminPreview) parent.postMessage({type: 'ofoq-preview-error'}, location.origin);
+  if (adminPreview) parent.postMessage({ type: 'ofoq-preview-error' }, location.origin);
 });
-
-
-
-// 3. الحديقة وعناصر الساحة
-// محيط المبنى: ممرات مفتوحة، أشجار، جلسات، وإنارة.
-// جميع الأشكال والخامات محلية؛ لا توجد تنزيلات إضافية عند فتح الصفحة.
-function createOutdoorFacilities(THREE, scene) {
-  const park = new THREE.Group();
-  park.name = 'OFOQOutdoorFacilities';
-  scene.add(park);
-
-  const material = (color, roughness = .8, metalness = 0) =>
-    new THREE.MeshStandardMaterial({ color, roughness, metalness });
-  const stone = material('#c9ccca');
-  const darkStone = material('#77868c');
-  const grass = material('#568068');
-  const bark = material('#796049');
-  const foliage = [material('#365f4b'), material('#47745a'), material('#608268')];
-  const wood = material('#ad8660');
-  const metal = material('#354b58', .35, .65);
-  const streetLights = [];
-  const lampHalos = [];
-  const haloCanvas = document.createElement('canvas');
-  haloCanvas.width = haloCanvas.height = 64;
-  const haloContext = haloCanvas.getContext('2d');
-  const haloGradient = haloContext.createRadialGradient(32, 32, 0, 32, 32, 32);
-  haloGradient.addColorStop(0, '#fff4cc');
-  haloGradient.addColorStop(.2, '#ffcc7bcc');
-  haloGradient.addColorStop(1, '#ffae4200');
-  haloContext.fillStyle = haloGradient;
-  haloContext.fillRect(0, 0, 64, 64);
-  const haloTexture = new THREE.CanvasTexture(haloCanvas);
-  const haloMaterial = new THREE.SpriteMaterial({
-    map: haloTexture, transparent: true, depthWrite: false,
-    blending: THREE.AdditiveBlending, toneMapped: false
-  });
-  const glow = new THREE.MeshStandardMaterial({
-    color: '#fff1d5', emissive: '#fff1d5', emissiveIntensity: 0
-  });
-
-  function mesh(geometry, surface, position, parent = park) {
-    const item = new THREE.Mesh(geometry, surface);
-    item.position.set(...position);
-    item.castShadow = true;
-    item.receiveShadow = true;
-    parent.add(item);
-    return item;
-  }
-  const box = (size, position, surface, parent) =>
-    mesh(new THREE.BoxGeometry(...size), surface, position, parent);
-  const cylinder = (top, bottom, height, position, surface, parent) =>
-    mesh(new THREE.CylinderGeometry(top, bottom, height, 16), surface, position, parent);
-
-  // Raised paving and planted beds leave the central entrance path clear.
-  box([46, .08, 34], [0, .1, 18], stone);
-  box([46, .06, 2.4], [0, .16, 32], darkStone);
-  for (const side of [-1, 1]) {
-    box([11, .2, 20], [side * 13.5, .16, 17], darkStone);
-    box([10.5, .14, 19.5], [side * 13.5, .28, 17], grass);
-    box([2, .05, 30], [side * 6.6, .16, 17], stone);
-    box([8, .16, 44], [side * 17, .08, -21], grass);
-  }
-  // Paving joints give the plaza scale without adding a texture download.
-  for (let z = 5; z <= 31; z += 3) {
-    box([10, .015, .045], [0, .19, z], darkStone);
-  }
-  for (const x of [-3.4, 3.4]) box([.045, .015, 28], [x, .19, 18], darkStone);
-
-  // Shared leaf geometry keeps the trees light enough for mobile devices.
-  const leafGeometry = new THREE.SphereGeometry(1, 14, 10);
-  function tree(x, z, scale, index) {
-    const group = new THREE.Group();
-    group.userData.autumnReplacement = z > 0 && Math.abs(x) < 20;
-    group.visible = !(group.userData.autumnReplacement && document.documentElement.dataset.autumnWalk === 'ready');
-    group.position.set(x, .35, z);
-    group.scale.setScalar(scale);
-    park.add(group);
-    cylinder(.13, .25, 3.3, [0, 1.65, 0], bark, group);
-    for (const [dx, y, dz, radius] of [
-      [0, 4.4, 0, 1.5], [-.85, 3.65, .1, 1.15],
-      [.8, 3.8, -.15, 1.2], [0, 3.8, .75, 1.1], [0, 5.1, 0, .95]
-    ]) {
-      const leaf = mesh(leafGeometry, foliage[(index + Math.round(y)) % 3], [dx, y, dz], group);
-      leaf.scale.set(radius, radius * .85, radius);
-    }
-    const ring = mesh(new THREE.TorusGeometry(.75, .08, 8, 24), stone, [0, .02, 0], group);
-    ring.rotation.x = Math.PI / 2;
-  }
-  let count = 0;
-  for (const side of [-1, 1]) {
-    for (const [x, z, size] of [[13, 9, 1], [16, 18, 1.15], [12, 26, .95], [22, 30, 1.1]]) {
-      tree(side * x, z, size, count++);
-    }
-    for (const z of [-8, -23, -38]) tree(side * 17, z, 1.1, count++);
-  }
-
-  function bench(x, z, rotation) {
-    const group = new THREE.Group();
-    group.position.set(x, .18, z);
-    group.rotation.y = rotation;
-    park.add(group);
-    for (const dz of [-.2, 0, .2]) box([2.7, .09, .16], [0, .55, dz], wood, group);
-    for (const y of [.9, 1.15]) box([2.7, .17, .08], [0, y, -.36], wood, group);
-    for (const dx of [-1.05, 1.05]) {
-      box([.1, .55, .65], [dx, .27, 0], metal, group);
-      box([.1, .8, .09], [dx, .8, -.36], metal, group);
-    }
-  }
-  for (const side of [-1, 1]) {
-    bench(side * 9.8, 14, side * Math.PI / 2);
-    bench(side * 10, 23, side * Math.PI / 2);
-    for (const z of [8, 20, 30]) {
-      cylinder(.08, .12, 3.8, [side * 5.5, 2.05, z], metal);
-      box([.7, .12, .7], [side * 5.5, 4, z], metal);
-      box([.55, .08, .55], [side * 5.5, 3.92, z], glow);
-      const lamp = new THREE.PointLight('#ffc27b', 0, 14, 2);
-      lamp.position.set(side * 5.5, 3.75, z);
-      park.add(lamp);
-      streetLights.push(lamp);
-      const halo = new THREE.Sprite(haloMaterial);
-      halo.position.set(side * 5.5, 4.08, z);
-      halo.scale.set(1.2, 1.2, 1);
-      park.add(halo);
-      lampHalos.push(halo);
-    }
-    cylinder(.34, .3, .9, [side * 7, .62, 25], metal);
-    cylinder(.37, .37, .08, [side * 7, 1.11, 25], darkStone);
-  }
-
-  // A small fountain sits to the side, away from the door and camera route.
-  const fountainFallback = new THREE.Group();
-  fountainFallback.name = 'OFOQFountainFallback';
-  fountainFallback.userData.dynamicScene = true;
-  fountainFallback.visible = document.documentElement.dataset.plazaFountain !== 'ready';
-  park.add(fountainFallback);
-  cylinder(3.5, 3.5, .28, [-24, .24, 15], stone, fountainFallback);
-  const rim = mesh(new THREE.TorusGeometry(3.15, .18, 10, 40), darkStone, [-24, .45, 15], fountainFallback);
-  rim.rotation.x = Math.PI / 2;
-  const water = new THREE.MeshPhysicalMaterial({
-    color: '#6bafb9', roughness: .15, metalness: .15, clearcoat: 1
-  });
-  cylinder(2.98, 2.98, .035, [-24, .39, 15], water, fountainFallback);
-  cylinder(.28, .45, 1.25, [-24, .98, 15], stone, fountainFallback);
-  cylinder(1.15, 1.15, .12, [-24, 1.62, 15], darkStone, fountainFallback);
-  cylinder(1.02, 1.02, .03, [-24, 1.7, 15], water, fountainFallback);
-
-  // Visitor bicycle parking on the opposite side of the plaza.
-  box([5, .1, 2.4], [24, .1, 14], stone);
-  for (const x of [22.5, 24, 25.5]) {
-    cylinder(.055, .055, .8, [x - .35, .55, 14], metal);
-    cylinder(.055, .055, .8, [x + .35, .55, 14], metal);
-    box([.8, .11, .11], [x, .95, 14], metal);
-  }
-  document.documentElement.dataset.outdoorTrees = String(count);
-  document.documentElement.dataset.outdoorFacilities = 'benches,lights,fountain,bicycle-parking,gardens';
-  park.userData.setNight = amount => {
-    const level = Math.max(0, Math.min(1, Number(amount)));
-    glow.emissiveIntensity = 2.8 * level;
-    streetLights.forEach(light => { light.intensity = 45 * level; });
-    haloMaterial.opacity = level;
-    lampHalos.forEach(halo => { halo.visible = level > .001; });
-    document.documentElement.dataset.streetLightsOn = String(level > .001);
-    document.documentElement.dataset.streetLightLevel = level.toFixed(4);
-    document.documentElement.dataset.streetLightCount = String(streetLights.length);
-  };
-  return park;
-}
-
-
-// 4. البحر والسماء وحركة الشمس والقمر
-
-// Coast, sky and day/night lighting. Downloaded props remain in 3D animation.
-async function createCoastalEnvironment(THREE, scene, { renderer, sun, ambient, outdoor, reducedMotion }) {
-  const coast = new THREE.Group();
-  coast.name = 'OFOQCoast';
-  scene.add(coast);
-  const sandMaterial = new THREE.MeshStandardMaterial({ color: '#e5cf9e', roughness: .96 });
-  const pathMaterial = new THREE.MeshStandardMaterial({ color: '#d8d5ca', roughness: .85 });
-  const woodMaterial = new THREE.MeshStandardMaterial({ color: '#a97c50', roughness: .8 });
-
-  function box(size, position, material) {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-    mesh.position.set(...position);
-    mesh.receiveShadow = true;
-    coast.add(mesh);
-    return mesh;
-  }
-
-  // Curved sand strip to the left of the entrance plaza.
-  const sand = new THREE.PlaneGeometry(36, 150, 18, 55);
-  sand.rotateX(-Math.PI / 2);
-  const sandPositions = sand.attributes.position;
-  for (let i = 0; i < sandPositions.count; i++) {
-    const z = sandPositions.getZ(i);
-    const ratio = (sandPositions.getX(i) + 18) / 36;
-    const shore = -63 + Math.sin(z * .045) * 2.6;
-    sandPositions.setXYZ(i, shore + ratio * (-28 - shore), -.10 + ratio * .34, z - 5);
-  }
-  sand.computeVertexNormals();
-  const beach = new THREE.Mesh(sand, sandMaterial);
-  beach.receiveShadow = true;
-  coast.add(beach);
-  const beachLife = createBeachLife(THREE, coast, { reducedMotion, mergeGeometries });
-
-  // Promenade and a short boardwalk link the coast to the existing plaza.
-  box([4, .16, 148], [-28, .20, -5], pathMaterial);
-  box([18, .12, 3.2], [-31, .26, 26], woodMaterial);
-  for (let x = -39; x <= -23; x += 1) box([.035, .02, 3.2], [x, .33, 26], pathMaterial);
-
-  const waterGeometry = new THREE.PlaneGeometry(245, 320, 80, 65);
-  waterGeometry.rotateX(-Math.PI / 2);
-  const waterMaterial = new THREE.MeshStandardMaterial({
-    color: '#147d9a', roughness: .24, metalness: .28
-  });
-  const ocean = new THREE.Mesh(waterGeometry, waterMaterial);
-  ocean.name = 'OFOQOcean';
-  ocean.position.set(-180, -.05, -5);
-  ocean.receiveShadow = true;
-  coast.add(ocean);
-  const offshore = new THREE.Mesh(new THREE.PlaneGeometry(480, 720), waterMaterial);
-  offshore.rotation.x = -Math.PI / 2;
-  offshore.position.set(-301.25, -.165, -54);
-  coast.add(offshore);
-
-  // A narrow, irregular foam edge follows the shoreline.
-  const foamPositions = [];
-  for (let z = -79; z < 70; z += 1.2) {
-    const edge = -63 + Math.sin((z + 5) * .045) * 2.6;
-    foamPositions.push(edge + .7, -.01, z, edge + 1.2, -.01, z);
-  }
-  const foamGeometry = new THREE.BufferGeometry();
-  foamGeometry.setAttribute('position', new THREE.Float32BufferAttribute(foamPositions, 3));
-  const foamMaterial = new THREE.LineBasicMaterial({ color: '#d8f5ed', transparent: true, opacity: .55 });
-  const foam = new THREE.LineSegments(foamGeometry, foamMaterial);
-  coast.add(foam);
-
-  // Smooth sand color variation comes from vertex colors, without texture files.
-  const sandColors = [];
-  for (let i = 0; i < sandPositions.count; i++) {
-    const variation = .96 + Math.sin(i * 1.73) * .035;
-    sandColors.push(variation, variation, variation);
-  }
-  sand.setAttribute('color', new THREE.Float32BufferAttribute(sandColors, 3));
-  sandMaterial.vertexColors = true;
-
-  const loader = new GLTFLoader();
-  const root = new URL('./assets/3d/environment/', import.meta.url).href;
-  const [palmAsset, tableAsset] = await Promise.all([
-    loader.loadAsync(root + 'palm-tree.glb'),
-    loader.loadAsync(root + 'beach-table.glb')
-  ]);
-
-  function placeModel(source, height, x, z, rotation = 0) {
-    const holder = new THREE.Group();
-    const model = source.clone(true);
-    model.updateMatrixWorld(true);
-    const bounds = new THREE.Box3().setFromObject(model);
-    const size = bounds.getSize(new THREE.Vector3());
-    const center = bounds.getCenter(new THREE.Vector3());
-    const scale = height / size.y;
-    model.scale.setScalar(scale);
-    model.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
-    model.traverse(node => {
-      if (node.isMesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
-        const materials = Array.isArray(node.material) ? node.material : [node.material];
-        materials.forEach(material => {
-          material.metalness = Math.min(material.metalness || 0, .1);
-          material.roughness = Math.max(material.roughness || .8, .65);
-        });
-      }
-    });
-    holder.add(model);
-    holder.position.set(x, .23, z);
-    holder.rotation.y = rotation;
-    coast.add(holder);
-    return holder;
-  }
-
-  for (let i = 0; i < 9; i++) {
-    placeModel(palmAsset.scene, 7 + i % 3, -34 - i % 2 * 3, -55 + i * 14, i * .8);
-  }
-  for (let i = 0; i < 5; i++) {
-    placeModel(tableAsset.scene, 3.5, -45 - i % 2 * 4, -39 + i * 20, i * .65);
-  }
-
-  // A single scene background controls the entire sky in both modes.
-  // No dome material can retain a different color above this background.
-
-  const celestialSky = new THREE.Group();
-  celestialSky.name = 'SAEICelestialSky';
-  scene.add(celestialSky);
-  const sunDisc = new THREE.Mesh(new THREE.SphereGeometry(3.6, 24, 16), new THREE.MeshBasicMaterial({ color: '#ffe3a0', transparent: true, depthWrite: false, fog: false }));
-  sunDisc.position.set(-90, 75, -100);
-  celestialSky.add(sunDisc);
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(4.5, 24, 16), new THREE.MeshStandardMaterial({
-    color: '#d8e0f1', emissive: '#b9c8e9', emissiveIntensity: .6, roughness: 1, transparent: true, depthWrite: false, fog: false
-  }));
-  moon.position.copy(sunDisc.position);
-  moon.scale.setScalar(.62);
-  celestialSky.add(moon);
-  const craterMaterial = new THREE.MeshBasicMaterial({ color: '#9baac6', transparent: true, depthWrite: false, fog: false });
-  for (const [x, y, z, radius] of [[-1, 1, 4.2, .6], [1.4, -.8, 3.9, .85], [-1.5, -1.6, 3.7, .45]]) {
-    const crater = new THREE.Mesh(new THREE.SphereGeometry(radius, 12, 8), craterMaterial);
-    crater.scale.z = .14;
-    crater.position.set(x, y, z);
-    moon.add(crater);
-  }
-
-  const starsGeometry = new THREE.BufferGeometry();
-  const starPositions = [];
-  for (let i = 0; i < 180; i++) {
-    const angle = i * 2.39996;
-    const elevation = .12 + (i % 67) / 67 * .85;
-    const radius = Math.sqrt(1 - elevation * elevation) * 195;
-    starPositions.push(Math.cos(angle) * radius, elevation * 195, Math.sin(angle) * radius);
-  }
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
-  const stars = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ color: '#d5e3ff', size: .65, transparent: true, opacity: 0, depthWrite: false, fog: false }));
-  celestialSky.add(stars);
-
-  const moonLight = new THREE.DirectionalLight('#9db8ee', .8);
-  moonLight.position.copy(moon.position);
-  scene.add(moonLight);
-
-  // One value controls the whole scene: 0 is day, 1 is night.
-  const transitionDuration = 6;
-  let nightAmount = 0;
-  let transitionStart = 0;
-  let transitionTarget = 0;
-  let transitionTime = transitionDuration;
-  let transitionStartedAt = 0;
-  let transitionFrame = null;
-  let destroyed = false;
-  const dayAmbient = new THREE.Color('#d5e6ff');
-  const nightAmbient = new THREE.Color('#9db7e2');
-  const dayFog = new THREE.Color('#87ceeb');
-  const nightFog = new THREE.Color('#080f20');
-  const daySky = new THREE.Color('#87ceeb');
-  const nightSky = new THREE.Color('#080f20');
-  const dayWater = new THREE.Color('#147d9a');
-  const nightWater = new THREE.Color('#164466');
-
-  function applyTimeOfDay(amount) {
-    nightAmount = amount;
-    const daylight = 1 - amount;
-
-
-    // The sun sets while the moon rises; both follow a small arc.
-    const arc = Math.sin(amount * Math.PI) * 15;
-    sunDisc.position.set(-65 - arc, 39 - 94 * amount, -172);
-    moon.position.set(-62 + arc, -48 + 77 * amount, -184);
-    // Keep each body visible during its journey; fade only near the horizon.
-    const sunOpacity = THREE.MathUtils.smoothstep(sunDisc.position.y, -5, 10);
-    const moonOpacity = THREE.MathUtils.smoothstep(moon.position.y, -5, 10);
-    sunDisc.material.opacity = sunOpacity;
-    moon.material.opacity = moonOpacity;
-    craterMaterial.opacity = moonOpacity;
-    sunDisc.visible = sunOpacity > 0;
-    moon.visible = moonOpacity > 0;
-    sun.intensity = 3.5 * daylight;
-    const daylightShadows = amount < .98;
-    if (sun.castShadow !== daylightShadows) {
-      sun.castShadow = daylightShadows;
-      renderer.shadowMap.needsUpdate = true;
-    }
-    moonLight.intensity = .8 * amount;
-    moonLight.position.copy(moon.position);
-    stars.material.opacity = amount;
-    ambient.intensity = THREE.MathUtils.lerp(1.65, .45, amount);
-    ambient.color.copy(dayAmbient).lerp(nightAmbient, amount);
-    renderer.toneMappingExposure = THREE.MathUtils.lerp(1.15, 1.05, amount);
-    scene.environmentIntensity = THREE.MathUtils.lerp(.85, .16, amount);
-    scene.fog.color.copy(dayFog).lerp(nightFog, amount);
-    // Match every uncovered part of the sky to the same day/night transition.
-    scene.background.copy(daySky).lerp(nightSky, amount);
-    waterMaterial.color.copy(dayWater).lerp(nightWater, amount);
-    foamMaterial.opacity = THREE.MathUtils.lerp(.55, .22, amount);
-    // Optional street-light integration must never stop the sky transition.
-    if (typeof outdoor?.userData?.setNight === 'function') {
-      outdoor.userData.setNight(amount);
-    }
-
-    const state = document.documentElement.dataset;
-    state.dayNightProgress = amount.toFixed(4);
-    state.dayNightTransitioning = String(transitionTime < transitionDuration);
-    state.sunVisible = String(sunDisc.visible);
-    state.moonVisible = String(moon.visible);
-    state.sunHeight = sunDisc.position.y.toFixed(2);
-    state.moonHeight = moon.position.y.toFixed(2);
-  }
-
-  function advanceTransition() {
-    transitionFrame = null;
-    if (destroyed) return;
-    transitionTime = Math.min((performance.now() - transitionStartedAt) / 1000, transitionDuration);
-    const progress = transitionTime / transitionDuration;
-    const eased = progress * progress * (3 - 2 * progress);
-    applyTimeOfDay(THREE.MathUtils.lerp(transitionStart, transitionTarget, eased));
-    if (transitionTime < transitionDuration) {
-      transitionFrame = requestAnimationFrame(advanceTransition);
-    }
-  }
-
-  function setNight(night, immediate = false) {
-    if (destroyed) return;
-    const target = night ? 1 : 0;
-    // The button and theme observer can request the same state in one turn.
-    if (!immediate && target === transitionTarget && transitionTime < transitionDuration) return;
-    if (transitionFrame !== null) cancelAnimationFrame(transitionFrame);
-    transitionFrame = null;
-    transitionStart = nightAmount;
-    transitionStartedAt = performance.now();
-    transitionTarget = target;
-    transitionTime = immediate || reducedMotion || transitionStart === target ? transitionDuration : 0;
-    document.documentElement.dataset.timeOfDay = night ? 'night' : 'day';
-    applyTimeOfDay(transitionTime === transitionDuration ? target : nightAmount);
-    if (transitionTime < transitionDuration) {
-      transitionFrame = requestAnimationFrame(advanceTransition);
-    }
-  }
-
-  const positions = waterGeometry.attributes.position;
-  let elapsed = 0, nextWave = 0;
-  function update(dt, camera, outside = true, peopleVisible = true) {
-    if (destroyed) return;
-    // Reconcile both directions with the visible page, including late model loading.
-    const nightRequested = document.documentElement.dataset.theme === 'dark';
-    if (Number(nightRequested) !== transitionTarget) setNight(nightRequested);
-    coast.visible = outside;
-    celestialSky.visible = outside;
-    // Keep distant sky objects at the same bearing while the camera descends.
-    if (outside) celestialSky.position.copy(camera.position);
-    const nearWater = outside && camera.position.y < 34 && camera.position.z > 12;
-    beachLife.update(dt, nearWater, peopleVisible);
-
-    if (reducedMotion || !nearWater) return;
-    elapsed += dt;
-    if (elapsed < nextWave) return;
-    nextWave = elapsed + 1 / 24;
-    for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i), z = positions.getZ(i);
-      positions.setY(i, Math.sin(x * .18 + elapsed * .8) * .065 + Math.sin(z * .16 - elapsed * .65) * .045);
-    }
-    positions.needsUpdate = true;
-    // The normal field is almost flat; no expensive per-frame recomputation.
-    foam.position.x = Math.sin(elapsed * .7) * .35;
-  }
-
-  // Follow the visible page mode even when models finish loading later.
-  setNight(document.documentElement.dataset.theme === 'dark', true);
-  const themeObserver = new MutationObserver(() => {
-    setNight(document.documentElement.dataset.theme === 'dark');
-  });
-  themeObserver.observe(document.documentElement, {
-    attributes: true, attributeFilter: ['data-theme']
-  });
-  const coastalBatches = mergeStaticMeshes(THREE, coast, mergeGeometries, new Set([ocean, beachLife.group])).geometries;
-  document.documentElement.dataset.coastalModels = 'palm-tree,beach-table';
-  document.documentElement.dataset.beachPalms = '9';
-  document.documentElement.dataset.beachTables = '5';
-  return {
-    setNight, update,
-    destroy() {
-      destroyed = true;
-      celestialSky.traverse(object => {
-        object.geometry?.dispose();
-        object.material?.dispose();
-      });
-      celestialSky.removeFromParent();
-      beachLife.destroy();
-      coastalBatches.forEach(geometry => geometry.dispose());
-      themeObserver.disconnect();
-      if (transitionFrame !== null) cancelAnimationFrame(transitionFrame);
-    }
-  };
-}
-
-
-// 6. بناء المشهد وحركة الكاميرا والأداء.
-async function createBuildingTour(container, {
-  reducedMotion = false,
-  onRoomChange = () => {},
-  onTourProgress = () => {}
-} = {}) {
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#c9dce9');
-  scene.fog = new THREE.Fog('#c9dce9', 100, 340);
-  const camera = new THREE.PerspectiveCamera(54, innerWidth / innerHeight, .08, 590);
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    preserveDrawingBuffer: false,
-    powerPreference: 'high-performance'
-  });
-  renderer.localClippingEnabled = true;
-  const maxPixelRatio = () => Math.min(devicePixelRatio, 1.2, Math.sqrt(1000000 / (innerWidth * innerHeight)));
-  let renderScale = maxPixelRatio();
-  renderer.setPixelRatio(renderScale);
-  let viewportWidth = innerWidth, viewportHeight = innerHeight;
-  renderer.setSize(viewportWidth, viewportHeight, false);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.25;
-  renderer.shadowMap.enabled = true;
-  // Architecture and landscaping are static; reuse their shadow map.
-  renderer.shadowMap.autoUpdate = false;
-  renderer.shadowMap.needsUpdate = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  container.append(renderer.domElement);
-  const descentClouds = createDescentClouds(THREE, scene);
-  descentClouds.setNight(document.documentElement.dataset.theme === 'dark' ? 1 : 0);
-  const headquartersLighting = createHeadquartersLighting(THREE, scene);
-  const ambient = new THREE.HemisphereLight('#d5e6ff', '#747568', 1.65);
-  scene.add(ambient);
-  const sun = new THREE.DirectionalLight('#fff0d9', 3.5);
-  sun.position.set(-30, 65, 30);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
-  Object.assign(sun.shadow.camera, {
-    left: -35,
-    right: 35,
-    top: 20,
-    bottom: -90,
-    near: 1,
-    far: 160
-  });
-  sun.shadow.bias = -.0005;
-  scene.add(sun);
-  const mat = (color, metalness = 0, roughness = .65) => new THREE.MeshStandardMaterial({
-    color,
-    metalness,
-    roughness
-  });
-  const navy = mat('#111e30'),
-    orange = mat('#ff783d'),
-    steel = mat('#50667a', .7, .32),
-    wall = mat('#d7dbe0'),
-    floor = mat('#a8b5c1'),
-    wood = mat('#b88d61'),
-    black = mat('#162233'),
-    glass = new THREE.MeshStandardMaterial({
-      color: '#6fa3be',
-      metalness: .75,
-      roughness: .085,
-      envMapIntensity: 1.4
-    }),
-    green = mat('#42765a');
-  const lightMat = new THREE.MeshStandardMaterial({
-    color: '#fff0d9',
-    emissive: '#fff0d9',
-    emissiveIntensity: 1.1
-  });
-
-  function box(w, h, d, x, y, z, m, parent = scene) {
-    const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
-    o.position.set(x, y, z);
-    o.castShadow = true;
-    o.receiveShadow = true;
-    parent.add(o);
-    return o;
-  }
-
-  function cylinder(r, h, x, y, z, m, parent = scene) {
-    const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 12), m);
-    o.position.set(x, y, z);
-    o.castShadow = true;
-    parent.add(o);
-    return o;
-  }
-
-  function sign(text, width, height, x, y, z, {
-    size = 80,
-    bg = '#111e30',
-    color = '#ffffff',
-    rotation = 0
-  } = {}) {
-    const c = document.createElement('canvas');
-    c.width = 1024;
-    c.height = Math.round(1024 * height / width);
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, c.width, c.height);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `750 ${size}px Segoe UI,Arial`;
-    ctx.fillStyle = color;
-    ctx.fillText(text, c.width / 2, c.height / 2);
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    const o = new THREE.Mesh(new THREE.PlaneGeometry(width, height), new THREE.MeshBasicMaterial({
-      map: tex,
-      side: THREE.DoubleSide
-    }));
-    o.position.set(x, y, z);
-    o.rotation.y = rotation;
-    scene.add(o);
-    return o;
-  }
-
-  const logoMaterials = [];
-  let indoorLogoTexture;
-  const logoTexture = new THREE.TextureLoader().load(new URL('../assets/branding/saei-logo.png', import.meta.url).href,
-    texture => {
-      if (disposed) { texture.dispose(); return; }
-      const indoorFace = document.createElement('canvas');
-      indoorFace.width = texture.image.width; indoorFace.height = texture.image.height;
-      const indoorContext = indoorFace.getContext('2d');
-      indoorContext.fillStyle = '#ffffff';
-      indoorContext.fillRect(0, 0, indoorFace.width, indoorFace.height);
-      indoorContext.drawImage(texture.image, indoorFace.width * .04, indoorFace.height * .04, indoorFace.width * .92, indoorFace.height * .92);
-      indoorLogoTexture = new THREE.CanvasTexture(indoorFace);
-      indoorLogoTexture.colorSpace = THREE.SRGBColorSpace;
-      indoorLogoTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-      // White lettering and orange steps on a transparent face blend into the facade.
-      const face = document.createElement('canvas');
-      face.width = texture.image.width; face.height = texture.image.height;
-      const context = face.getContext('2d');
-      context.drawImage(texture.image, face.width * .025, face.height * .025, face.width * .95, face.height * .95);
-      const pixels = context.getImageData(0, 0, face.width, face.height);
-      for (let i = 0; i < pixels.data.length; i += 4) {
-        if (!pixels.data[i + 3]) continue;
-        // Preserve the orange brand mark, recolor the dark wordmark for glass facades.
-        if (pixels.data[i] < 100 && pixels.data[i + 1] < 120 && pixels.data[i + 2] < 145) {
-          pixels.data[i] = 245; pixels.data[i + 1] = 248; pixels.data[i + 2] = 255;
-        }
-      }
-      context.putImageData(pixels, 0, 0);
-      texture.image = face;
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-      texture.repeat.set(1, 1);
-      texture.offset.set(0, 0);
-      texture.needsUpdate = true;
-      logoMaterials.forEach(material => { const map = material.userData.television ? indoorLogoTexture : texture; material.userData.dayMap = map; const off = requestedNight && material.userData.television; material.map = off ? null : map; material.color.set(off ? '#05070b' : '#ffffff'); material.needsUpdate = true; });
-    }, undefined, error => console.warn('SAEI: logo image unavailable.', error));
-  function logo(width, x, y, z, television = false) {
-    const c = document.createElement('canvas'); c.width = 740; c.height = 296;
-    const ctx = c.getContext('2d');
-    if (television) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height); }
-    ctx.fillStyle = television ? '#111e30' : '#f5f8ff'; ctx.textAlign = 'center'; ctx.font = 'bold 80px Arial';
-    ctx.fillText('SAEI', 370, 175);
-    const fallback = new THREE.CanvasTexture(c); fallback.colorSpace = THREE.SRGBColorSpace;
-    const material = new THREE.MeshBasicMaterial({map: fallback, transparent: true, alphaTest: .05});
-    material.toneMapped = false;
-    material.userData.dayMap = fallback;
-    material.userData.television = television;
-    logoMaterials.push(material);
-    const screenHeight = width * .39990;
-    if (television) {
-    box(width + .16, screenHeight + .18, .14, x, y, z - .08, mat('#111821'));
-    box(width + .04, .025, .025, x, y - screenHeight / 2 - .055, z + .005, mat('#303a48'));
-    const indicatorMaterial = new THREE.MeshBasicMaterial({color:'#63d8b1',toneMapped:false});
-    const indicator = new THREE.Mesh(new THREE.SphereGeometry(.015,8,6), indicatorMaterial);
-    indicator.position.set(x + width / 2 - .05, y - screenHeight / 2 - .055, z + .022);scene.add(indicator);
-    material.userData.indicator = indicatorMaterial;
-    }
-    const plaque = new THREE.Mesh(new THREE.PlaneGeometry(width, width * 0.39990), material);
-    plaque.position.set(x, y, z); scene.add(plaque);
-  }
-
-  function plant(x, z) {
-    cylinder(.32, .65, x, .33, z, navy);
-    cylinder(.045, 1, x, 1.0, z, wood);
-    for (let i = 0; i < 6; i++) {
-      const leaf = new THREE.Mesh(new THREE.SphereGeometry(.45, 8, 6), green);
-      leaf.scale.set(1, .7, .7);
-      leaf.position.set(x + Math.sin(i) * .25, 1.45 + (i % 3) * .18, z + Math.cos(i) * .25);
-      scene.add(leaf);
-    }
-  }
-  const people = [],
-    deskGroups = [], interiorProps = [];
-
-  function person(x, z, { seat = null, rotation = 0, elevation = INTERIOR_FLOOR } = {}) {
-    const group = new THREE.Group();
-    group.position.set(x, elevation, z);
-    group.rotation.y = rotation;
-    group.userData.seat = seat;
-    scene.add(group);
-    people.push(group);
-    return group;
-  }
-
-  const interior = createTourInterior(THREE, scene, { box, cylinder, people: person, props: interiorProps });
-
-  function desk(x, z, pose = 1) {
-    const g = interior.groupAt(x, z);
-    box(2.02, .075, .92, 0, .7425, 0, wood, g);
-    for (const a of [-.85, .85]) box(.06, .705, .72, a, .3525, 0, steel, g);
-    box(.82, .48, .06, 0, 1.10, -.16, black, g);
-    box(.72, .38, .012, 0, 1.10, -.122, glass, g);
-    box(.07, .14, .07, 0, .85, -.16, steel, g);
-    box(.48, .026, .16, 0, .793, .18, navy, g);
-    box(.56, .11, .59, 0, .425, .98, black, g);
-    box(.56, .61, .11, 0, .78, 1.23, navy, g);
-    cylinder(.045, .36, 0, .20, .98, steel, g);
-    cylinder(.28, .06, 0, .04, .98, steel, g);
-    interior.sit(g, { z: 1.05, height: .48, pose });
-    interior.contact(g, 2.35, 1.9, .25);
-    deskGroups.push(g);
-  }
-  // Concept geometry only: final meshes will come from the approved Sketchfab downloads.
-  box(160, .3, 220, 0, -.32, -25, mat('#68798a'));
-  box(22, .18, 90, 0, -.05, -39, floor);
-  box(20, .2, 20, 0, .02, 10, mat('#b4b8bd'));
-  box(5, .04, 20, 0, .15, 10, mat('#d8d6cd'));
-  // Enclosed podium and a slender, closed skyscraper facade above its entrance.
-  logo(13.2, 0, 43, 2.3);
-  const skylineFallback = [];
-  for (const [x, z, h] of [
-      [60, -75, 27],
-      [40, -45, 36],
-      [50, -110, 45],
-      [34, 9, 22]
-    ]) {
-    skylineFallback.push(box(16, h, 16, x, h / 2, z, mat('#263c53')));
-    for (let y = 2; y < h; y += 3) skylineFallback.push(box(16.1, .15, 16.1, x, y, z, steel));
-  }
-  box(.3, 4.8, 86, -10, 2.4, -40, wall);
-  box(.3, 4.8, 86, 10, 2.4, -40, wall);
-  box(20, 4.8, .3, 0, 2.4, -83, wall);
-  box(20, .2, 86, 0, 4.85, -40, navy);
-  box(8.35, 4.8, .3, -5.8, 2.4, 2, glass);
-  box(8.35, 4.8, .3, 5.8, 2.4, 2, glass);
-  box(3.3, 1.35, .45, 0, 4.15, 2, navy);
-  logo(2.7, 0, 4.05, 2.3);
-  box(4.7, .18, 3.1, 0, 3.15, 3.3, steel);
-  box(3.2, .08, .16, 0, 3.03, 4.85, lightMat);
-  const doorMat = new THREE.MeshStandardMaterial({
-    color: '#84adc3',
-    metalness: .3,
-    roughness: .2,
-    transparent: true,
-    opacity: .55
-  });
-  const doorLeft = box(1.5, 3, .14, -.77, 1.5, 2.05, doorMat),
-    doorRight = box(1.5, 3, .14, .77, 1.5, 2.05, doorMat);
-  doorLeft.castShadow = doorRight.castShadow = false;
-  const entrance = { x: 0, z: 2.05, height: 3, approach: 9.5, fullyOpen: 5.5 };
-  const roomDoors = [];
-  let mainDoorAmount = 0;
-  function slidingRoomDoor(name, x, z, rotation, width = 5.1, height = 3.35) {
-    const group = new THREE.Group();
-    group.name = 'GlassDoor-' + name;
-    group.position.set(x, 0, z);
-    group.rotation.y = rotation;
-    // All moving leaves and their trim must stay out of static geometry batches.
-    group.userData.dynamicDoor = true;
-    scene.add(group);
-    const half = width / 2;
-    const leaves = [-1, 1].map(side => {
-      const leaf = new THREE.Group();
-      leaf.position.x = side * width / 4;
-      group.add(leaf);
-      box(half - .04, height - .06, .14, 0, height / 2, 0, doorMat, leaf);
-      for (const edge of [-1, 1]) box(.045, height, .17, edge * (half / 2 - .025), height / 2, 0, steel, leaf);
-      for (const y of [.035, height - .035]) box(half, .07, .17, 0, y, 0, steel, leaf);
-      // A narrow safety stripe makes the closed glass visible from both sides.
-      box(half - .1, .055, .15, 0, 1.25, 0, steel, leaf);
-      mergeStaticMeshes(THREE, leaf, mergeGeometries);
-      return leaf;
-    });
-    for (const side of [-1, 1]) box(.1, height + .1, .24, side * half, height / 2, 0, steel, group);
-    box(width + .15, .12, .3, 0, height + .025, 0, navy, group);
-    group.traverse(node => { if (node.isMesh) node.castShadow = false; });
-    mergeStaticMeshes(THREE, group, mergeGeometries, new Set(leaves));
-    roomDoors.push({ name, x, z, height, width, leaves, group, amount: 0 });
-    document.documentElement.dataset.roomDoorCount = String(roomDoors.length);
-  }
-  box(.1, 3, .1, -1.55, 1.5, 2.1, steel);
-  box(.1, 3, .1, 1.55, 1.5, 2.1, steel);
-  plant(-4, 6);
-  plant(4, 6);
-  for (let z = -5; z > -82; z -= 10) {
-    box(1.8, .04, 2.5, 0, 4.7, z, lightMat);
-    const l = new THREE.PointLight('#e2efff', 10, 16, 2);
-    l.position.set(0, 3.8, z);
-    scene.add(l);
-    box(.07, .015, 8, -1.75, .14, z, orange);
-    box(.07, .015, 8, 1.75, .14, z, orange);
-  }
-  // Lobby: reception, waiting lounge and a clear passage into the corridor.
-  interior.reception(5, -8.7);
-  person(5, -9.85);
-  logo(3.4, 5, 2.8, -12, true);
-  plant(-7, -4);
-  plant(8, -4);
-  const lobbySofas = [
-    interior.sofa(-7.8, -6.4, Math.PI / 2, false),
-    interior.sofa(7.3, -4.8, -Math.PI / 2, true)
-  ];
-  interior.coffeeTable(-6.3, -6.4, Math.PI / 2);
-  interior.coffeeTable(5.8, -4.8, Math.PI / 2);
-  interior.carpet(-7.2, -6.4, 2.85, 3.2);
-  interior.carpet(6.7, -4.8, 2.85, 3.2);
-  interior.cabinet(-7, -9, 0);
-  const rooms = [{
-    name: 'العمل الحر',
-    x: -6,
-    z: -22
-  }, {
-    name: 'الأكاديمية',
-    x: 6,
-    z: -36
-  }, {
-    name: 'فرص التدريب',
-    x: -6,
-    z: -50
-  }, {
-    name: 'الوظائف',
-    x: 6,
-    z: -64
-  }];
-  for (const r of rooms) {
-    const side = Math.sign(r.x),
-      partition = side * 2.25;
-    box(7.6, 4.7, .22, r.x, 2.35, r.z - 6.8, wall);
-    box(7.6, 4.7, .22, r.x, 2.35, r.z + 6.8, wall);
-    box(.18, 4.7, 4.3, partition, 2.35, r.z - 4.7, wall);
-    box(.18, 4.7, 4.3, partition, 2.35, r.z + 4.7, wall);
-    box(.18, 1.3, 5.1, partition, 4.05, r.z, wall);
-    slidingRoomDoor(r.name, partition, r.z, Math.PI / 2);
-    sign(r.name, 5.6, .72, r.x, 3.7, r.z - 6.66, {
-      color: '#ff783d',
-      size: 85
-    });
-    plant(side * 8.7, r.z - 5);
-    box(5, .04, 2.4, r.x, 4.69, r.z, lightMat);
-    const l = new THREE.PointLight('#fff0dc', 17, 14, 2);
-    l.position.set(r.x, 3.65, r.z);
-    scene.add(l);
-  }
-  desk(-7.2, -24.5, 1);
-  desk(-4.1, -24.5, 2);
-  desk(-7.4, -19.65, 3);
-  interior.cabinet(-6.7, -28.35, 1);
-  interior.acousticPanels(-9.79, -23.8, 1, Math.PI / 2);
-  sign('صمّم / برمج / ابتكر', 4.8, .48, -6, 2.4, -28.65, {
-    size: 54,
-    color: '#c5d5e8'
-  });
-  // Academy: tutorial screen, desks, a tutor and seated learners.
-  box(4.3, 1.8, .13, 6, 2.35, -42.56, navy);
-  sign('ابنِ خطوتك القادمة', 3.9, .66, 6, 2.4, -42.45, {
-    color: '#ff783d',
-    size: 70
-  });
-  interior.classroom(4.25, -38.4, 0);
-  interior.classroom(7.5, -38.4, 1);
-  interior.classroom(4.25, -33.3, 1);
-  interior.classroom(7.5, -33.3, 2);
-  interior.podium(7.05, -40.4);
-  person(7.05, -41.02);
-  interior.cabinet(7.8, -29.6, 2, Math.PI);
-  interior.acousticPanels(9.79, -36.2, 2, -Math.PI / 2);
-  desk(-7.5, -53.7, 1);
-  interior.mentorTable(-4.25, -53.45);
-  interior.mentorTable(-7.35, -47.35);
-  interior.cabinet(-7.75, -56.36, 3);
-  interior.acousticPanels(-9.79, -52.0, 3, Math.PI / 2);
-  box(2.6, 1.5, .1, -5.5, 2.5, -56.65, navy);
-  sign('تعلّم ← طبّق ← تطوّر', 2.3, .55, -5.5, 2.5, -56.56, {
-    size: 68,
-    color: '#ff9a6d'
-  });
-  interior.interview(6.4, -67.15);
-  interior.sofa(8.8, -62.1, -Math.PI / 2, false);
-  interior.cabinet(7.6, -57.56, 4, Math.PI);
-  interior.acousticPanels(9.79, -66.5, 4, -Math.PI / 2);
-  sign('فرصتك القادمة', 4.8, .5, 6, 2.2, -70.65, {
-    size: 57,
-    color: '#a9c3d8'
-  });
-  // Events: enclosed auditorium at the end of the same corridor.
-  // A glass entrance spans the hall, leaving a central sliding doorway.
-  for (const side of [-1, 1]) box(7.7, 3.35, .14, side * 6.15, 1.675, -70.8, doorMat);
-  box(20, 1.3, .18, 0, 4.05, -70.8, wall);
-  slidingRoomDoor('الفعاليات', 0, -70.8, 0, 4.5);
-  box(15, .35, 3.5, 0, .2, -80, wood);
-  box(8, 2.5, .15, 0, 2.9, -82.72, navy);
-  sign('فعاليات سعي', 7.2, 1, 0, 3.1, -82.59, {
-    color: '#ff783d',
-    size: 85
-  });
-  const stageTop = .375;
-  interior.carpet(-4.48, -75.03, 4.15, 6, true);
-  interior.carpet(4.48, -75.03, 4.15, 6, true);
-  interior.podium(2.25, -79.3, stageTop);
-  person(2.25, -79.94, { elevation: stageTop });
-  for (let row = 0; row < 3; row++) {
-    for (const [seat, x] of [-5.7, -3.25, 3.25, 5.7].entries()) {
-      interior.theatreSeat(x, -73.05 - 1.9 * row, (seat + row) % 4 !== 0, (seat + row) % 3 + 1);
-    }
-  }
-  plant(-8, -80);
-  plant(8, -80);
-
-  let city = null, headquartersExterior = null;
-  let streetLife = null, traffic = null, autumnWalk = null, plazaFountain = null, realisticFurniture = null, scenicPlantings = null;
-  const aircraft = createCityAircraft(THREE, scene, reducedMotion);
-  let cityLightLevel = Number(document.documentElement.dataset.theme === 'dark');
-  const localLights = [];
-  function batchStaticMeshes() {
-    const excluded = new Set([doorLeft, doorRight, ...skylineFallback]);
-    const result = mergeStaticMeshes(THREE, scene, mergeGeometries, excluded, {cellSize: 20, disposeUnused: true});
-    document.documentElement.dataset.batchedMeshes = String(result.savedMeshes);
-  }
-  function registerLocalLights(root) {
-    root.traverse(object => {
-      if (!object.isPointLight) return;
-      object.visible = false;
-      localLights.push(object);
-    });
-  }
-  let env = null;
-  let requestedNight = document.documentElement.dataset.theme === 'dark';
-  let screenBrightness = requestedNight ? 0 : 1;
-  const employeeExits = new Map();
-  function restoreEmployees() {
-    employeeExits.clear();
-    people.forEach(holder => {
-      const home = holder.userData.home;
-      if (!home) return;
-      holder.position.copy(home.position); holder.rotation.y = home.rotation;
-      holder.scale.setScalar(1);
-      holder.userData.fadeMaterials?.forEach(({ material, opacity, transparent, depthWrite }) => {
-        material.opacity = opacity; material.transparent = transparent; material.depthWrite = depthWrite; material.needsUpdate = true;
-      });
-      holder.userData.mixer?.stopAllAction();
-      holder.userData.restAction?.reset().setEffectiveWeight(1).play();
-      const model = holder.children[0];
-      if (model) {
-        model.position.copy(home.modelPosition);
-        model.scale.copy(home.modelScale);
-      }
-    });
-  }
-  function beginEmployeeExits() {
-    restoreEmployees();
-    people.forEach((holder, index) => {
-      const direction = Math.abs(holder.position.x) > 1 ? -Math.sign(holder.position.x) : 0;
-      const target = holder.position.clone().add(new THREE.Vector3(direction * 2.4, 0, direction ? 0 : 2.4));
-      employeeExits.set(holder, { delay: (index % 5) * .45, points: [target], started: false, elapsed: 0 });
-    });
-  }
-  function employeeDoorProximity(door) {
-    let proximity = 0;
-    employeeExits.forEach((_, holder) => { proximity = Math.max(proximity, doorProximity(holder.position, door)); });
-    return proximity;
-  }
-  let coastal = {
-    update() {},
-    setNight(night) {
-      cityLightLevel = Number(night);
-      descentClouds.setNight(cityLightLevel);
-      city?.setNight(cityLightLevel);
-      headquartersLighting.setNight(cityLightLevel);
-      sun.intensity = night ? .35 : 3.5;
-      ambient.intensity = night ? .45 : 1.65;
-      scene.background.set(night ? '#080f20' : '#87ceeb');
-      scene.fog.color.copy(scene.background);
-    }
-  };
-
-  const keys = [
-    // Bank towards the tower from above the marine layer, level out over the
-    // promenade, then cross the centre of the glass doors at eye height.
-    [0,    [44, 159, 264],    [23, 128, 99]],
-    [2.5,  [35, 132, 213],    [15, 102, 64]],
-    [4.7,  [23, 94, 145],     [4, 67, 38]],
-    [6.7,  [14, 61, 87],      [0, 41, 0]],
-    [8.4,  [5, 24, 55],       [0, 19, -1]],
-    [9.9,  [2, 10, 41],       [0, 11, 0]],
-    [11.5, [0, 3.3, 28],      [0, 5, 1]],
-    [13.5, [0, 2, 13],        [0, 2.3, 0]],
-    [16.6, [0, 1.85, 2.05],   [0, 1.85, -7]],
-    [19, [1, 2.1, -6],
-      [5, 1.4, -9]
-    ],
-    [21, [0, 2, -14],
-      [0, 2, -22]
-    ],
-    [23, [0, 2, -21.05],
-      [-6, 1.8, -24]
-    ],
-    [26, [-4.3, 2.0, -22],
-      [-7, 1.4, -26]
-    ],
-    [28.45, [-4.6, 2.1, -22],
-      [-6, 1.5, -27]
-    ],
-    [30.3, [0, 2, -23],
-      [0, 2, -36]
-    ],
-    [33.15, [0, 2, -34.95],
-      [6, 1.8, -38]
-    ],
-    [35.25, [4.3, 2.0, -36],
-      [6.5, 1.6, -40]
-    ],
-    [37.5, [4.6, 2.1, -36],
-      [6, 1.8, -42]
-    ],
-    [39.3, [0, 2, -37],
-      [0, 2, -50]
-    ],
-    [42.15, [0, 2, -48.95],
-      [-6, 1.7, -53]
-    ],
-    [44.25, [-4.5, 2, -50],
-      [-6.5, 1.6, -54]
-    ],
-    [46.5, [-4.8, 2.1, -50],
-      [-5.7, 1.8, -55]
-    ],
-    [48.3, [0, 2, -51],
-      [0, 2, -64]
-    ],
-    [51.15, [0, 2, -62.95],
-      [6, 1.7, -66]
-    ],
-    [53.25, [4.1, 2, -64],
-      [6, 1.5, -67]
-    ],
-    [55.5, [4.4, 2.1, -64],
-      [6.3, 1.7, -68]
-    ],
-    [57.45, [0, 2, -65],
-      [0, 2, -77]
-    ],
-    [59.75, [0, 2, -69],
-      [0, 2.5, -81]
-    ],
-    [63, [0, 2.2, -72.45],
-      [0, 2.0, -81]
-    ],
-    [68, [0, 2.3, -74.15],
-      [0, 2.4, -81]
-    ]
-  ];
-
-  const smooth = x => x * x * (3 - 2 * x),
-    stops = TOUR_STOPS;
-  let time = 0,
-    disposed = false;
-  // السكرول يحدّد الوجهة فقط؛ حلقة الرسم تحرّك الكاميرا تدريجيًا.
-  let targetTime = 0;
-  let cameraSmoothness = .27;
-  let preview = adminPreview ? {active: false} : null;
-  let previewCity = true, previewPeople = true;
-  const cameraPath = createTourPath(keys);
-  const pathPosition = new Float64Array(3);
-  const pathAim = new Float64Array(3);
-  const lookTarget = new THREE.Vector3();
-
-  function seek(t) {
-    time = Math.max(0, Math.min(TOUR_END, t));
-    cameraPath(time, pathPosition, pathAim);
-    camera.position.fromArray(pathPosition);
-    lookTarget.fromArray(pathAim);
-    const distanceView = THREE.MathUtils.smoothstep(camera.position.y, 25, 155);
-    if (camera.aspect < .8) lookTarget.x += 9 * distanceView;
-    camera.lookAt(lookTarget);
-    scene.fog.near = THREE.MathUtils.lerp(100, 190, distanceView);
-    scene.fog.far = THREE.MathUtils.lerp(340, 550, distanceView);
-    headquartersLighting.updateCamera(camera);
-    descentClouds.update(camera);
-    const fov = THREE.MathUtils.lerp(innerWidth < 768 ? 70 : 55, 64, smooth(Math.max(0, Math.min(1, (time - 9.5) / 7))));
-    if (camera.fov !== fov) {
-      camera.fov = fov;
-      camera.updateProjectionMatrix();
-    }
-    document.documentElement.dataset.tourTime = time.toFixed(2);
-    if (!adminPreview) { onRoomChange(roomAtTourTime(time)); onTourProgress(time); }
-  }
-
-  function moveToTime(value) {
-    const next = Math.max(0, Math.min(TOUR_END, value));
-    if (next !== targetTime || !document.documentElement.dataset.tourTarget) {
-      document.documentElement.dataset.tourTarget = next.toFixed(2);
-    }
-    targetTime = next;
-    if (reducedMotion && time !== next) seek(next);
-  }
-
-  let resizeFrame = null;
-  function resize() {
-    if (resizeFrame !== null) return;
-    resizeFrame = requestAnimationFrame(() => {
-      resizeFrame = null;
-      if (viewportWidth === innerWidth && viewportHeight === innerHeight) return;
-      viewportWidth = innerWidth;
-      viewportHeight = innerHeight;
-      camera.aspect = viewportWidth / viewportHeight;
-      camera.updateProjectionMatrix();
-      const nextScale = Math.min(renderScale, maxPixelRatio());
-      if (nextScale !== renderScale) {
-        renderScale = nextScale;
-        renderer.setPixelRatio(renderScale);
-      }
-      renderer.setSize(viewportWidth, viewportHeight, false);
-      seek(time);
-    });
-  }
-  addEventListener('resize', resize);
-  seek(time);
-  let last = performance.now(), renderFrame = null;
-  let sampleTime = 0, sampleFrames = 0, slowFrames = 0, stableFastTime = 0;
-  let nextLightSelection = 0;
-  const frustum = new THREE.Frustum();
-  const viewProjection = new THREE.Matrix4();
-  const characterBounds = new THREE.Sphere(new THREE.Vector3(), 1.5);
-  function updateLocalLights(now) {
-    if (!localLights.length || now < nextLightSelection) return;
-    nextLightSelection = now + 100;
-    let first = null, second = null, firstDistance = Infinity, secondDistance = Infinity;
-    for (const light of localLights) {
-      const distance = camera.position.distanceToSquared(light.position);
-      if (distance < firstDistance) {
-        second = first;
-        secondDistance = firstDistance;
-        first = light;
-        firstDistance = distance;
-      } else if (distance < secondDistance) {
-        second = light;
-        secondDistance = distance;
-      }
-    }
-    for (const light of localLights) light.visible = light === first || light === second;
-    document.documentElement.dataset.activeLocalLights = String(Math.min(2, localLights.length));
-  }
-
-  function animate(now) {
-    if (disposed) return;
-    renderFrame = requestAnimationFrame(animate);
-    const elapsedMs = now - last;
-    const dt = Math.min(elapsedMs / 1000, .05);
-    last = now;
-    if (document.hidden) { sampleTime = sampleFrames = slowFrames = stableFastTime = 0; return; }
-    if (preview && !preview.active) return;
-    if (preview?.playing) {
-      preview.elapsed = Math.min(preview.duration, preview.elapsed + dt);
-      // Follow the entrance portion of the existing tour, including the sliding doors.
-      targetTime = receptionTime * preview.elapsed / preview.duration;
-      if (preview.elapsed === preview.duration) preview.playing = false;
-    }
-    if (Math.abs(targetTime - time) > .0001) {
-      seek(reducedMotion ? targetTime : advanceTour(time, targetTime, elapsedMs / 1000, cameraSmoothness));
-    }
-    screenBrightness = THREE.MathUtils.damp(screenBrightness, requestedNight ? 0 : 1, 3.5, dt);
-    logoMaterials.forEach(material => {
-      if (!material.userData.television) return;
-      const off = screenBrightness < .008;
-      const map = off ? null : material.userData.dayMap;
-      if (material.map !== map) { material.map = map; material.needsUpdate = true; }
-      material.color.setScalar(off ? .002 : screenBrightness);
-      material.userData.indicator?.color.set(off ? '#d15a43' : '#63d8b1');
-    });
-    employeeExits.forEach((exit, holder) => {
-      exit.delay -= dt;
-      if (exit.delay > 0) return;
-      if (!exit.started) {
-        exit.started = true;
-        holder.userData.mixer?.stopAllAction();
-        (holder.userData.walkAction || holder.userData.idleAction)?.reset().fadeIn(.4).play();
-        const model = holder.children[0];
-        if (model && holder.userData.standingPosition) {
-          model.position.copy(holder.userData.standingPosition);
-          model.scale.setScalar(holder.userData.standingScale);
-        }
-      }
-      exit.elapsed += dt;
-      const target = exit.points[0];
-      const dx = target.x - holder.position.x, dz = target.z - holder.position.z;
-      const distance = Math.hypot(dx, dz), step = dt * 1.25;
-      holder.rotation.y = Math.atan2(dx, dz);
-      if (distance <= step) { holder.position.copy(target); }
-      else { holder.position.x += dx / distance * step; holder.position.z += dz / distance * step; }
-      const fade = THREE.MathUtils.clamp((exit.elapsed - .9) / 1.1, 0, 1);
-      holder.userData.fadeMaterials?.forEach(({ material, opacity }) => {
-        if (fade > 0 && !material.transparent) { material.transparent = true; material.depthWrite = false; material.needsUpdate = true; }
-        material.opacity = opacity * (1 - fade);
-      });
-      if (fade === 1) { holder.visible = false; employeeExits.delete(holder); }
-    });
-    const exteriorVisible = previewCity && camera.position.z > -2;
-    if (headquartersExterior) headquartersExterior.visible = camera.position.z > 4.4;
-    if (city) {
-      city.group.visible = exteriorVisible;
-      if (exteriorVisible) city.updateCamera(camera);
-    }
-    streetLife?.update(dt, camera, exteriorVisible, previewPeople && !requestedNight);
-    traffic?.update(dt, camera, exteriorVisible);
-    aircraft.update(dt, time < 17, previewCity);
-    const entranceTarget = Math.max(
-      doorProximity(camera.position, entrance), streetLife?.entranceProximity() || 0, employeeDoorProximity(entrance)
-    );
-    const mainDoorNext = advanceDoor(mainDoorAmount, entranceTarget, elapsedMs / 1000, reducedMotion);
-    mainDoorAmount = mainDoorNext;
-    doorLeft.position.x = -.77 - 1.55 * mainDoorAmount;
-    doorRight.position.x = .77 + 1.55 * mainDoorAmount;
-    document.documentElement.dataset.doorOpen = String(mainDoorAmount > .95);
-    document.documentElement.dataset.entranceDoorAmount = mainDoorAmount.toFixed(2);
-    for (const door of roomDoors) {
-      const dx = camera.position.x - door.x, dz = camera.position.z - door.z;
-      door.group.visible = time > 10 && dx * dx + dz * dz < 35 * 35;
-      const target = Math.max(doorProximity(camera.position, door), employeeDoorProximity(door));
-      const amount = advanceDoor(door.amount, target, elapsedMs / 1000, reducedMotion);
-      door.amount = amount;
-      door.leaves.forEach((leaf, index) => {
-        const side = index === 0 ? -1 : 1;
-        leaf.position.x = side * (door.width / 4 + (door.width / 2 + .06) * amount);
-      });
-    }
-    document.documentElement.dataset.roomDoors = JSON.stringify(roomDoors.map(door => ({ name: door.name, open: Number(door.amount.toFixed(2)) })));
-    camera.updateMatrixWorld();
-    viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    frustum.setFromProjectionMatrix(viewProjection);
-    let activePeople = 0;
-    people.forEach(holder => {
-      const mixer = holder.userData.mixer;
-      if (!previewPeople || (requestedNight && !(employeeExits.has(holder)))) { holder.visible = false; return; }
-      if (!mixer) { holder.visible = true; return; }
-      characterBounds.center.copy(holder.position); characterBounds.center.y += 1;
-      const distance = camera.position.distanceToSquared(characterBounds.center);
-      holder.visible = distance < 28 * 28 && frustum.intersectsSphere(characterBounds);
-      if (reducedMotion || !holder.visible || distance > 18 * 18) return;
-      mixer.update(dt); activePeople++;
-    });
-    // Interior furniture is occluded outside and in distant rooms.
-    for (const group of interiorProps) group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
-    // Stop invisible ocean geometry updates after entering the building.
-    coastal.update(dt, camera, camera.position.z > -2, previewPeople && !requestedNight);
-    const outsideEntrance = camera.position.z > 1.85;
-    const landscapeDetail = renderScale < .62 ? .27 : 1;
-    autumnWalk?.update(dt, outsideEntrance, camera, landscapeDetail);
-    scenicPlantings?.update(camera, previewCity && outsideEntrance, Number(document.documentElement.dataset.dayNightProgress ?? (requestedNight ? 1 : 0)));
-    plazaFountain?.update(dt, outsideEntrance);
-    updateLocalLights(now);
-    renderer.render(scene, camera);
-    document.documentElement.dataset.activePeople = String(activePeople);
-    // Adapt to several slow frames, rather than treating a single loading
-    // stall as a reason to change quality during the tour.
-    if (elapsedMs > 0) {
-      sampleTime += Math.min(elapsedMs, 250);
-      sampleFrames++;
-      if (elapsedMs >= 95) slowFrames++;
-      if ((sampleTime >= 850 && sampleFrames >= 5) || slowFrames >= 3) {
-        const averageFrameMs = sampleTime / sampleFrames;
-        let nextScale = nextRenderScale(renderScale, averageFrameMs, viewportWidth * viewportHeight);
-        const canRecover = averageFrameMs < 18.5 && Math.abs(targetTime - time) < .001
-          && document.documentElement.dataset.modelLoad === 'ready';
-        stableFastTime = canRecover ? stableFastTime + sampleTime : 0;
-        if (stableFastTime >= 3000 && renderScale < maxPixelRatio()) {
-          nextScale = Math.min(maxPixelRatio(), renderScale * 1.12);
-          stableFastTime = 0;
-        }
-        if (nextScale !== renderScale) {
-          renderScale = nextScale;
-          renderer.setPixelRatio(renderScale);
-        }
-        document.documentElement.dataset.renderScale = renderScale.toFixed(2);
-        sampleTime = sampleFrames = slowFrames = 0;
-      }
-    }
-  }
-  batchStaticMeshes();
-  registerLocalLights(scene);
-  updateLocalLights(performance.now());
-  renderFrame = requestAnimationFrame(animate);
-  // Render the base tour immediately; model enhancements load independently.
-  renderer.render(scene, camera);
-  const yieldToTour = () => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
-  async function loadModels() {
-    try {
-      // Local GLB assets are bundled with the project; visitors never need to upload models.
-      await yieldToTour();
-      if (disposed) return;
-      const generator = new THREE.PMREMGenerator(renderer);
-      const studio = new RoomEnvironment();
-      env = generator.fromScene(studio, .04);
-      generator.dispose();
-      studio.dispose();
-      scene.environment = env.texture;
-      const loader = new GLTFLoader(),
-        assetRoot = './assets/3d/';
-      const [headquarters, office, boss, woman, colleague, furnitureAssets] = await Promise.all([
-        loader.loadAsync(new URL('../3D/' + HEADQUARTERS_MODEL, import.meta.url).href),
-        loader.loadAsync(assetRoot + 'furniture/modern-office.glb'),
-    
-        loader.loadAsync(assetRoot + 'people/formal-boss.glb'),
-        loader.loadAsync(assetRoot + 'people/formal-businesswoman.glb'),
-        loader.loadAsync(new URL('../3D/business-male-4.glb', import.meta.url).href).catch(() => null),
-        loadRealisticFurniture(THREE, new GLTFLoader()).catch(error => {
-          console.warn('SAEI: keeping existing furniture because the new models failed to load.', error);
-          return null;
-        })
-      ]);
-      if (disposed) { furnitureAssets?.destroy(); return; }
-      realisticFurniture = furnitureAssets;
-      const tower = placeHeadquartersModel(THREE, headquarters.scene);
-      scene.add(tower);
-      headquartersExterior = tower;
-      mergeStaticMeshes(THREE, tower, mergeGeometries);
-      headquartersLighting.addFacade(tower);
-      headquartersLighting.setNight(cityLightLevel);
-      await yieldToTour();
-      if (disposed) return;
-      const outdoor = createOutdoorFacilities(THREE, scene);
-      mergeStaticMeshes(THREE, outdoor, mergeGeometries, new Set(), { cellSize: 20, disposeUnused: true });
-      registerLocalLights(outdoor);
-      const setOutdoorNight = outdoor.userData.setNight;
-      outdoor.userData.setNight = amount => {
-        descentClouds.setNight(amount);
-        cityLightLevel = amount;
-        headquartersLighting.setNight(amount);
-        if (typeof setOutdoorNight === 'function') setOutdoorNight(amount);
-        city?.setNight(amount);
-        traffic?.setNight(amount);
-      };
-      coastal = await createCoastalEnvironment(THREE, scene, {
-        renderer, sun, ambient, outdoor, reducedMotion
-      });
-      coastal.setNight(document.documentElement.dataset.theme === 'dark', true);
-      document.documentElement.dataset.buildingModel = 'free-london-skyscraper';
-      document.documentElement.dataset.buildingMaterial = 'original-london-materials';
-      // Extract only furniture, keeping the source room's posters and walls out of the tour.
-      function collect(asset, pattern) {
-        const group = new THREE.Group();
-        asset.scene.updateMatrixWorld(true);
-        asset.scene.traverse(n => {
-          if (n.isMesh && pattern.test(n.name)) {
-            const mesh = new THREE.Mesh(n.geometry.clone().applyMatrix4(n.matrixWorld), n.material);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            group.add(mesh);
-          }
-        });
-        return group;
-      }
-    
-      function fit(group, width) {
-        const b = new THREE.Box3().setFromObject(group),
-          s = b.getSize(new THREE.Vector3()),
-          c = b.getCenter(new THREE.Vector3());
-        const factor = width / Math.max(s.x, s.z);
-        group.scale.setScalar(factor);
-        group.position.set(-c.x * factor, -b.min.y * factor, -c.z * factor);
-        return group;
-      }
-      for (const g of deskGroups) {
-        if (!furnitureAssets) continue;
-        g.children.forEach(mesh => { if (mesh.castShadow) mesh.geometry.dispose(); });
-        g.clear();
-        g.add(furnitureAssets.desk.clone(true), furnitureAssets.chair.clone(true));
-        box(.82, .43, .043, 0, 1.10, -.19, black, g);
-        box(.747, .364, .009, 0, 1.10, -.166, glass, g);
-        box(.07, .114, .07, 0, .84, -.19, steel, g);
-        box(.25, .022, .16, 0, .804, -.19, black, g);
-        box(.48, .025, .16, 0, .805, .2, navy, g);
-        interior.contact(g, 2.35, 1.9, .25);
-      }
-      if (furnitureAssets) for (const sofa of lobbySofas) {
-        sofa.clear();
-        const model = furnitureAssets.sofa.clone(true);
-        // Align the imported cushion height with the lounge seat anchor.
-        model.scale.y = .98;
-        sofa.add(model);
-        interior.contact(sofa, 2.35, 1.22);
-      }
-      // Source props provide extra plants and desk lamps, placed around the reception.
-      const plants = fit(collect(office, /Window_Plant_0/), 1.3);
-      for (const x of [-7.5, 8]) {
-        const wrapper = new THREE.Group();
-        wrapper.position.set(x, .05, -8);
-        wrapper.add(plants.clone(true));
-        wrapper.userData.dynamicScene = true;
-        interiorProps.push(wrapper);
-        scene.add(wrapper);
-      }
-    
-      const poseBounds = new Map();
-      function boundsForPose(clip, model) {
-        if (!poseBounds.has(clip)) {
-          model.updateMatrixWorld(true);
-          poseBounds.set(clip, new THREE.Box3().setFromObject(model, true));
-        }
-        return poseBounds.get(clip);
-      }
-      let sliceStart = performance.now();
-      for (let n = 0; n < people.length; n++) {
-        if (performance.now() - sliceStart > 8) {
-          await yieldToTour();
-          if (disposed) return;
-          sliceStart = performance.now();
-        }
-        const holder = people[n],
-          seat = holder.userData.seat,
-          asset = seat || n % 2 === 0 ? boss : woman;
-        holder.clear();
-        const model = clone(asset.scene);
-        const mixer = new THREE.AnimationMixer(model);
-        const idle = asset.animations.find(a => a.name.endsWith('Idle1')) || asset.animations[0];
-        const idleAction = mixer.clipAction(idle).play();
-        mixer.setTime(0);
-        const standing = boundsForPose(idle, model),
-          scale = 1.82 / standing.getSize(new THREE.Vector3()).y;
-        const seatedClip = seat && asset.animations.find(a => a.name.endsWith('SitIdle' + seat.pose));
-        const restClip = seatedClip || idle;
-        if (seatedClip) {
-          idleAction.stop();
-          mixer.clipAction(restClip).play();
-          mixer.setTime(0);
-        }
-        const b = boundsForPose(restClip, model),
-          center = b.getCenter(new THREE.Vector3());
-        model.scale.setScalar(scale);
-        model.position.set(-center.x * scale, -b.min.y * scale, -center.z * scale);
-        if (seatedClip) {
-          const pelvis = model.getObjectByName('Root_01');
-          if (pelvis) {
-            // The model's pelvis sits above the cushion surface. Anchor it in
-            // X/Z and fit the pose vertically from the floor to that surface.
-            // Read the pose in unscaled model coordinates.
-            model.position.set(0, 0, 0);
-            model.scale.setScalar(1);
-            const hip = pelvis.getWorldPosition(new THREE.Vector3());
-            const cushionHeight = seat.height - holder.position.y;
-            const hipClearance = .13;
-            const verticalScale = cushionHeight / (hip.y - b.min.y - hipClearance);
-            model.scale.set(scale, verticalScale, scale);
-            model.position.set(-hip.x * scale, -b.min.y * verticalScale, -hip.z * scale);
-          }
-        }
-        const fadeMaterials = [];
-        model.traverse(o => {
-          if (o.isMesh) {
-            const copyMaterial = source => {
-              const material = source.clone();
-              fadeMaterials.push({ material, opacity: material.opacity, transparent: material.transparent, depthWrite: material.depthWrite });
-              return material;
-            };
-            o.material = Array.isArray(o.material) ? o.material.map(copyMaterial) : copyMaterial(o.material);
-            o.castShadow = false;
-            o.receiveShadow = true;
-          }
-        });
-        holder.userData.fadeMaterials = fadeMaterials;
-        holder.add(model);
-        holder.userData.mixer = mixer;
-        holder.userData.idleAction = idleAction;
-        holder.userData.restAction = mixer.clipAction(restClip);
-        holder.userData.home = {
-          position: holder.position.clone(), rotation: holder.rotation.y,
-          modelPosition: model.position.clone(), modelScale: model.scale.clone()
-        };
-        const standingCenter = standing.getCenter(new THREE.Vector3());
-        holder.userData.standingPosition = new THREE.Vector3(-standingCenter.x * scale, -standing.min.y * scale, -standingCenter.z * scale);
-        holder.userData.standingScale = scale;
-        const walkClip = asset.animations.find(a => /walk/i.test(a.name));
-        if (walkClip) holder.userData.walkAction = mixer.clipAction(walkClip);
-      }
-      document.documentElement.dataset.realisticPeople = String(people.length);
-      document.documentElement.dataset.characterModels = '2';
-      document.documentElement.dataset.furnitureModels = furnitureAssets ? '4' : '1';
-      document.documentElement.dataset.realisticFurniture = furnitureAssets ? 'ready' : 'fallback';
-      streetLife = createStreetLife(THREE, scene, { boss, woman, colleague, clone, reducedMotion });
-    
-    
-    
-    
-    
-      renderer.shadowMap.needsUpdate = true;
-      document.documentElement.dataset.modelLoad = 'ready';
-    } catch (error) {
-      console.warn('SAEI: using the base tour because model loading failed.', error);
-      document.documentElement.dataset.modelLoad = 'fallback';
-    }
-  }
-  // The street grid and city silhouettes are available before the GLBs load.
-  document.documentElement.dataset.cityStatus = 'loading';
-  createAccessRoads(THREE, scene, { mergeGeometries }).then(neighborhood => {
-    if (disposed) { neighborhood.destroy(); return; }
-    city = neighborhood;
-    scene.getObjectByName('OFOQCity').visible = previewCity;
-    city.setNight(cityLightLevel);
-    city.updateCamera(camera);
-    renderer.shadowMap.needsUpdate = true;
-    skylineFallback.forEach(mesh => { scene.remove(mesh); mesh.geometry.dispose(); });
-  }).catch(error => {
-    if (!disposed) document.documentElement.dataset.cityStatus = 'roads-unavailable';
-    console.warn('SAEI: city models unavailable; keeping the base skyline.', error);
-  });
-  document.documentElement.dataset.modelLoad = 'loading';
-  loadModels();
-  createScenicPlantings(THREE, scene).then(plantings => {
-    if (disposed) { plantings.destroy(); return; }
-    scenicPlantings = plantings;
-  }).catch(error => console.warn('SAEI: optional park photographs unavailable.', error));
-  createPlazaFountain(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(fountain => {
-    if (disposed) { fountain.destroy(); return; }
-    plazaFountain = fountain;
-    const fallback = scene.getObjectByName('OFOQFountainFallback');
-    if (fallback) fallback.visible = false;
-    renderer.shadowMap.needsUpdate = true;
-  }).catch(error => {
-    document.documentElement.dataset.plazaFountain = 'unavailable';
-    console.warn('SAEI: imported plaza fountain could not be loaded.', error);
-  });
-  createAutumnWalk(THREE, scene, { loader: new GLTFLoader(), reducedMotion }).then(walk => {
-    if (disposed) { walk.destroy(); return; }
-    autumnWalk = walk;
-    scene.traverse(node => { if (node.userData.autumnReplacement) node.visible = false; });
-    renderer.shadowMap.needsUpdate = true;
-  }).catch(error => {
-    document.documentElement.dataset.autumnWalk = 'unavailable';
-    console.warn('SAEI: autumn maples could not be loaded.', error);
-  });
-  aircraft.loadModel(new GLTFLoader()).catch(error => {
-    document.documentElement.dataset.aircraftSource = 'procedural-fallback';
-    console.warn('SAEI: aircraft model unavailable; using the lightweight fallback.', error);
-  });
-  document.documentElement.dataset.trafficStatus = 'loading';
-  createCityTraffic(THREE, scene, { loader: new GLTFLoader(), mergeGeometries, reducedMotion }).then(result => {
-    if (disposed) { result.destroy(); return; }
-    traffic = result;
-    traffic.setNight(requestedNight ? 1 : cityLightLevel);
-  }).catch(error => {
-    if (!disposed) document.documentElement.dataset.trafficStatus = 'unavailable';
-    console.warn('SAEI: the sedan asset could not be loaded.', error);
-  });
-  return {
-    configurePreview(config) {
-      if (!adminPreview) return;
-      if (config.theme) this.setNight(config.theme === 'dark', true);
-      if (config.active === false) { if (preview) preview.active = false; return; }
-      if (config.resume && preview) { preview.active = true; return; }
-      const duration = Number(config.duration), smoothness = Number(config.smoothness);
-      preview = {
-        duration: Number.isFinite(duration) ? Math.max(8, Math.min(40, duration)) : 16,
-        elapsed: 0, active: true, playing: Boolean(config.autoplay) && !reducedMotion
-      };
-      cameraSmoothness = Number.isFinite(smoothness) ? Math.max(.2, Math.min(2, smoothness)) : .65;
-      previewCity = config.city !== false; previewPeople = config.people !== false;
-      skylineFallback.forEach(mesh => { mesh.visible = previewCity; });
-      const cityGroup = scene.getObjectByName('OFOQCity');
-      if (cityGroup) cityGroup.visible = previewCity;
-      people.forEach(holder => { holder.visible = previewPeople && !requestedNight; });
-      moveToTime(0);
-      seek(0);
-      renderer.shadowMap.needsUpdate = true;
-    },
-    setNight: (night, immediate = false) => {
-      const changed = requestedNight !== night;
-      requestedNight = night;
-      if (immediate || reducedMotion) screenBrightness = night ? 0 : 1;
-      if (!night) restoreEmployees();
-      else if (changed && !immediate && !reducedMotion && previewPeople) beginEmployeeExits();
-      else if (immediate || reducedMotion) employeeExits.clear();
-      logoMaterials.forEach(material => { const off = screenBrightness < .008 && material.userData.television; material.map = off ? null : material.userData.dayMap; material.color.set(off ? '#05070b' : '#ffffff'); material.userData.indicator?.color.set(off ? '#d15a43' : '#63d8b1'); material.needsUpdate = true; });
-      people.forEach(holder => { holder.visible = previewPeople && (!night || (employeeExits.has(holder))); });
-      if (immediate || document.documentElement.dataset.modelLoad !== 'ready') traffic?.setNight(night ? 1 : 0);
-      coastal.setNight(night, immediate);
-    },
-    moveToTime,
-    seek(value) { moveToTime(value); if (time !== targetTime) seek(targetTime); },
-    goToRoom(index) {
-      if (!Number.isInteger(index) || index < 0 || index >= stops.length || disposed) return;
-      moveToTime(index === 0 && skipOpening ? receptionTime : stops[index]);
-    },
-    destroy() {
-      disposed = true;
-      if (renderFrame !== null) cancelAnimationFrame(renderFrame);
-      if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
-      removeEventListener('resize', resize);
-      coastal.destroy?.();
-      descentClouds.destroy();
-      headquartersLighting.destroy();
-      interior.destroy();
-      autumnWalk?.destroy();
-      scenicPlantings?.destroy();
-      plazaFountain?.destroy();
-      realisticFurniture?.destroy();
-      city?.destroy();
-      streetLife?.destroy();
-      traffic?.destroy();
-      aircraft.destroy();
-      logoTexture.dispose();
-      indoorLogoTexture?.dispose();
-      logoMaterials.forEach(material => { material.map?.dispose(); material.dispose(); });
-      renderer.dispose();
-      env?.dispose();
-      scene.traverse(o => {
-        o.geometry?.dispose();
-      });
-    }
-  };
-}
-
-
-
-
-
 
 // إغلاق قائمة الحساب عند الضغط خارجها أو على زر Escape.
 const accountMenu = document.querySelector('.account-menu');

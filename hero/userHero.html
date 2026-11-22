@@ -1,179 +1,150 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+  <head>
+    <script src="../assets/frontend-runtime.js"></script>
+    <script src="../assets/platform-data.js"></script>
+    <meta charset="UTF-8" />
 
-<head>
-  <script src="../assets/frontend-runtime.js"></script>
-  <script src="../assets/platform-data.js"></script>
-  <meta charset="UTF-8">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+    <meta name="theme-color" content="#0b1526" />
 
-  <meta name="theme-color" content="#0b1526">
+    <title>SAEI — مساحة لمستقبلك</title>
 
-  <title>SAEI — مساحة لمستقبلك</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+    />
 
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
-  >
-
-  
-
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
       }
-    }
-  </script>
-  <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg">
-  <link rel="stylesheet" href="userHero.css?v=smooth-tour-1">
-  <link rel="stylesheet" href="../assets/arabic-ui.css">
-  <script defer src="../assets/arabic-ui.js"></script>
-  <script defer src="../assets/demo-auth.js"></script>
-  <link rel="stylesheet" href="navbar.css">
-<link rel="stylesheet" href="../assets/cards.css">
-<link rel="stylesheet" href="../assets/fonts.css">
-  <link rel="stylesheet" href="../assets/popup-ui.css">
-  <link rel="stylesheet" href="../assets/shared-navbar.css?v=account-dropdown-6">
-</head>
+    </script>
+    <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg" />
+    <link rel="stylesheet" href="userHero.css?v=scene-loader-1" />
+    <link rel="stylesheet" href="../assets/arabic-ui.css" />
+    <script defer src="../assets/arabic-ui.js"></script>
+    <script defer src="../assets/demo-auth.js"></script>
+    <link rel="stylesheet" href="navbar.css" />
+    <link rel="stylesheet" href="../assets/cards.css" />
+    <link rel="stylesheet" href="../assets/fonts.css" />
+    <link rel="stylesheet" href="../assets/popup-ui.css" />
+    <link rel="stylesheet" href="../assets/shared-navbar.css?v=account-dropdown-6" />
+  </head>
 
-<body data-section="hero">
-
-  <!-- مشهد الأنيميشن -->
-  <div id="scene" aria-hidden="true"></div>
-  <div class="scene-vignette"></div>
-  <script src="../assets/shared-navbar.js?v=account-dropdown-6" data-mode="hero"></script>
-
-  <!-- أقسام التمرير لتحريك الكاميرا -->
-  <main id="journey">
-
-    <section
-      id="lobby"
-      class="chapter"
-      aria-label="الرئيسية"
-    ></section>
-
-    <section
-      id="freelance"
-      class="chapter"
-      aria-label="العمل الحر"
-    ></section>
-
-    <section
-      id="academy"
-      class="chapter"
-      aria-label="الأكاديمية"
-    ></section>
-
-    <section
-      id="internships"
-      class="chapter"
-      aria-label="فرص التدريب"
-    ></section>
-
-    <section
-      id="jobs"
-      class="chapter"
-      aria-label="الوظائف"
-    ></section>
-
-    <section
-      id="events"
-      class="chapter"
-      aria-label="الفعاليات"
-    ></section>
-
-  </main>
-
-  <footer id="journeyEnd" class="journey-end" aria-label="ختام الجولة" aria-hidden="true" inert>
-    <div class="journey-end-content">
-      <div class="journey-end-intro">
-        <a class="journey-end-brand" href="#lobby" aria-label="سعي — العودة لبداية الجولة">
-          <span class="ofoq-brand"><img class="ofoq-logo" src="../assets/branding/saei-logo.svg" alt="سعي | SAEI" width="1254" height="1254"></span>
-          <span>سعي <small>SAEI</small></span>
-        </a>
-        <p class="journey-end-eyebrow">نهاية الجولة، وبداية فرصتك</p>
-        <h2>خطوتك التالية تبدأ من هنا.</h2>
-        <p>تعلّم، اكتشف فرصًا جديدة، وتواصل مع أشخاص يشاركونك الطموح.</p>
-        <button id="restartTour" class="journey-restart" type="button">العودة لبداية الجولة <span aria-hidden="true">↑</span></button>
+  <body data-section="hero">
+    <!-- مشهد الأنيميشن -->
+    <div id="sceneLoader" class="scene-loader" role="status">
+      <div class="scene-loader-mark">
+        <img src="../assets/branding/saei-logo.svg" alt="سعي" width="1254" height="1254" />
       </div>
-      <nav class="journey-end-links" aria-label="استكشف أقسام سعي">
-        <h3>استكشف سعي</h3>
-        <a href="../Freelance/freelance.html">العمل الحر</a>
-        <a href="../Academy/academy.html">الأكاديمية</a>
-        <a href="../Internships/internships.html">فرص التدريب</a>
-        <a href="../Jobs/jobs.html">الوظائف</a>
-        <a href="../Events/events.html">الفعاليات</a>
-      </nav>
-      <nav class="journey-end-links" aria-label="التواصل والحساب">
-        <h3>خلّينا على تواصل</h3>
-        <a href="../Account/Messages/messages.html">الرسائل والتواصل</a>
-        <a href="../Account/Profile/profile.html">الملف الشخصي</a>
-        <a href="../Auth/Register/register.html">انضم إلى سعي</a>
-        <a href="../Credits/credits.html">مصادر المجسّمات</a>
-      </nav>
+      <span class="scene-loader-spinner" aria-hidden="true"></span>
+      <span>جارٍ تجهيز الجولة…</span>
     </div>
-    <div class="journey-end-bottom"><span>© <span id="tourFooterYear">2026</span> سعي — جميع الحقوق محفوظة.</span><span>مساحة تجمع التعلّم والعمل والطموح.</span></div>
-  </footer>
+    <noscript
+      ><style>
+        .scene-loader {
+          display: none;
+        }
+      </style></noscript
+    >
+    <div id="scene" aria-hidden="true"></div>
+    <div class="scene-vignette"></div>
+    <script src="../assets/shared-navbar.js?v=account-dropdown-6" data-mode="hero"></script>
 
-<div class="scene-caption">
+    <!-- أقسام التمرير لتحريك الكاميرا -->
+    <main id="journey">
+      <section id="lobby" class="chapter" aria-label="الرئيسية"></section>
 
-    <span class="live-dot"></span>
+      <section id="freelance" class="chapter" aria-label="العمل الحر"></section>
 
-    <span id="sceneCaption">
-      الرئيسية / أهلًا بك
-    </span>
+      <section id="academy" class="chapter" aria-label="الأكاديمية"></section>
 
-    <small>مساحة تفاعلية ثلاثية الأبعاد</small>
+      <section id="internships" class="chapter" aria-label="فرص التدريب"></section>
 
-  </div>
+      <section id="jobs" class="chapter" aria-label="الوظائف"></section>
 
-  <!-- الفوتر المشترك -->
+      <section id="events" class="chapter" aria-label="الفعاليات"></section>
+    </main>
 
-<footer class="tour-footer">
-  <a class="model-credits" href="../Credits/credits.html">مصادر المجسّمات</a>
+    <footer id="journeyEnd" class="journey-end" aria-label="ختام الجولة" aria-hidden="true" inert>
+      <div class="journey-end-content">
+        <div class="journey-end-intro">
+          <a class="journey-end-brand" href="#lobby" aria-label="سعي — العودة لبداية الجولة">
+            <span class="ofoq-brand"
+              ><img
+                class="ofoq-logo"
+                src="../assets/branding/saei-logo.svg"
+                alt="سعي | SAEI"
+                width="1254"
+                height="1254"
+            /></span>
+            <span>سعي <small>SAEI</small></span>
+          </a>
+          <p class="journey-end-eyebrow">نهاية الجولة، وبداية فرصتك</p>
+          <h2>خطوتك التالية تبدأ من هنا.</h2>
+          <p>تعلّم، اكتشف فرصًا جديدة، وتواصل مع أشخاص يشاركونك الطموح.</p>
+          <button id="restartTour" class="journey-restart" type="button"
+            >العودة لبداية الجولة <span aria-hidden="true">↑</span></button
+          >
+        </div>
+        <nav class="journey-end-links" aria-label="استكشف أقسام سعي">
+          <h3>استكشف سعي</h3>
+          <a href="../Freelance/freelance.html">العمل الحر</a>
+          <a href="../Academy/academy.html">الأكاديمية</a>
+          <a href="../Internships/internships.html">فرص التدريب</a>
+          <a href="../Jobs/jobs.html">الوظائف</a>
+          <a href="../Events/events.html">الفعاليات</a>
+        </nav>
+        <nav class="journey-end-links" aria-label="التواصل والحساب">
+          <h3>خلّينا على تواصل</h3>
+          <a href="../Account/Messages/messages.html">الرسائل والتواصل</a>
+          <a href="../Account/Profile/profile.html">الملف الشخصي</a>
+          <a href="../Auth/Register/register.html">انضم إلى سعي</a>
+          <a href="../Credits/credits.html">مصادر المجسّمات</a>
+        </nav>
+      </div>
+      <div class="journey-end-bottom"
+        ><span>© <span id="tourFooterYear">2026</span> سعي — جميع الحقوق محفوظة.</span
+        ><span>مساحة تجمع التعلّم والعمل والطموح.</span></div
+      >
+    </footer>
 
-  <span id="status" role="status">
-    جارٍ تجهيز المكتب…
-  </span>
+    <div class="scene-caption">
+      <span class="live-dot"></span>
 
-  <span class="scroll-hint">
-    مرّر لاستكشاف الغرف
-    <b aria-hidden="true">↓</b>
-  </span>
+      <span id="sceneCaption"> الرئيسية / أهلًا بك </span>
 
-  <span id="counter" dir="ltr">
-    01 / 06
-  </span>
-
-  <div class="progress-track" aria-hidden="true">
-    <div id="progress"></div>
-  </div>
-
-</footer>
-
-
-  <noscript>
-    <div class="no-script">
-      يرجى تفعيل JavaScript لتجربة المكتب ثلاثي الأبعاد.
+      <small>مساحة تفاعلية ثلاثية الأبعاد</small>
     </div>
-  </noscript>
 
-  
+    <!-- الفوتر المشترك -->
 
-  
+    <footer class="tour-footer">
+      <a class="model-credits" href="../Credits/credits.html">مصادر المجسّمات</a>
 
-  
+      <span id="status" role="status"> جارٍ تجهيز المكتب… </span>
 
-  
+      <span class="scroll-hint">
+        مرّر لاستكشاف الغرف
+        <b aria-hidden="true">↓</b>
+      </span>
 
-  <script type="module" src="userHero.js?v=smooth-tour-1"></script>
-</body>
+      <span id="counter" dir="ltr"> 01 / 06 </span>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="progress"></div>
+      </div>
+    </footer>
+
+    <noscript>
+      <div class="no-script"> يرجى تفعيل JavaScript لتجربة المكتب ثلاثي الأبعاد. </div>
+    </noscript>
+
+    <script type="module" src="userHero.js?v=realistic-coastal-tour"></script>
+  </body>
 </html>
-

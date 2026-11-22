@@ -1,285 +1,313 @@
 // بيانات تجريبية. عدّل القائمة هنا لإضافة فرص أو فعاليات.
 const pageData = {
-  "section": "events",
-  "noun": "events",
-  "action": "عرض الفعالية",
-  "types": [
-    [
-      "workshop",
-      "ورشة عمل"
-    ],
-    [
-      "meetup",
-      "لقاء"
-    ],
-    [
-      "talk",
-      "جلسة حوارية"
-    ]
+  section: 'events',
+  noun: 'events',
+  action: 'عرض الفعالية',
+  types: [
+    ['workshop', 'ورشة عمل'],
+    ['meetup', 'لقاء'],
+    ['talk', 'جلسة حوارية']
   ],
-  "extras": [
-    [
-      "free",
-      "مجاني"
-    ],
-    [
-      "paid",
-      "مدفوع"
-    ]
+  extras: [
+    ['free', 'مجاني'],
+    ['paid', 'مدفوع']
   ],
-  "items": [
+  items: [
     {
-      "id": "ideas-event",
-      "title": "أمسية صنّاع الأفكار",
-      "company": "مجتمع سعي",
-      "category": "career",
-      "location": "onsite",
-      "itemType": "meetup",
-      "extra": "free",
-      "reward": 0,
-      "offer": "دخول مجاني",
-      "date": "2026-10-10",
-      "deadline": "2026-11-14",
-      "eventTime": "6:00–8:00 مساءً · بتوقيت عمّان",
-      "venue": "مساحة سعي · عمّان",
-      "symbol": "↗",
-      "description": "تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.",
-      "details": [
-        "الترحيب والتعارف",
-        "عروض قصيرة للمشاريع",
-        "تعارف وحوارات مفتوحة"
-      ],
-      "requirements": [
-        "أحضر فكرة أو مشروعًا للمشاركة",
-        "نرحّب بجميع مستويات الخبرة",
-        "فعالية توضيحية: المكان والبرنامج أمثلة فقط"
+      id: 'ideas-event',
+      title: 'أمسية صنّاع الأفكار',
+      company: 'مجتمع سعي',
+      category: 'career',
+      location: 'onsite',
+      itemType: 'meetup',
+      extra: 'free',
+      reward: 0,
+      offer: 'دخول مجاني',
+      date: '2026-10-10',
+      deadline: '2026-11-14',
+      eventTime: '6:00–8:00 مساءً · بتوقيت عمّان',
+      venue: 'مساحة سعي · عمّان',
+      symbol: '↗',
+      description: 'تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.',
+      details: ['الترحيب والتعارف', 'عروض قصيرة للمشاريع', 'تعارف وحوارات مفتوحة'],
+      requirements: [
+        'أحضر فكرة أو مشروعًا للمشاركة',
+        'نرحّب بجميع مستويات الخبرة',
+        'فعالية توضيحية: المكان والبرنامج أمثلة فقط'
       ]
     },
     {
-      "id": "product-event",
-      "title": "ابنِ منتجك الأول",
-      "company": "برايت لابز",
-      "category": "development",
-      "location": "remote",
-      "itemType": "workshop",
-      "extra": "paid",
-      "reward": 15,
-      "offer": "تذكرة بـ15 دولارًا",
-      "date": "2026-10-09",
-      "deadline": "2026-11-07",
-      "eventTime": "4:00–6:00 مساءً · بتوقيت عمّان",
-      "venue": "عبر الإنترنت · جلسة توضيحية",
-      "symbol": "</>",
-      "description": "حوّل فكرة صغيرة إلى نموذج يعمل من خلال ورشة عملية بإرشاد مختصين.",
-      "details": [
-        "اختيار مشكلة تستحق الحل",
-        "رسم تصوّر لحل واضح",
-        "بناء نموذج أولي صغير ومشاركته"
-      ],
-      "requirements": [
-        "حاسوب محمول ومتصفح",
-        "المعرفة الأساسية بـHTML وCSS مفيدة",
-        "جميع المواد محتوى توضيحي"
+      id: 'product-event',
+      title: 'ابنِ منتجك الأول',
+      company: 'برايت لابز',
+      category: 'development',
+      location: 'remote',
+      itemType: 'workshop',
+      extra: 'paid',
+      reward: 15,
+      offer: 'تذكرة بـ15 دولارًا',
+      date: '2026-10-09',
+      deadline: '2026-11-07',
+      eventTime: '4:00–6:00 مساءً · بتوقيت عمّان',
+      venue: 'عبر الإنترنت · جلسة توضيحية',
+      symbol: '</>',
+      description: 'حوّل فكرة صغيرة إلى نموذج يعمل من خلال ورشة عملية بإرشاد مختصين.',
+      details: ['اختيار مشكلة تستحق الحل', 'رسم تصوّر لحل واضح', 'بناء نموذج أولي صغير ومشاركته'],
+      requirements: [
+        'حاسوب محمول ومتصفح',
+        'المعرفة الأساسية بـHTML وCSS مفيدة',
+        'جميع المواد محتوى توضيحي'
       ]
     },
     {
-      "id": "design-event",
-      "title": "التصميم لأشخاص حقيقيين",
-      "company": "استوديو نورث",
-      "category": "design",
-      "location": "hybrid",
-      "itemType": "talk",
-      "extra": "free",
-      "reward": 0,
-      "offer": "دخول مجاني",
-      "date": "2026-10-08",
-      "deadline": "2026-11-21",
-      "eventTime": "5:00–6:30 مساءً · بتوقيت عمّان",
-      "venue": "مساحة سعي وعبر الإنترنت · مثال",
-      "symbol": "◈",
-      "description": "حوار حول الأبحاث وسهولة الوصول والقرارات التي تصنع منتجات أفضل.",
-      "details": [
-        "تجارب بحثية من فرق المنتجات",
-        "تطبيقات عملية للتصميم الذي يراعي سهولة الوصول",
-        "أسئلة الجمهور والنقاش"
+      id: 'design-event',
+      title: 'التصميم لأشخاص حقيقيين',
+      company: 'استوديو نورث',
+      category: 'design',
+      location: 'hybrid',
+      itemType: 'talk',
+      extra: 'free',
+      reward: 0,
+      offer: 'دخول مجاني',
+      date: '2026-10-08',
+      deadline: '2026-11-21',
+      eventTime: '5:00–6:30 مساءً · بتوقيت عمّان',
+      venue: 'مساحة سعي وعبر الإنترنت · مثال',
+      symbol: '◈',
+      description: 'حوار حول الأبحاث وسهولة الوصول والقرارات التي تصنع منتجات أفضل.',
+      details: [
+        'تجارب بحثية من فرق المنتجات',
+        'تطبيقات عملية للتصميم الذي يراعي سهولة الوصول',
+        'أسئلة الجمهور والنقاش'
       ],
-      "requirements": [
-        "متاح للمصممين وكل من يرغب بالتعلّم",
-        "لا تُشترط خبرة سابقة",
-        "Example event; no real booking is made"
+      requirements: [
+        'متاح للمصممين وكل من يرغب بالتعلّم',
+        'لا تُشترط خبرة سابقة',
+        'Example event; no real booking is made'
       ]
     },
     {
-      "id": "freelance-event",
-      "title": "لقاء المستقلين على القهوة",
-      "company": "أورنج كولكتيف",
-      "category": "career",
-      "location": "onsite",
-      "itemType": "meetup",
-      "extra": "paid",
-      "reward": 5,
-      "offer": "تذكرة بـ5 دولارات",
-      "date": "2026-10-07",
-      "deadline": "2026-11-28",
-      "eventTime": "10:00 صباحًا–12:00 ظهرًا · بتوقيت عمّان",
-      "venue": "مقهى المجتمع · عمّان · مثال",
-      "symbol": "◎",
-      "description": "تبادل الأفكار حول الوصول إلى العملاء وإدارة المشاريع وبناء عمل مستدام.",
-      "details": [
-        "تعارف على القهوة",
-        "نقاشات ضمن مجموعات صغيرة",
-        "نصائح وأسئلة وعلاقات مفيدة"
-      ],
-      "requirements": [
-        "نرحّب بالمستقلين في جميع المراحل",
-        "أحضر سؤالًا أو تجربة للمشاركة",
-        "أسعار التذاكر والمكان أمثلة توضيحية"
+      id: 'freelance-event',
+      title: 'لقاء المستقلين على القهوة',
+      company: 'أورنج كولكتيف',
+      category: 'career',
+      location: 'onsite',
+      itemType: 'meetup',
+      extra: 'paid',
+      reward: 5,
+      offer: 'تذكرة بـ5 دولارات',
+      date: '2026-10-07',
+      deadline: '2026-11-28',
+      eventTime: '10:00 صباحًا–12:00 ظهرًا · بتوقيت عمّان',
+      venue: 'مقهى المجتمع · عمّان · مثال',
+      symbol: '◎',
+      description: 'تبادل الأفكار حول الوصول إلى العملاء وإدارة المشاريع وبناء عمل مستدام.',
+      details: ['تعارف على القهوة', 'نقاشات ضمن مجموعات صغيرة', 'نصائح وأسئلة وعلاقات مفيدة'],
+      requirements: [
+        'نرحّب بالمستقلين في جميع المراحل',
+        'أحضر سؤالًا أو تجربة للمشاركة',
+        'أسعار التذاكر والمكان أمثلة توضيحية'
       ]
     }
   ]
 };
 
-
 (function () {
-// The list and detail pages read the same example data.
-const kind = document.body.dataset.kind;
-if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('events', pageData.items);
-const records = kind === 'course' ? courses : kind === 'project' ? projects : pageData.items;
-const requestedId = new URLSearchParams(location.search).get('id');
-const record = requestedId === null ? records[0] : records.find(item => String(item.id) === requestedId);
-const get = id => document.getElementById(id);
+  // The list and detail pages read the same example data.
+  const kind = document.body.dataset.kind;
+  if (window.OfoqFrontend?.contentFor)
+    pageData.items = window.OfoqFrontend.contentFor('events', pageData.items);
+  const records = kind === 'course' ? courses : kind === 'project' ? projects : pageData.items;
+  const requestedId = new URLSearchParams(location.search).get('id');
+  const record =
+    requestedId === null ? records[0] : records.find((item) => String(item.id) === requestedId);
+  const get = (id) => document.getElementById(id);
 
-window.componentsReady.then(() => {
-  get('year').textContent = new Date().getFullYear();
-}).catch(() => {});
+  window.componentsReady
+    .then(() => {
+      get('year').textContent = new Date().getFullYear();
+    })
+    .catch(() => {});
 
-const detailLabels = { '2-months': 'شهران', '3-months': '3 أشهر', '6-months': '6 أشهر', development: 'التطوير', design: 'التصميم', marketing: 'التسويق', career: 'المسار المهني والمجتمع', beginner: 'مبتدئ', intermediate: 'متوسط', remote: 'عن بُعد', onsite: 'من مقر العمل', hybrid: 'هجين', 'full-time': 'دوام كامل', 'part-time': 'دوام جزئي', contract: 'عقد مؤقت', workshop: 'ورشة عمل', path: 'مسار تعلّم', talk: 'جلسة حوارية', meetup: 'لقاء' };
+  const detailLabels = {
+    '2-months': 'شهران',
+    '3-months': '3 أشهر',
+    '6-months': '6 أشهر',
+    development: 'التطوير',
+    design: 'التصميم',
+    marketing: 'التسويق',
+    career: 'المسار المهني والمجتمع',
+    beginner: 'مبتدئ',
+    intermediate: 'متوسط',
+    remote: 'عن بُعد',
+    onsite: 'من مقر العمل',
+    hybrid: 'هجين',
+    'full-time': 'دوام كامل',
+    'part-time': 'دوام جزئي',
+    contract: 'عقد مؤقت',
+    workshop: 'ورشة عمل',
+    path: 'مسار تعلّم',
+    talk: 'جلسة حوارية',
+    meetup: 'لقاء'
+  };
 
-function addFact(label, value) {
-  const row = document.createElement('div');
-  const term = document.createElement('dt');
-  const description = document.createElement('dd');
-  term.textContent = label;
-  description.textContent = kind === 'event' && value === 'remote' ? 'عبر الإنترنت' : detailLabels[value] || value;
-  row.append(term, description);
-  get('detailFacts').append(row);
-}
+  function addFact(label, value) {
+    const row = document.createElement('div');
+    const term = document.createElement('dt');
+    const description = document.createElement('dd');
+    term.textContent = label;
+    description.textContent =
+      kind === 'event' && value === 'remote' ? 'عبر الإنترنت' : detailLabels[value] || value;
+    row.append(term, description);
+    get('detailFacts').append(row);
+  }
 
-function showList(id, values) {
-  values.forEach(value => {
-    const item = document.createElement('li');
-    item.textContent = value;
-    get(id).append(item);
-  });
-}
-
-if (!record) {
-  get('detailContent').hidden = true;
-  get('notFound').hidden = false;
-  get('notFound').focus();
-} else {
-  document.title = record.title + ' — SAEI';
-  get('detailTitle').textContent = record.title;
-  get('detailDescription').textContent = record.description;
-  get('detailDescription').insertAdjacentHTML('afterend', window.OfoqPublishers.card(window.OfoqPublishers.forRecord(kind, record)));
-  addFact('المجال', record.category);
-
-  if (kind === 'project') {
-    addFact('الميزانية', '$' + record.budget);
-    addFact('المدة', record.weeks === 1 ? 'أسبوع واحد' : record.weeks === 2 ? 'أسبوعان' : record.weeks + ' أسابيع');
-    addFact('نوع المشروع', record.type === 'fixed' ? 'بسعر ثابت' : 'مشروع مستمر');
-    showList('detailTasks', [record.description, 'الاتفاق على نطاق العمل والمراحل قبل البدء.', 'عرض العمل وتطبيق الملاحظات.']);
-    showList('detailRequirements', record.skills.map(skill => 'خبرة في ' + skill));
-    get('projectConversation').hidden = false;
-  } else if (kind === 'course') {
-    addFact('المدرّب', record.instructor);
-    addFact('المستوى', record.level);
-    addFact('المدة', record.hours + (record.hours >= 3 && record.hours <= 10 ? ' ساعات · ' : ' ساعة · ') + record.sessions + ' جلسات');
-    addFact('السعر', record.price ? '$' + record.price + ' (مثال)' : 'مجاني');
-    get('tasksTitle').textContent = 'ما الذي ستتعلّمه؟';
-    showList('detailTasks', record.syllabus);
-    get('requirementsTitle').textContent = 'مشروعك التطبيقي';
-    showList('detailRequirements', [record.project]);
-    get('courseLessons').hidden = false;
-    record.syllabus.forEach(title => {
-      const lesson = document.createElement('details');
-      const summary = document.createElement('summary');
-      summary.textContent = title;
-      const text = document.createElement('p');
-      text.textContent = 'نبذة توضيحية للدرس: ' + title + '. تدرّب على هذا الموضوع أثناء تنفيذ: ' + record.project;
-      const label = document.createElement('label');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      label.append(checkbox, ' تحديد هذه الوحدة التوضيحية كمقروءة');
-      lesson.append(summary, text, label);
-      get('lessonList').append(lesson);
+  function showList(id, values) {
+    values.forEach((value) => {
+      const item = document.createElement('li');
+      item.textContent = value;
+      get(id).append(item);
     });
-    get('lessonList').addEventListener('change', () => {
-      const read = get('lessonList').querySelectorAll('input:checked').length;
-      get('lessonProgress').max = record.syllabus.length;
-      get('lessonProgress').value = read;
-      get('lessonStatus').textContent = read + ' من أصل ' + record.syllabus.length + ' وحدات مقروءة';
-    });
-    get('previewFormTitle').textContent = 'معاينة التسجيل بالمسار';
-    get('messageField').hidden = true;
-    get('previewMessage').required = false;
+  }
+
+  if (!record) {
+    get('detailContent').hidden = true;
+    get('notFound').hidden = false;
+    get('notFound').focus();
   } else {
-    addFact('الجهة', record.company);
-    addFact('الموقع', record.location);
-    addFact('النوع', record.itemType);
-    addFact('المقابل', record.offer);
-    addFact(kind === 'event' ? 'تاريخ الفعالية' : 'آخر موعد للتقديم', new Intl.DateTimeFormat('ar-JO', {dateStyle:'medium', timeZone:'UTC'}).format(new Date(record.deadline+'T12:00:00Z')));
-    showList('detailTasks', record.details);
-    showList('detailRequirements', record.requirements);
-    if (kind === 'event') {
-      addFact('الوقت', record.eventTime);
-      addFact('المكان', record.venue);
-      get('tasksTitle').textContent = 'برنامج الفعالية';
-      get('previewFormTitle').textContent = 'معاينة التسجيل بالفعالية';
+    document.title = record.title + ' — SAEI';
+    get('detailTitle').textContent = record.title;
+    get('detailDescription').textContent = record.description;
+    get('detailDescription').insertAdjacentHTML(
+      'afterend',
+      window.OfoqPublishers.card(window.OfoqPublishers.forRecord(kind, record))
+    );
+    addFact('المجال', record.category);
+
+    if (kind === 'project') {
+      addFact('الميزانية', '$' + record.budget);
+      addFact(
+        'المدة',
+        record.weeks === 1
+          ? 'أسبوع واحد'
+          : record.weeks === 2
+            ? 'أسبوعان'
+            : record.weeks + ' أسابيع'
+      );
+      addFact('نوع المشروع', record.type === 'fixed' ? 'بسعر ثابت' : 'مشروع مستمر');
+      showList('detailTasks', [
+        record.description,
+        'الاتفاق على نطاق العمل والمراحل قبل البدء.',
+        'عرض العمل وتطبيق الملاحظات.'
+      ]);
+      showList(
+        'detailRequirements',
+        record.skills.map((skill) => 'خبرة في ' + skill)
+      );
+      get('projectConversation').hidden = false;
+    } else if (kind === 'course') {
+      addFact('المدرّب', record.instructor);
+      addFact('المستوى', record.level);
+      addFact(
+        'المدة',
+        record.hours +
+          (record.hours >= 3 && record.hours <= 10 ? ' ساعات · ' : ' ساعة · ') +
+          record.sessions +
+          ' جلسات'
+      );
+      addFact('السعر', record.price ? '$' + record.price + ' (مثال)' : 'مجاني');
+      get('tasksTitle').textContent = 'ما الذي ستتعلّمه؟';
+      showList('detailTasks', record.syllabus);
+      get('requirementsTitle').textContent = 'مشروعك التطبيقي';
+      showList('detailRequirements', [record.project]);
+      get('courseLessons').hidden = false;
+      record.syllabus.forEach((title) => {
+        const lesson = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = title;
+        const text = document.createElement('p');
+        text.textContent =
+          'نبذة توضيحية للدرس: ' + title + '. تدرّب على هذا الموضوع أثناء تنفيذ: ' + record.project;
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        label.append(checkbox, ' تحديد هذه الوحدة التوضيحية كمقروءة');
+        lesson.append(summary, text, label);
+        get('lessonList').append(lesson);
+      });
+      get('lessonList').addEventListener('change', () => {
+        const read = get('lessonList').querySelectorAll('input:checked').length;
+        get('lessonProgress').max = record.syllabus.length;
+        get('lessonProgress').value = read;
+        get('lessonStatus').textContent =
+          read + ' من أصل ' + record.syllabus.length + ' وحدات مقروءة';
+      });
+      get('previewFormTitle').textContent = 'معاينة التسجيل بالمسار';
       get('messageField').hidden = true;
       get('previewMessage').required = false;
+    } else {
+      addFact('الجهة', record.company);
+      addFact('الموقع', record.location);
+      addFact('النوع', record.itemType);
+      addFact('المقابل', record.offer);
+      addFact(
+        kind === 'event' ? 'تاريخ الفعالية' : 'آخر موعد للتقديم',
+        new Intl.DateTimeFormat('ar-JO', { dateStyle: 'medium', timeZone: 'UTC' }).format(
+          new Date(record.deadline + 'T12:00:00Z')
+        )
+      );
+      showList('detailTasks', record.details);
+      showList('detailRequirements', record.requirements);
+      if (kind === 'event') {
+        addFact('الوقت', record.eventTime);
+        addFact('المكان', record.venue);
+        get('tasksTitle').textContent = 'برنامج الفعالية';
+        get('previewFormTitle').textContent = 'معاينة التسجيل بالفعالية';
+        get('messageField').hidden = true;
+        get('previewMessage').required = false;
+      }
     }
   }
-}
 
-// Paid items open the shared payment-method popup; free registration stays available.
-if (record && kind === 'event' && record.reward > 0) {
-  const form = get('previewForm');
-  form.hidden = true;
-  get('previewFormTitle').textContent = 'دفع تذكرة الفعالية';
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'btn btn-orange detail-payment-button';
-  button.textContent = 'دفع ←';
-  button.setAttribute('aria-label', 'دفع تذكرة الفعالية ' + record.title);
-  button.dataset.paymentTitle = record.title;
-  button.dataset.paymentAmount = record.reward;
-  button.dataset.paymentKind = 'تذكرة الفعالية';
-  form.after(button);
-}
+  // Paid items open the shared payment-method popup; free registration stays available.
+  if (record && kind === 'event' && record.reward > 0) {
+    const form = get('previewForm');
+    form.hidden = true;
+    get('previewFormTitle').textContent = 'دفع تذكرة الفعالية';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-orange detail-payment-button';
+    button.textContent = 'دفع ←';
+    button.setAttribute('aria-label', 'دفع تذكرة الفعالية ' + record.title);
+    button.dataset.paymentTitle = record.title;
+    button.dataset.paymentAmount = record.reward;
+    button.dataset.paymentKind = 'تذكرة الفعالية';
+    form.after(button);
+  }
 
-get('previewForm').addEventListener('input', event => event.target.setCustomValidity(''));
-get('previewForm').addEventListener('submit', event => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  form.querySelectorAll('[required]').forEach(input => {
-    input.setCustomValidity(input.value.trim() ? '' : 'يرجى إدخال نص.');
+  get('previewForm').addEventListener('input', (event) => event.target.setCustomValidity(''));
+  get('previewForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    form.querySelectorAll('[required]').forEach((input) => {
+      input.setCustomValidity(input.value.trim() ? '' : 'يرجى إدخال نص.');
+    });
+    if (!form.reportValidity()) return;
+    window.OfoqFrontend.register(record.id, record.title, location.href);
+    form.reset();
+    form.hidden = true;
+    get('previewSuccess').querySelector('h3') &&
+      (get('previewSuccess').querySelector('h3').textContent = 'تم التسجيل');
+    get('previewSuccess').querySelector('p') &&
+      (get('previewSuccess').querySelector('p').textContent =
+        'يمكنك متابعة نشاطك من لوحة المتابعة خلال هذه الزيارة.');
+    get('previewSuccess').hidden = false;
+    get('previewSuccess').focus();
   });
-  if (!form.reportValidity()) return;
-  window.OfoqFrontend.register(record.id, record.title, location.href);
-  form.reset();
-  form.hidden = true;
-  get('previewSuccess').querySelector('h3') && (get('previewSuccess').querySelector('h3').textContent = 'تم التسجيل');
-  get('previewSuccess').querySelector('p') && (get('previewSuccess').querySelector('p').textContent = 'يمكنك متابعة نشاطك من لوحة المتابعة خلال هذه الزيارة.');
-  get('previewSuccess').hidden = false;
-  get('previewSuccess').focus();
-});
 
-get('previewAgain').addEventListener('click', () => {
-  get('previewSuccess').hidden = true;
-  get('previewForm').hidden = false;
-  get('previewName').focus();
-});
-
-
+  get('previewAgain').addEventListener('click', () => {
+    get('previewSuccess').hidden = true;
+    get('previewForm').hidden = false;
+    get('previewName').focus();
+  });
 })();

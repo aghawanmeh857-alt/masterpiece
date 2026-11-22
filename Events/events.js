@@ -1,207 +1,204 @@
 // بيانات تجريبية. عدّل القائمة هنا لإضافة فرص أو فعاليات.
 const pageData = {
-  "section": "events",
-  "noun": "events",
-  "action": "عرض الفعالية",
-  "types": [
-    [
-      "workshop",
-      "ورشة عمل"
-    ],
-    [
-      "meetup",
-      "لقاء"
-    ],
-    [
-      "talk",
-      "جلسة حوارية"
-    ]
+  section: 'events',
+  noun: 'events',
+  action: 'عرض الفعالية',
+  types: [
+    ['workshop', 'ورشة عمل'],
+    ['meetup', 'لقاء'],
+    ['talk', 'جلسة حوارية']
   ],
-  "extras": [
-    [
-      "free",
-      "مجاني"
-    ],
-    [
-      "paid",
-      "مدفوع"
-    ]
+  extras: [
+    ['free', 'مجاني'],
+    ['paid', 'مدفوع']
   ],
-  "items": [
+  items: [
     {
-      "id": "ideas-event",
-      "title": "أمسية صنّاع الأفكار",
-      "company": "مجتمع سعي",
-      "category": "career",
-      "location": "onsite",
-      "itemType": "meetup",
-      "extra": "free",
-      "reward": 0,
-      "offer": "دخول مجاني",
-      "date": "2026-10-10",
-      "deadline": "2026-11-14",
-      "eventTime": "6:00–8:00 مساءً · بتوقيت عمّان",
-      "venue": "مساحة سعي · عمّان",
-      "symbol": "↗",
-      "description": "تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.",
-      "details": [
-        "الترحيب والتعارف",
-        "عروض قصيرة للمشاريع",
-        "تعارف وحوارات مفتوحة"
-      ],
-      "requirements": [
-        "أحضر فكرة أو مشروعًا للمشاركة",
-        "نرحّب بجميع مستويات الخبرة",
-        "فعالية توضيحية: المكان والبرنامج أمثلة فقط"
+      id: 'ideas-event',
+      title: 'أمسية صنّاع الأفكار',
+      company: 'مجتمع سعي',
+      category: 'career',
+      location: 'onsite',
+      itemType: 'meetup',
+      extra: 'free',
+      reward: 0,
+      offer: 'دخول مجاني',
+      date: '2026-10-10',
+      deadline: '2026-11-14',
+      eventTime: '6:00–8:00 مساءً · بتوقيت عمّان',
+      venue: 'مساحة سعي · عمّان',
+      symbol: '↗',
+      description: 'تعرّف على صنّاع آخرين، وشارك مشروعًا صغيرًا، وابنِ علاقات جديدة.',
+      details: ['الترحيب والتعارف', 'عروض قصيرة للمشاريع', 'تعارف وحوارات مفتوحة'],
+      requirements: [
+        'أحضر فكرة أو مشروعًا للمشاركة',
+        'نرحّب بجميع مستويات الخبرة',
+        'فعالية توضيحية: المكان والبرنامج أمثلة فقط'
       ]
     },
     {
-      "id": "product-event",
-      "title": "ابنِ منتجك الأول",
-      "company": "برايت لابز",
-      "category": "development",
-      "location": "remote",
-      "itemType": "workshop",
-      "extra": "paid",
-      "reward": 15,
-      "offer": "تذكرة بـ15 دولارًا",
-      "date": "2026-10-09",
-      "deadline": "2026-11-07",
-      "eventTime": "4:00–6:00 مساءً · بتوقيت عمّان",
-      "venue": "عبر الإنترنت · جلسة توضيحية",
-      "symbol": "</>",
-      "description": "حوّل فكرة صغيرة إلى نموذج يعمل من خلال ورشة عملية بإرشاد مختصين.",
-      "details": [
-        "اختيار مشكلة تستحق الحل",
-        "رسم تصوّر لحل واضح",
-        "بناء نموذج أولي صغير ومشاركته"
-      ],
-      "requirements": [
-        "حاسوب محمول ومتصفح",
-        "المعرفة الأساسية بـHTML وCSS مفيدة",
-        "جميع المواد محتوى توضيحي"
+      id: 'product-event',
+      title: 'ابنِ منتجك الأول',
+      company: 'برايت لابز',
+      category: 'development',
+      location: 'remote',
+      itemType: 'workshop',
+      extra: 'paid',
+      reward: 15,
+      offer: 'تذكرة بـ15 دولارًا',
+      date: '2026-10-09',
+      deadline: '2026-11-07',
+      eventTime: '4:00–6:00 مساءً · بتوقيت عمّان',
+      venue: 'عبر الإنترنت · جلسة توضيحية',
+      symbol: '</>',
+      description: 'حوّل فكرة صغيرة إلى نموذج يعمل من خلال ورشة عملية بإرشاد مختصين.',
+      details: ['اختيار مشكلة تستحق الحل', 'رسم تصوّر لحل واضح', 'بناء نموذج أولي صغير ومشاركته'],
+      requirements: [
+        'حاسوب محمول ومتصفح',
+        'المعرفة الأساسية بـHTML وCSS مفيدة',
+        'جميع المواد محتوى توضيحي'
       ]
     },
     {
-      "id": "design-event",
-      "title": "التصميم لأشخاص حقيقيين",
-      "company": "استوديو نورث",
-      "category": "design",
-      "location": "hybrid",
-      "itemType": "talk",
-      "extra": "free",
-      "reward": 0,
-      "offer": "دخول مجاني",
-      "date": "2026-10-08",
-      "deadline": "2026-11-21",
-      "eventTime": "5:00–6:30 مساءً · بتوقيت عمّان",
-      "venue": "مساحة سعي وعبر الإنترنت · مثال",
-      "symbol": "◈",
-      "description": "حوار حول الأبحاث وسهولة الوصول والقرارات التي تصنع منتجات أفضل.",
-      "details": [
-        "تجارب بحثية من فرق المنتجات",
-        "تطبيقات عملية للتصميم الذي يراعي سهولة الوصول",
-        "أسئلة الجمهور والنقاش"
+      id: 'design-event',
+      title: 'التصميم لأشخاص حقيقيين',
+      company: 'استوديو نورث',
+      category: 'design',
+      location: 'hybrid',
+      itemType: 'talk',
+      extra: 'free',
+      reward: 0,
+      offer: 'دخول مجاني',
+      date: '2026-10-08',
+      deadline: '2026-11-21',
+      eventTime: '5:00–6:30 مساءً · بتوقيت عمّان',
+      venue: 'مساحة سعي وعبر الإنترنت · مثال',
+      symbol: '◈',
+      description: 'حوار حول الأبحاث وسهولة الوصول والقرارات التي تصنع منتجات أفضل.',
+      details: [
+        'تجارب بحثية من فرق المنتجات',
+        'تطبيقات عملية للتصميم الذي يراعي سهولة الوصول',
+        'أسئلة الجمهور والنقاش'
       ],
-      "requirements": [
-        "متاح للمصممين وكل من يرغب بالتعلّم",
-        "لا تُشترط خبرة سابقة",
-        "Example event; no real booking is made"
+      requirements: [
+        'متاح للمصممين وكل من يرغب بالتعلّم',
+        'لا تُشترط خبرة سابقة',
+        'Example event; no real booking is made'
       ]
     },
     {
-      "id": "freelance-event",
-      "title": "لقاء المستقلين على القهوة",
-      "company": "أورنج كولكتيف",
-      "category": "career",
-      "location": "onsite",
-      "itemType": "meetup",
-      "extra": "paid",
-      "reward": 5,
-      "offer": "تذكرة بـ5 دولارات",
-      "date": "2026-10-07",
-      "deadline": "2026-11-28",
-      "eventTime": "10:00 صباحًا–12:00 ظهرًا · بتوقيت عمّان",
-      "venue": "مقهى المجتمع · عمّان · مثال",
-      "symbol": "◎",
-      "description": "تبادل الأفكار حول الوصول إلى العملاء وإدارة المشاريع وبناء عمل مستدام.",
-      "details": [
-        "تعارف على القهوة",
-        "نقاشات ضمن مجموعات صغيرة",
-        "نصائح وأسئلة وعلاقات مفيدة"
-      ],
-      "requirements": [
-        "نرحّب بالمستقلين في جميع المراحل",
-        "أحضر سؤالًا أو تجربة للمشاركة",
-        "أسعار التذاكر والمكان أمثلة توضيحية"
+      id: 'freelance-event',
+      title: 'لقاء المستقلين على القهوة',
+      company: 'أورنج كولكتيف',
+      category: 'career',
+      location: 'onsite',
+      itemType: 'meetup',
+      extra: 'paid',
+      reward: 5,
+      offer: 'تذكرة بـ5 دولارات',
+      date: '2026-10-07',
+      deadline: '2026-11-28',
+      eventTime: '10:00 صباحًا–12:00 ظهرًا · بتوقيت عمّان',
+      venue: 'مقهى المجتمع · عمّان · مثال',
+      symbol: '◎',
+      description: 'تبادل الأفكار حول الوصول إلى العملاء وإدارة المشاريع وبناء عمل مستدام.',
+      details: ['تعارف على القهوة', 'نقاشات ضمن مجموعات صغيرة', 'نصائح وأسئلة وعلاقات مفيدة'],
+      requirements: [
+        'نرحّب بالمستقلين في جميع المراحل',
+        'أحضر سؤالًا أو تجربة للمشاركة',
+        'أسعار التذاكر والمكان أمثلة توضيحية'
       ]
     }
   ]
 };
 
-
 (async function () {
-// أدوات بسيطة مشتركة لصفحات التدريب والوظائف والفعاليات.
-async function startListings() {
-  if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
-  await window.componentsReady;
-if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.contentFor('events', pageData.items);
+  // أدوات بسيطة مشتركة لصفحات التدريب والوظائف والفعاليات.
+  async function startListings() {
+    if (!window.componentsReady) throw new Error('Page initialization is unavailable.');
+    await window.componentsReady;
+    if (window.OfoqFrontend?.contentFor)
+      pageData.items = window.OfoqFrontend.contentFor('events', pageData.items);
 
-  function get(id) {
-    return document.getElementById(id);
-  }
-
-  function safeText(value) {
-    const span = document.createElement('span');
-    span.textContent = value;
-    return span.innerHTML.replace(/"/g, '&quot;');
-  }
-
-  const labels = {
-    development: 'التطوير', design: 'التصميم', marketing: 'التسويق',
-    career: 'المسار المهني والمجتمع', remote: 'عن بُعد', onsite: 'من مقر العمل', hybrid: 'هجين'
-  };
-  for (const [value, label] of [...pageData.types, ...pageData.extras]) {
-    labels[value] = label;
-  }
-  if (pageData.section === 'events') labels.remote = 'عبر الإنترنت';
-
-  function dateLabel(date) {
-    return new Intl.DateTimeFormat('ar-JO', {
-      month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'
-    }).format(new Date(date + 'T12:00:00Z'));
-  }
-
-  // 1) البحث والفلاتر والترتيب.
-  function renderItems() {
-    const query = get('searchQuery').value.trim().toLowerCase();
-    const filters = ['category', 'location', 'itemType', 'extra'];
-    const results = pageData.items.filter(item => {
-      const text = [item.title, item.company, item.description,
-        ...item.details, ...item.requirements].join(' ').toLowerCase();
-      if (query && !text.includes(query)) return false;
-      return filters.every(key => !get(key).value || item[key] === get(key).value);
-    });
-
-    const sort = get('sortBy').value;
-    if (sort === 'recent') results.sort((a, b) => b.date.localeCompare(a.date));
-    if (sort === 'soon') results.sort((a, b) => a.deadline.localeCompare(b.deadline));
-    if (sort === 'reward') {
-      results.sort((a, b) => pageData.section === 'events' ? a.reward - b.reward : b.reward - a.reward);
+    function get(id) {
+      return document.getElementById(id);
     }
 
-    get('itemList').innerHTML = results.map(itemCard).join('');
-    get('resultCount').textContent = results.length + ' من الفرص المتاحة';
-    get('emptyState').hidden = results.length > 0;
-  }
+    function safeText(value) {
+      const span = document.createElement('span');
+      span.textContent = value;
+      return span.innerHTML.replace(/"/g, '&quot;');
+    }
 
-  function itemCard(item) {
-    const isEvent = pageData.section === 'events';
-    const detailFile = { jobs: 'Job/job.html', internships: 'Internship/internship.html', events: 'Event/event.html' }[pageData.section];
-    const detailUrl = detailFile + '?id=' + encodeURIComponent(item.id);
-    const cover = {development: 'code', design: 'mobile', marketing: 'marketing', career: 'dashboard'}[item.category] || 'dashboard';
-    const dateBlock = `<span class="opportunity-event-date"><strong>${item.deadline.slice(8)}</strong><span>${new Intl.DateTimeFormat('ar-JO', {month:'short', timeZone:'UTC'}).format(new Date(item.deadline+'T12:00:00Z'))} ${item.deadline.slice(0,4)}</span></span>`;
-    return `
+    const labels = {
+      development: 'التطوير',
+      design: 'التصميم',
+      marketing: 'التسويق',
+      career: 'المسار المهني والمجتمع',
+      remote: 'عن بُعد',
+      onsite: 'من مقر العمل',
+      hybrid: 'هجين'
+    };
+    for (const [value, label] of [...pageData.types, ...pageData.extras]) {
+      labels[value] = label;
+    }
+    if (pageData.section === 'events') labels.remote = 'عبر الإنترنت';
+
+    function dateLabel(date) {
+      return new Intl.DateTimeFormat('ar-JO', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC'
+      }).format(new Date(date + 'T12:00:00Z'));
+    }
+
+    // 1) البحث والفلاتر والترتيب.
+    function renderItems() {
+      const query = get('searchQuery').value.trim().toLowerCase();
+      const filters = ['category', 'location', 'itemType', 'extra'];
+      const results = pageData.items.filter((item) => {
+        const text = [
+          item.title,
+          item.company,
+          item.description,
+          ...item.details,
+          ...item.requirements
+        ]
+          .join(' ')
+          .toLowerCase();
+        if (query && !text.includes(query)) return false;
+        return filters.every((key) => !get(key).value || item[key] === get(key).value);
+      });
+
+      const sort = get('sortBy').value;
+      if (sort === 'recent') results.sort((a, b) => b.date.localeCompare(a.date));
+      if (sort === 'soon') results.sort((a, b) => a.deadline.localeCompare(b.deadline));
+      if (sort === 'reward') {
+        results.sort((a, b) =>
+          pageData.section === 'events' ? a.reward - b.reward : b.reward - a.reward
+        );
+      }
+
+      get('itemList').innerHTML = results.map(itemCard).join('');
+      get('resultCount').textContent = results.length + ' من الفرص المتاحة';
+      get('emptyState').hidden = results.length > 0;
+    }
+
+    function itemCard(item) {
+      const isEvent = pageData.section === 'events';
+      const detailFile = {
+        jobs: 'Job/job.html',
+        internships: 'Internship/internship.html',
+        events: 'Event/event.html'
+      }[pageData.section];
+      const detailUrl = detailFile + '?id=' + encodeURIComponent(item.id);
+      const cover =
+        { development: 'code', design: 'mobile', marketing: 'marketing', career: 'dashboard' }[
+          item.category
+        ] || 'dashboard';
+      const dateBlock = `<span class="opportunity-event-date"><strong>${item.deadline.slice(8)}</strong><span>${new Intl.DateTimeFormat('ar-JO', { month: 'short', timeZone: 'UTC' }).format(new Date(item.deadline + 'T12:00:00Z'))} ${item.deadline.slice(0, 4)}</span></span>`;
+      return `
       <article class="listing-card" data-item="${item.id}" data-card-details="${safeText(JSON.stringify(item))}">
         <div class="opportunity-media"><a class="opportunity-cover" href="${detailUrl}" aria-label="تفاصيل ${safeText(item.title)}"><img src="../assets/project-covers/${cover}.svg" alt="" width="800" height="450" loading="lazy">${dateBlock}</a></div>
         <div class="listing-details">
@@ -214,7 +211,17 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
             <span>${labels[item.itemType]}</span>
             <span>${labels[item.extra]}</span>
           </div>
-          <p class="listing-date">${isEvent ? `<span>من ${item.eventTime.split(' · ')[0].split('–').map(part => `<bdi>${safeText(part)}</bdi>`).join(' إلى ')}</span><span class="event-timezone">${safeText(item.eventTime.split(' · ')[1] || '')}</span>` : 'آخر موعد للتقديم: ' + dateLabel(item.deadline)}</p>
+          <p class="listing-date">${
+            isEvent
+              ? `<span>من ${item.eventTime
+                  .split(' · ')[0]
+                  .split('–')
+                  .map((part) => `<bdi>${safeText(part)}</bdi>`)
+                  .join(
+                    ' إلى '
+                  )}</span><span class="event-timezone">${safeText(item.eventTime.split(' · ')[1] || '')}</span>`
+              : 'آخر موعد للتقديم: ' + dateLabel(item.deadline)
+          }</p>
         </div>
         <div class="listing-offer">
           <strong>${safeText(item.offer)}</strong>
@@ -224,75 +231,83 @@ if (window.OfoqFrontend?.contentFor) pageData.items = window.OfoqFrontend.conten
           <a class="details-link" href="${detailFile}?id=${encodeURIComponent(item.id)}">التفاصيل الكاملة ←</a>
         </div>
       </article>`;
-  }
+    }
 
-  function clearFilters() {
-    get('filterForm').reset();
-    get('searchQuery').value = '';
+    function clearFilters() {
+      get('filterForm').reset();
+      get('searchQuery').value = '';
+      renderItems();
+    }
+
+    // 2) التفاصيل ومعاينة النموذج. لا تُرسل أي بيانات.
+    function resetPreview() {
+      get('previewForm').reset();
+      get('previewArea').hidden = false;
+      get('previewSuccess').hidden = true;
+    }
+
+    let selectedItem = null;
+    function openDetails(item) {
+      selectedItem = item;
+      resetPreview();
+      get('detailTitle').textContent = item.title;
+      get('detailDescription').textContent = item.description;
+      const summary = [item.company, labels[item.location], labels[item.itemType], item.offer];
+      if (pageData.section === 'events')
+        summary.push(dateLabel(item.deadline), item.eventTime, item.venue);
+      else summary.push('آخر موعد للتقديم: ' + dateLabel(item.deadline));
+      get('detailSummary').textContent = summary.join(' · ');
+      get('detailTasks').innerHTML = item.details
+        .map((text) => '<li>' + safeText(text) + '</li>')
+        .join('');
+      get('detailRequirements').innerHTML = item.requirements
+        .map((text) => '<li>' + safeText(text) + '</li>')
+        .join('');
+      bootstrap.Modal.getOrCreateInstance(get('detailModal')).show();
+    }
+
+    get('itemList').addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button || button.hasAttribute('data-payment-title')) return;
+      const id = button.closest('.listing-card').dataset.item;
+      openDetails(pageData.items.find((item) => item.id === id));
+    });
+
+    get('filterForm').addEventListener('change', renderItems);
+    get('searchQuery').addEventListener('input', renderItems);
+    get('filterForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      renderItems();
+    });
+    get('searchForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      renderItems();
+    });
+    get('searchQuery').addEventListener('search', renderItems);
+    get('sortBy').addEventListener('change', renderItems);
+    get('clearFilters').addEventListener('click', clearFilters);
+    get('resetEmpty').addEventListener('click', clearFilters);
+
+    get('previewForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!get('previewForm').reportValidity()) return;
+      if (!selectedItem) return;
+      window.OfoqFrontend.register(
+        selectedItem.id,
+        selectedItem.title,
+        new URL('Event/event.html?id=' + selectedItem.id, location.href).href
+      );
+      get('previewSuccess').textContent = 'تم التسجيل في الفعالية خلال هذه الزيارة.';
+      get('previewArea').hidden = true;
+      get('previewSuccess').hidden = false;
+      get('previewSuccess').setAttribute('tabindex', '-1');
+      get('previewSuccess').focus();
+    });
+    get('detailModal').addEventListener('hidden.bs.modal', resetPreview);
+
+    get('year').textContent = new Date().getFullYear();
     renderItems();
   }
 
-  // 2) التفاصيل ومعاينة النموذج. لا تُرسل أي بيانات.
-  function resetPreview() {
-    get('previewForm').reset();
-    get('previewArea').hidden = false;
-    get('previewSuccess').hidden = true;
-  }
-
-  let selectedItem = null;
-  function openDetails(item) {
-    selectedItem = item;
-    resetPreview();
-    get('detailTitle').textContent = item.title;
-    get('detailDescription').textContent = item.description;
-    const summary = [item.company, labels[item.location], labels[item.itemType], item.offer];
-    if (pageData.section === 'events') summary.push(dateLabel(item.deadline), item.eventTime, item.venue);
-    else summary.push('آخر موعد للتقديم: ' + dateLabel(item.deadline));
-    get('detailSummary').textContent = summary.join(' · ');
-    get('detailTasks').innerHTML = item.details.map(text => '<li>' + safeText(text) + '</li>').join('');
-    get('detailRequirements').innerHTML = item.requirements.map(text => '<li>' + safeText(text) + '</li>').join('');
-    bootstrap.Modal.getOrCreateInstance(get('detailModal')).show();
-  }
-
-  get('itemList').addEventListener('click', event => {
-    const button = event.target.closest('button');
-    if (!button || button.hasAttribute('data-payment-title')) return;
-    const id = button.closest('.listing-card').dataset.item;
-    openDetails(pageData.items.find(item => item.id === id));
-  });
-
-  get('filterForm').addEventListener('change', renderItems);
-  get('searchQuery').addEventListener('input', renderItems);
-  get('filterForm').addEventListener('submit', event => {
-    event.preventDefault();
-    renderItems();
-  });
-  get('searchForm').addEventListener('submit', event => {
-    event.preventDefault();
-    renderItems();
-  });
-  get('searchQuery').addEventListener('search', renderItems);
-  get('sortBy').addEventListener('change', renderItems);
-  get('clearFilters').addEventListener('click', clearFilters);
-  get('resetEmpty').addEventListener('click', clearFilters);
-
-  get('previewForm').addEventListener('submit', event => {
-    event.preventDefault();
-    if (!get('previewForm').reportValidity()) return;
-    if (!selectedItem) return;
-    window.OfoqFrontend.register(selectedItem.id, selectedItem.title, new URL('Event/event.html?id=' + selectedItem.id, location.href).href);
-    get('previewSuccess').textContent = 'تم التسجيل في الفعالية خلال هذه الزيارة.';
-    get('previewArea').hidden = true;
-    get('previewSuccess').hidden = false;
-    get('previewSuccess').setAttribute('tabindex', '-1');
-    get('previewSuccess').focus();
-  });
-  get('detailModal').addEventListener('hidden.bs.modal', resetPreview);
-
-  get('year').textContent = new Date().getFullYear();
-  renderItems();
-}
-
-startListings().catch(error => console.error('SAEI listing page:', error));
-
+  startListings().catch((error) => console.error('SAEI listing page:', error));
 })();

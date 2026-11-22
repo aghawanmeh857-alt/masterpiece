@@ -1,339 +1,471 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+  <head>
+    <script src="../assets/frontend-runtime.js"></script>
+    <script src="../assets/platform-data.js"></script>
+    <script src="../assets/publishing.js"></script>
+    <meta charset="UTF-8" />
 
-<head>
-  <script src="../assets/frontend-runtime.js"></script>
-  <script src="../assets/platform-data.js"></script>
-  <script src="../assets/publishing.js"></script>
-  <meta charset="UTF-8">
-    
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1526">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1526" />
 
-  <title>استكشف المشاريع — سعي</title>
+    <title>استكشف المشاريع — سعي</title>
 
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
-  >
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+    />
 
-  
-  
-  <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg">
-  
-    
+    <link rel="icon" type="image/png" href="../assets/branding/saei-logo.svg" />
 
-  <link rel="stylesheet" href="../assets/site-base.css">
-<link rel="stylesheet" href="freelance.css">
-  <link rel="stylesheet" href="../assets/arabic-ui.css">
-  <link rel="stylesheet" href="marketplace.css">
-  <script src="../assets/publishers.js"></script>
-  <script defer src="../assets/arabic-ui.js"></script>
-  <script defer src="../assets/demo-auth.js"></script>
-<link rel="stylesheet" href="../assets/cards.css">
-<link rel="stylesheet" href="../assets/fonts.css">
-  <link rel="stylesheet" href="../assets/popup-ui.css">
-  <link rel="stylesheet" href="../assets/shared-navbar.css?v=account-dropdown-6">
-</head>
+    <link rel="stylesheet" href="../assets/site-base.css" />
+    <link rel="stylesheet" href="freelance.css" />
+    <link rel="stylesheet" href="../assets/arabic-ui.css" />
+    <link rel="stylesheet" href="marketplace.css" />
+    <script src="../assets/publishers.js"></script>
+    <script defer src="../assets/arabic-ui.js"></script>
+    <script defer src="../assets/demo-auth.js"></script>
+    <link rel="stylesheet" href="../assets/cards.css" />
+    <link rel="stylesheet" href="../assets/fonts.css" />
+    <link rel="stylesheet" href="../assets/popup-ui.css" />
+    <link rel="stylesheet" href="../assets/shared-navbar.css?v=account-dropdown-6" />
+  </head>
 
-<body data-section="freelance">
-  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+  <body data-section="freelance">
+    <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
 
-  <!-- النافبار المشترك -->
-<script src="../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
-  <main id="mainContent" tabindex="-1" class="container-xl page-content">
+    <!-- النافبار المشترك -->
+    <script src="../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
+    <main id="mainContent" tabindex="-1" class="container-xl page-content">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">
+            <span></span>
+            العمل الحر / فرصتك القادمة
+          </p>
 
-    <div class="page-heading">
-      <div>
-        <p class="eyebrow">
-          <span></span>
-          العمل الحر / فرصتك القادمة
-        </p>
+          <h1>استكشف <em>المشاريع.</em></h1>
 
-        <h1>استكشف <em>المشاريع.</em></h1>
-
-        <p class="intro">
-          اكتشف فرصًا جديدة واعمل على مشاريع تناسب مهاراتك.
-        </p>
-      </div>
-
-      <nav aria-label="مسار التصفح">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="../hero/userHero.html">الرئيسية</a>
-          </li>
-
-          <li class="breadcrumb-item active" aria-current="page">
-            العمل الحر
-          </li>
-        </ol>
-      </nav>
-    </div>
-
-
-
-    <div class="workspace">
-
-      <!-- فلاتر Freelance -->
-      <aside class="filter-panel panel" aria-labelledby="filterTitle">
-        <form autocomplete="off" id="searchForm" class="market-search"><label for="searchQuery">بحث</label><div class="search-field"><input id="searchQuery" class="form-control" type="search" placeholder="ابحث عن مشروع أو مهارة…"></div></form>
-        <section class="category-browser" aria-labelledby="categoriesTitle"><h2 id="categoriesTitle">الأقسام</h2><div id="categoryList"></div></section>
-        <div class="filter-heading"><h2 id="filterTitle">تصفية النتائج</h2><button id="clearFilters" class="text-button" type="button">مسح الكل</button></div>
-        <form autocomplete="off" id="filterForm">
-          <div class="field"><label for="category">المجال</label><select id="category" class="form-select"><option value="">كل المجالات</option><option value="development">التطوير</option><option value="design">التصميم</option><option value="marketing">التسويق</option></select></div>
-          <div class="field"><label for="budget">الميزانية</label><select id="budget" class="form-select"><option value="">كل الميزانيات</option><option value="low">حتى 300 دولار</option><option value="medium">من 301 إلى 600 دولار</option><option value="high">أكثر من 600 دولار</option></select></div>
-          <div class="field"><label for="deadline">موعد التسليم</label><select id="deadline" class="form-select"><option value="">كل المواعيد</option><option value="1">خلال أسبوع</option><option value="2">خلال أسبوعين</option><option value="4">خلال 4 أسابيع</option></select></div>
-          <div class="field"><label for="projectType">نوع المشروع</label><select id="projectType" class="form-select"><option value="">كل الأنواع</option><option value="fixed">بسعر ثابت</option><option value="ongoing">مشروع مستمر</option></select></div>
-          <div class="field"><label for="skills">المهارات</label><div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="skills" class="form-control" type="search" placeholder="ابحث عن مهارة…"></div></div>
-        </form>
-        <p class="filter-footnote"><span class="live-dot"></span> اصنع طريقك بنفسك.</p>
-      </aside>
-
-      <section class="results" aria-label="المشاريع المتاحة">
-
-        <div class="market-toolbar"><h2>المشاريع المتاحة</h2>          <div class="sort-field">
-            <label for="sortBy">الترتيب حسب</label>
-
-            <select id="sortBy" class="form-select">
-              <option value="recent">الأحدث</option>
-              <option value="budget-high">الأعلى ميزانية</option>
-              <option value="budget-low">الأقل ميزانية</option>
-              <option value="deadline">الأقرب تسليمًا</option>
-            </select>
-          </div></div>
-
-        <div class="results-meta">
-          <p id="resultCount" role="status" aria-live="polite"></p>
-          <button hidden id="project-favorites" class="project-favorites-filter" type="button" aria-pressed="false">♡ المفضلة <span id="projectFavoritesCount">0</span></button>
-        </div>
-        <p id="favoritesStatus" class="favorites-status" role="status" aria-live="polite"></p>
-
-        <div
-          id="activeFilters"
-          class="active-filters"
-          aria-label="الفلاتر المفعّلة"
-        ></div>
-
-        <div id="projectList" class="project-list"></div>
-
-        <div id="emptyState" class="empty-state panel" hidden>
-          <span aria-hidden="true">⌕</span>
-          <h2>لا توجد مشاريع مطابقة</h2>
-          <p>جرّب بحثًا آخر أو امسح الفلاتر.</p>
-
-          <button id="resetEmpty" class="btn btn-orange" type="button">
-            مسح البحث والفلاتر
-          </button>
+          <p class="intro"> اكتشف فرصًا جديدة واعمل على مشاريع تناسب مهاراتك. </p>
         </div>
 
-        <p class="demo-note">
-          تفاعل مع المشاريع وتابع طلباتك خلال هذه الزيارة. لا تُرسل الطلبات إلى جهة خارجية.
-        </p>
+        <nav aria-label="مسار التصفح">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="../hero/userHero.html">الرئيسية</a>
+            </li>
 
-      </section>
-    </div>
-
-    <section class="community-banner" aria-labelledby="shareTitle">
-      <div>
-        <p class="eyebrow mb-2">فكرتك / الفريق المناسب</p>
-        <h2 id="shareTitle">عندك فكرة؟ خلّينا نبنيها معًا.</h2>
-        <p>شارك مشروعك وتواصل مع مستقلين يساعدونك على تنفيذه.</p>
+            <li class="breadcrumb-item active" aria-current="page"> العمل الحر </li>
+          </ol>
+        </nav>
       </div>
-      <button id="openPost" class="btn btn-orange" type="button">+ شارك مشروعًا</button>
-    </section>
 
-    <section id="community" class="community-section" aria-label="المشاريع المشتركة" hidden>
-      <div id="ideaFeed" class="idea-feed"></div>
-    </section>
-  </main>
+      <div class="workspace">
+        <!-- فلاتر Freelance -->
+        <aside class="filter-panel panel" aria-labelledby="filterTitle">
+          <form autocomplete="off" id="searchForm" class="market-search"
+            ><label for="searchQuery">بحث</label
+            ><div class="search-field"
+              ><input
+                id="searchQuery"
+                class="form-control"
+                type="search"
+                placeholder="ابحث عن مشروع أو مهارة…" /></div
+          ></form>
+          <section class="category-browser" aria-labelledby="categoriesTitle"
+            ><h2 id="categoriesTitle">الأقسام</h2><div id="categoryList"></div
+          ></section>
+          <div class="filter-heading"
+            ><h2 id="filterTitle">تصفية النتائج</h2
+            ><button id="clearFilters" class="text-button" type="button">مسح الكل</button></div
+          >
+          <form autocomplete="off" id="filterForm">
+            <div class="field"
+              ><label for="category">المجال</label
+              ><select id="category" class="form-select"
+                ><option value="">كل المجالات</option
+                ><option value="development">التطوير</option
+                ><option value="design">التصميم</option
+                ><option value="marketing">التسويق</option></select
+              ></div
+            >
+            <div class="field"
+              ><label for="budget">الميزانية</label
+              ><select id="budget" class="form-select"
+                ><option value="">كل الميزانيات</option
+                ><option value="low">حتى 300 دولار</option
+                ><option value="medium">من 301 إلى 600 دولار</option
+                ><option value="high">أكثر من 600 دولار</option></select
+              ></div
+            >
+            <div class="field"
+              ><label for="deadline">موعد التسليم</label
+              ><select id="deadline" class="form-select"
+                ><option value="">كل المواعيد</option
+                ><option value="1">خلال أسبوع</option
+                ><option value="2">خلال أسبوعين</option
+                ><option value="4">خلال 4 أسابيع</option></select
+              ></div
+            >
+            <div class="field"
+              ><label for="projectType">نوع المشروع</label
+              ><select id="projectType" class="form-select"
+                ><option value="">كل الأنواع</option
+                ><option value="fixed">بسعر ثابت</option
+                ><option value="ongoing">مشروع مستمر</option></select
+              ></div
+            >
+            <div class="field"
+              ><label for="skills">المهارات</label
+              ><div class="search-field"
+                ><svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="10.5" cy="10.5" r="6.5" />
+                  <path d="m16 16 4.5 4.5" /></svg
+                ><input
+                  id="skills"
+                  class="form-control"
+                  type="search"
+                  placeholder="ابحث عن مهارة…" /></div
+            ></div>
+          </form>
+          <p class="filter-footnote"><span class="live-dot"></span> اصنع طريقك بنفسك.</p>
+        </aside>
 
-  <!-- الفوتر المشترك -->
-  <footer class="page-footer container-xl">
-  <span>© SAEI <span id="year"></span></span>
-  <a data-room-link href="../hero/userHero.html#freelance">العودة إلى قسم <span data-room-name>العمل الحر</span>  <span aria-hidden="true">↗</span></a>
-</footer>
+        <section class="results" aria-label="المشاريع المتاحة">
+          <div class="market-toolbar"
+            ><h2>المشاريع المتاحة</h2>
+            <div class="sort-field">
+              <label for="sortBy">الترتيب حسب</label>
 
-  <!-- نافذة التقديم -->
-  <div
-    id="applyModal"
-    class="modal fade"
-    tabindex="-1"
-    aria-labelledby="applyTitle"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content panel">
+              <select id="sortBy" class="form-select">
+                <option value="recent">الأحدث</option>
+                <option value="budget-high">الأعلى ميزانية</option>
+                <option value="budget-low">الأقل ميزانية</option>
+                <option value="deadline">الأقرب تسليمًا</option>
+              </select>
+            </div></div
+          >
 
-        <div class="modal-header">
-          <div>
-            <p class="eyebrow mb-2">سعي / التقديم</p>
+          <div class="results-meta">
+            <p id="resultCount" role="status" aria-live="polite"></p>
+            <button
+              hidden
+              id="project-favorites"
+              class="project-favorites-filter"
+              type="button"
+              aria-pressed="false"
+              >♡ المفضلة <span id="projectFavoritesCount">0</span></button
+            >
+          </div>
+          <p id="favoritesStatus" class="favorites-status" role="status" aria-live="polite"></p>
 
-            <h2 id="applyTitle" class="modal-title fs-5">
-              طلب العمل على المشروع
-            </h2>
+          <div id="activeFilters" class="active-filters" aria-label="الفلاتر المفعّلة"></div>
+
+          <div id="projectList" class="project-list"></div>
+
+          <div id="emptyState" class="empty-state panel" hidden>
+            <span aria-hidden="true">⌕</span>
+            <h2>لا توجد مشاريع مطابقة</h2>
+            <p>جرّب بحثًا آخر أو امسح الفلاتر.</p>
+
+            <button id="resetEmpty" class="btn btn-orange" type="button">
+              مسح البحث والفلاتر
+            </button>
           </div>
 
-          <button
-            type="button"
-            class="btn-close btn-close-white"
-            data-bs-dismiss="modal"
-            aria-label="إغلاق"
-          ></button>
+          <p class="demo-note">
+            تفاعل مع المشاريع وتابع طلباتك خلال هذه الزيارة. لا تُرسل الطلبات إلى جهة خارجية.
+          </p>
+        </section>
+      </div>
+
+      <section class="community-banner" aria-labelledby="shareTitle">
+        <div>
+          <p class="eyebrow mb-2">فكرتك / الفريق المناسب</p>
+          <h2 id="shareTitle">عندك فكرة؟ خلّينا نبنيها معًا.</h2>
+          <p>شارك مشروعك وتواصل مع مستقلين يساعدونك على تنفيذه.</p>
         </div>
+        <button id="openPost" class="btn btn-orange" type="button">+ شارك مشروعًا</button>
+      </section>
 
-        <div class="modal-body">
+      <section id="community" class="community-section" aria-label="المشاريع المشتركة" hidden>
+        <div id="ideaFeed" class="idea-feed"></div>
+      </section>
+    </main>
 
-          <p id="applySummary" class="apply-summary"></p>
+    <!-- الفوتر المشترك -->
+    <footer class="page-footer container-xl">
+      <span>© SAEI <span id="year"></span></span>
+      <a data-room-link href="../hero/userHero.html#freelance"
+        >العودة إلى قسم <span data-room-name>العمل الحر</span> <span aria-hidden="true">↗</span></a
+      >
+    </footer>
 
-          <form autocomplete="off" id="applicationForm">
+    <!-- نافذة التقديم -->
+    <div
+      id="applyModal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="applyTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content panel">
+          <div class="modal-header">
+            <div>
+              <p class="eyebrow mb-2">سعي / التقديم</p>
 
-            <div class="field">
-              <label for="applicantName">اسمك</label>
-
-              <input
-                id="applicantName"
-                class="form-control"
-                autocomplete="name"
-                maxlength="100"
-                required
-              >
+              <h2 id="applyTitle" class="modal-title fs-5"> طلب العمل على المشروع </h2>
             </div>
-
-            <div class="field">
-              <label for="applicantEmail">البريد الإلكتروني</label>
-
-              <input
-                id="applicantEmail"
-                class="form-control"
-                type="email"
-                autocomplete="email"
-                maxlength="200"
-                required
-               dir="ltr">
-            </div>
-
-            <div class="field">
-              <label for="applicantPitch">
-                الخبرات
-              </label>
-
-              <textarea
-                id="applicantPitch"
-                class="form-control"
-                rows="3"
-                maxlength="1500"
-                placeholder="اذكر خبراتك ومشاريعك السابقة ذات الصلة بهذا المشروع"
-                required
-              ></textarea>
-            </div>
-
-            <div class="field">
-              <label for="applicantCV">السيرة الذاتية (CV) <span class="field-hint">— اختياري</span></label>
-              <input id="applicantCV" name="cv" class="form-control" type="file" accept=".pdf,.doc,.docx" aria-describedby="applicantCVHint">
-              <p id="applicantCVHint" class="field-hint">اختر ملف PDF أو Word. الملف للمعاينة فقط؛ لا يُرفع أو يُحفظ.</p>
-            </div>
-
-            <p class="demo-note">
-              بعد التأكيد يظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا تُرسل البيانات أو الملفات إلى جهة خارجية.
-            </p>
-
-            <button class="btn btn-orange w-100" type="submit">
-              معاينة الطلب
-            </button>
-
-          </form>
-
-          <div
-            id="applicationSuccess"
-            class="application-success"
-            role="status"
-            hidden
-          >
-            <span aria-hidden="true">✓</span>
-            <h3>اكتملت المعاينة!</h3>
-
-            <p>
-              لم يُحفظ أو يُرسل أي طلب؛ التقديم الفعلي غير متاح في هذه النسخة.
-            </p>
 
             <button
-              class="btn btn-orange"
               type="button"
+              class="btn-close btn-close-white"
               data-bs-dismiss="modal"
-            >
-              العودة إلى المشاريع
-            </button>
+              aria-label="إغلاق"
+            ></button>
           </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
+          <div class="modal-body">
+            <p id="applySummary" class="apply-summary"></p>
 
+            <form autocomplete="off" id="applicationForm">
+              <div class="field">
+                <label for="applicantName">اسمك</label>
 
-  <!-- New project form: display only, no data storage. -->
-  <div id="postModal" class="modal fade" tabindex="-1" aria-labelledby="postModalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content panel">
-        <div class="modal-header">
-          <div><p class="eyebrow mb-2">سعي / شارك فكرة</p><h2 id="postModalTitle" class="modal-title fs-5">ابحث عن مستقلين لفكرتك</h2></div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-        </div>
-        <div class="modal-body">
-          <form autocomplete="off" id="postForm" novalidate>
-            <div class="field"><label for="postName">اسمك الظاهر</label><input id="postName" class="form-control" dir="auto" minlength="2" maxlength="80" autocomplete="nickname" data-text required></div>
-            <div class="field"><label for="postTitle">عنوان المشروع</label><input id="postTitle" class="form-control" dir="auto" minlength="5" maxlength="120" placeholder="ما المشروع الذي ترغب بتنفيذه؟" data-text required></div>
-            <div class="field"><label for="postDescription">فكرتك والمساعدة التي تحتاجها</label><textarea id="postDescription" class="form-control" dir="auto" rows="4" minlength="20" maxlength="2000" placeholder="اشرح فكرتك والمهارات التي تبحث عنها…" data-text required></textarea></div>
-            <div class="post-row">
-              <div class="field"><label for="postCategory">المجال</label><select id="postCategory" class="form-select"><option>التطوير</option><option>التصميم</option><option>التسويق</option><option>أخرى</option></select></div>
-              <div class="field"><label for="postBudget">الميزانية بالدولار</label><input id="postBudget" class="form-control" type="number" required min="1" max="1000000" step="1" placeholder="e.g. 500"></div>
+                <input
+                  id="applicantName"
+                  class="form-control"
+                  autocomplete="name"
+                  maxlength="100"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label for="applicantEmail">البريد الإلكتروني</label>
+
+                <input
+                  id="applicantEmail"
+                  class="form-control"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="200"
+                  required
+                  dir="ltr"
+                />
+              </div>
+
+              <div class="field">
+                <label for="applicantPitch"> الخبرات </label>
+
+                <textarea
+                  id="applicantPitch"
+                  class="form-control"
+                  rows="3"
+                  maxlength="1500"
+                  placeholder="اذكر خبراتك ومشاريعك السابقة ذات الصلة بهذا المشروع"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="field">
+                <label for="applicantCV"
+                  >السيرة الذاتية (CV) <span class="field-hint">— اختياري</span></label
+                >
+                <input
+                  id="applicantCV"
+                  name="cv"
+                  class="form-control"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  aria-describedby="applicantCVHint"
+                />
+                <p id="applicantCVHint" class="field-hint"
+                  >اختر ملف PDF أو Word. الملف للمعاينة فقط؛ لا يُرفع أو يُحفظ.</p
+                >
+              </div>
+
+              <p class="demo-note">
+                بعد التأكيد يظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا تُرسل البيانات أو
+                الملفات إلى جهة خارجية.
+              </p>
+
+              <button class="btn btn-orange w-100" type="submit"> معاينة الطلب </button>
+            </form>
+
+            <div id="applicationSuccess" class="application-success" role="status" hidden>
+              <span aria-hidden="true">✓</span>
+              <h3>اكتملت المعاينة!</h3>
+
+              <p> لم يُحفظ أو يُرسل أي طلب؛ التقديم الفعلي غير متاح في هذه النسخة. </p>
+
+              <button class="btn btn-orange" type="button" data-bs-dismiss="modal">
+                العودة إلى المشاريع
+              </button>
             </div>
-            <div class="field"><label for="postSkills">المهارات المطلوبة (اختياري)</label><input id="postSkills" class="form-control" dir="auto" maxlength="150" placeholder="React، Figma، كتابة المحتوى"></div>
-            <p class="demo-note">يظهر المنشور والتعليقات ضمن التجربة الحالية؛ تحديث الصفحة يبدأ تجربة جديدة.</p>
-            <button class="btn btn-orange w-100" type="submit">نشر المشروع ←</button>
-          </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- One reusable card; JavaScript fills in user text with textContent. -->
-  <template id="ideaCardTemplate">
-    <article class="idea-card" tabindex="-1">
-      <div class="idea-top">
-        <span class="idea-avatar" aria-hidden="true"></span>
-        <div><span class="idea-author" dir="auto"></span><small>يبحث عن مستقلين · الآن</small></div>
-        <span class="idea-category"></span>
+    <!-- New project form: display only, no data storage. -->
+    <div
+      id="postModal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="postModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content panel">
+          <div class="modal-header">
+            <div
+              ><p class="eyebrow mb-2">سعي / شارك فكرة</p
+              ><h2 id="postModalTitle" class="modal-title fs-5">ابحث عن مستقلين لفكرتك</h2></div
+            >
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="إغلاق"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form autocomplete="off" id="postForm" novalidate>
+              <div class="field"
+                ><label for="postName">اسمك الظاهر</label
+                ><input
+                  id="postName"
+                  class="form-control"
+                  dir="auto"
+                  minlength="2"
+                  maxlength="80"
+                  autocomplete="nickname"
+                  data-text
+                  required
+              /></div>
+              <div class="field"
+                ><label for="postTitle">عنوان المشروع</label
+                ><input
+                  id="postTitle"
+                  class="form-control"
+                  dir="auto"
+                  minlength="5"
+                  maxlength="120"
+                  placeholder="ما المشروع الذي ترغب بتنفيذه؟"
+                  data-text
+                  required
+              /></div>
+              <div class="field"
+                ><label for="postDescription">فكرتك والمساعدة التي تحتاجها</label
+                ><textarea
+                  id="postDescription"
+                  class="form-control"
+                  dir="auto"
+                  rows="4"
+                  minlength="20"
+                  maxlength="2000"
+                  placeholder="اشرح فكرتك والمهارات التي تبحث عنها…"
+                  data-text
+                  required
+                ></textarea>
+              </div>
+              <div class="post-row">
+                <div class="field"
+                  ><label for="postCategory">المجال</label
+                  ><select id="postCategory" class="form-select"
+                    ><option>التطوير</option
+                    ><option>التصميم</option
+                    ><option>التسويق</option
+                    ><option>أخرى</option></select
+                  ></div
+                >
+                <div class="field"
+                  ><label for="postBudget">الميزانية بالدولار</label
+                  ><input
+                    id="postBudget"
+                    class="form-control"
+                    type="number"
+                    required
+                    min="1"
+                    max="1000000"
+                    step="1"
+                    placeholder="e.g. 500"
+                /></div>
+              </div>
+              <div class="field"
+                ><label for="postSkills">المهارات المطلوبة (اختياري)</label
+                ><input
+                  id="postSkills"
+                  class="form-control"
+                  dir="auto"
+                  maxlength="150"
+                  placeholder="React، Figma، كتابة المحتوى"
+              /></div>
+              <p class="demo-note"
+                >يظهر المنشور والتعليقات ضمن التجربة الحالية؛ تحديث الصفحة يبدأ تجربة جديدة.</p
+              >
+              <button class="btn btn-orange w-100" type="submit">نشر المشروع ←</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <h3 class="idea-title" dir="auto"></h3>
-      <p class="idea-description" dir="auto"></p>
-      <div class="idea-skills"></div>
-      <p class="idea-budget"></p>
-      <details>
-        <summary>شارك في الحوار <span class="comment-count">لا توجد تعليقات بعد</span></summary>
-        <div class="idea-comments"></div>
-        <form autocomplete="off" class="comment-form" novalidate>
-          <label>اسمك الظاهر<input class="comment-name form-control" dir="auto" autocomplete="nickname" minlength="2" maxlength="80" data-text required></label>
-          <label>تعليقك<textarea class="comment-message form-control" dir="auto" rows="3" maxlength="1000" placeholder="اطرح سؤالًا أو اعرض مهاراتك…" data-text required></textarea></label>
-          <button class="btn btn-orange" type="submit">إضافة تعليق</button>
-          <p class="comment-status" role="status"></p>
-        </form>
-      </details>
-    </article>
-  </template>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- One reusable card; JavaScript fills in user text with textContent. -->
+    <template id="ideaCardTemplate">
+      <article class="idea-card" tabindex="-1">
+        <div class="idea-top">
+          <span class="idea-avatar" aria-hidden="true"></span>
+          <div
+            ><span class="idea-author" dir="auto"></span><small>يبحث عن مستقلين · الآن</small></div
+          >
+          <span class="idea-category"></span>
+        </div>
+        <h3 class="idea-title" dir="auto"></h3>
+        <p class="idea-description" dir="auto"></p>
+        <div class="idea-skills"></div>
+        <p class="idea-budget"></p>
+        <details>
+          <summary>شارك في الحوار <span class="comment-count">لا توجد تعليقات بعد</span></summary>
+          <div class="idea-comments"></div>
+          <form autocomplete="off" class="comment-form" novalidate>
+            <label
+              >اسمك الظاهر<input
+                class="comment-name form-control"
+                dir="auto"
+                autocomplete="nickname"
+                minlength="2"
+                maxlength="80"
+                data-text
+                required
+            /></label>
+            <label
+              >تعليقك<textarea
+                class="comment-message form-control"
+                dir="auto"
+                rows="3"
+                maxlength="1000"
+                placeholder="اطرح سؤالًا أو اعرض مهاراتك…"
+                data-text
+                required
+              ></textarea>
+            </label>
+            <button class="btn btn-orange" type="submit">إضافة تعليق</button>
+            <p class="comment-status" role="status"></p>
+          </form>
+        </details>
+      </article>
+    </template>
 
-  
-  
-    
-  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script src="../assets/theme.js"></script>
-<script src="freelance.js"></script>
-  <script src="../assets/community.js"></script>
-  <script src="../assets/application-form.js"></script>
-<script defer src="../assets/project-details.js"></script>
-<script type="module" src="../assets/card-details.js"></script>
-</body>
+    <script src="../assets/theme.js"></script>
+    <script src="freelance.js"></script>
+    <script src="../assets/community.js"></script>
+    <script src="../assets/application-form.js"></script>
+    <script defer src="../assets/project-details.js"></script>
+    <script type="module" src="../assets/card-details.js"></script>
+  </body>
 </html>

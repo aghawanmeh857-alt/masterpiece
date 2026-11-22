@@ -9,100 +9,189 @@
   const experience = form.querySelector('textarea');
   const cv = form.querySelector('input[type="file"]');
   experience.required = false;
-  form.querySelector(`label[for="${experience.id}"]`).textContent = 'خبراتك المرتبطة بالمشروع — اختياري';
+  form.querySelector(`label[for="${experience.id}"]`).textContent =
+    'خبراتك المرتبطة بالمشروع — اختياري';
   const portfolioField = document.createElement('div');
   portfolioField.className = 'field';
-  portfolioField.innerHTML = '<label for="applicantPortfolio">رابط معرض الأعمال أو GitHub — اختياري</label><input id="applicantPortfolio" class="form-control" type="url" dir="ltr" maxlength="500" placeholder="https://" aria-describedby="portfolioHint"><p id="portfolioHint" class="field-hint">أضف رابطًا يعرض نماذج من أعمالك.</p>';
+  portfolioField.innerHTML =
+    '<label for="applicantPortfolio">رابط معرض الأعمال أو GitHub — اختياري</label><input id="applicantPortfolio" class="form-control" type="url" dir="ltr" maxlength="500" placeholder="https://" aria-describedby="portfolioHint"><p id="portfolioHint" class="field-hint">أضف رابطًا يعرض نماذج من أعمالك.</p>';
   cv.closest('.field').before(portfolioField);
   const portfolio = portfolioField.querySelector('input');
   const fileInfo = document.createElement('p');
   fileInfo.className = 'cv-file-info';
   fileInfo.setAttribute('role', 'status');
   const remove = document.createElement('button');
-  remove.type = 'button'; remove.className = 'text-button cv-remove';
-  remove.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg><span>إزالة الملف</span>';
+  remove.type = 'button';
+  remove.className = 'text-button cv-remove';
+  remove.innerHTML =
+    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg><span>إزالة الملف</span>';
   remove.setAttribute('aria-label', 'إزالة ملف السيرة الذاتية المرفق');
   remove.hidden = true;
   cv.after(fileInfo, remove);
-  document.getElementById('applicantCVHint').textContent = 'PDF أو Word، حتى 5 ميغابايت. الملف للمعاينة فقط؛ لا يُرفع أو يُحفظ.';
+  document.getElementById('applicantCVHint').textContent =
+    'PDF أو Word، حتى 5 ميغابايت. الملف للمعاينة فقط؛ لا يُرفع أو يُحفظ.';
   const fields = [name, email, experience, portfolio, cv];
   const errors = new Map();
-  fields.forEach(field => {
+  fields.forEach((field) => {
     const error = document.createElement('p');
-    error.className = 'application-error'; error.id = field.id + 'Error'; error.hidden = true;
+    error.className = 'application-error';
+    error.id = field.id + 'Error';
+    error.hidden = true;
     field.closest('.field').append(error);
-    field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), error.id].filter(Boolean).join(' '));
+    field.setAttribute(
+      'aria-describedby',
+      [field.getAttribute('aria-describedby'), error.id].filter(Boolean).join(' ')
+    );
     errors.set(field, error);
   });
   function message(field) {
     const value = field.value.trim();
     if (field === name && value.length < 2) return 'اكتب اسمك من حرفين على الأقل.';
-    if (field === email && (!value || field.validity.typeMismatch)) return 'أدخل بريدًا إلكترونيًا صحيحًا، مثل name@example.com.';
-    if (field === portfolio && value && (!/^https?:\/\//i.test(value) || field.validity.typeMismatch)) return 'أدخل رابطًا كاملًا يبدأ بـ https:// أو http://.';
+    if (field === email && (!value || field.validity.typeMismatch))
+      return 'أدخل بريدًا إلكترونيًا صحيحًا، مثل name@example.com.';
+    if (
+      field === portfolio &&
+      value &&
+      (!/^https?:\/\//i.test(value) || field.validity.typeMismatch)
+    )
+      return 'أدخل رابطًا كاملًا يبدأ بـ https:// أو http://.';
     if (field === cv && field.files.length) {
       const file = field.files[0];
       if (!/\.(pdf|doc|docx)$/i.test(file.name)) return 'اختر ملف PDF أو Word بصيغة DOC أو DOCX.';
       if (file.size > 5 * 1024 * 1024) return 'حجم الملف أكبر من 5 ميغابايت. اختر ملفًا أصغر.';
     }
-    if (field.maxLength > 0 && value.length > field.maxLength) return `الحد الأقصى ${field.maxLength} حرفًا.`;
+    if (field.maxLength > 0 && value.length > field.maxLength)
+      return `الحد الأقصى ${field.maxLength} حرفًا.`;
     return '';
   }
   function validate(field) {
     field.setCustomValidity('');
-    const text = message(field), error = errors.get(field);
-    error.textContent = text; error.hidden = !text;
+    const text = message(field),
+      error = errors.get(field);
+    error.textContent = text;
+    error.hidden = !text;
     field.setAttribute('aria-invalid', String(Boolean(text)));
     return !text;
   }
-  fields.forEach(field => {
-    field.addEventListener('input', () => { if (field.getAttribute('aria-invalid') === 'true') validate(field); });
+  fields.forEach((field) => {
+    field.addEventListener('input', () => {
+      if (field.getAttribute('aria-invalid') === 'true') validate(field);
+    });
     field.addEventListener('blur', () => validate(field));
   });
   function updateFile() {
     const file = cv.files[0];
-    fileInfo.textContent = file ? `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} ميغابايت` : '';
+    fileInfo.textContent = file
+      ? `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} ميغابايت`
+      : '';
     remove.hidden = !file;
     validate(cv);
   }
   cv.addEventListener('change', updateFile);
-  remove.addEventListener('click', () => { cv.value = ''; updateFile(); cv.focus(); });
+  remove.addEventListener('click', () => {
+    cv.value = '';
+    updateFile();
+    cv.focus();
+  });
   const review = document.createElement('section');
-  review.className = 'application-review'; review.hidden = true; review.tabIndex = -1;
+  review.className = 'application-review';
+  review.hidden = true;
+  review.tabIndex = -1;
   review.setAttribute('aria-label', 'مراجعة طلب التقديم');
-  review.innerHTML = '<h3>راجع طلبك</h3><dl></dl><p class="demo-note">سيظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا يُرسل إلى جهة خارجية.</p><div class="application-review-actions"><button type="button" class="btn btn-orange" data-confirm>تأكيد التقديم</button><button type="button" class="text-button" data-edit>تعديل المعلومات</button></div>';
+  review.innerHTML =
+    '<h3>راجع طلبك</h3><dl></dl><p class="demo-note">سيظهر الطلب في لوحة متابعتك خلال هذه الزيارة. لا يُرسل إلى جهة خارجية.</p><div class="application-review-actions"><button type="button" class="btn btn-orange" data-confirm>تأكيد التقديم</button><button type="button" class="text-button" data-edit>تعديل المعلومات</button></div>';
   form.after(review);
   const submit = form.querySelector('button[type="submit"]');
   submit.textContent = 'مراجعة الطلب ←';
-  form.addEventListener('submit', event => {
-    event.preventDefault(); event.stopImmediatePropagation();
-    const valid = fields.map(validate);
-    if (valid.includes(false)) { fields[valid.indexOf(false)].focus(); return; }
-    const list = review.querySelector('dl'); list.replaceChildren();
-    [['الاسم', name.value], ['البريد الإلكتروني', email.value], ['الخبرات', experience.value || 'لم تُضف خبرات'], ['معرض الأعمال', portfolio.value || 'لم يُضف رابط'], ['السيرة الذاتية', fileInfo.textContent || 'لم يُرفق ملف']].forEach(([label, value]) => {
-      const term = document.createElement('dt'), detail = document.createElement('dd');
-      term.textContent = label; detail.textContent = value; detail.dir = 'auto'; list.append(term, detail);
-    });
-    form.hidden = true; review.hidden = false; review.focus();
-  }, true);
-  review.querySelector('[data-edit]').addEventListener('click', () => { review.hidden = true; form.hidden = false; name.focus(); });
+  form.addEventListener(
+    'submit',
+    (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const valid = fields.map(validate);
+      if (valid.includes(false)) {
+        fields[valid.indexOf(false)].focus();
+        return;
+      }
+      const list = review.querySelector('dl');
+      list.replaceChildren();
+      [
+        ['الاسم', name.value],
+        ['البريد الإلكتروني', email.value],
+        ['الخبرات', experience.value || 'لم تُضف خبرات'],
+        ['معرض الأعمال', portfolio.value || 'لم يُضف رابط'],
+        ['السيرة الذاتية', fileInfo.textContent || 'لم يُرفق ملف']
+      ].forEach(([label, value]) => {
+        const term = document.createElement('dt'),
+          detail = document.createElement('dd');
+        term.textContent = label;
+        detail.textContent = value;
+        detail.dir = 'auto';
+        list.append(term, detail);
+      });
+      form.hidden = true;
+      review.hidden = false;
+      review.focus();
+    },
+    true
+  );
+  review.querySelector('[data-edit]').addEventListener('click', () => {
+    review.hidden = true;
+    form.hidden = false;
+    name.focus();
+  });
   review.querySelector('[data-confirm]').addEventListener('click', () => {
     const app = window.OfoqFrontend;
-    const selected = form.id === 'applicationForm' ? app.activeApplication : { kind: 'project', id: new URLSearchParams(location.search).get('id'), title: document.getElementById('detailTitle').textContent, href: location.href };
+    const selected =
+      form.id === 'applicationForm'
+        ? app.activeApplication
+        : {
+            kind: 'project',
+            id: new URLSearchParams(location.search).get('id'),
+            title: document.getElementById('detailTitle').textContent,
+            href: location.href
+          };
     if (!selected?.id) return;
-    app.apply(selected.kind, selected.id, selected.title, selected.href, app.applicationDetails?.(form) || {});
-    form.reset(); form.hidden = true;
+    app.apply(
+      selected.kind,
+      selected.id,
+      selected.title,
+      selected.href,
+      app.applicationDetails?.(form) || {}
+    );
+    form.reset();
+    form.hidden = true;
     const success = document.querySelector('#applicationSuccess, #previewSuccess');
     review.hidden = true;
     success.replaceChildren();
-    const message = document.createElement('p'); message.textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
-    const link = document.createElement('a'); link.className = 'btn btn-orange'; link.textContent = 'متابعة طلباتي ←';
-    link.href = new URL('Account/Dashboard/dashboard.html?tab=application', new URL('../', [...document.scripts].find(script => script.src.endsWith('/assets/application-form.js')).src)).href;
+    const message = document.createElement('p');
+    message.textContent = 'أُضيف طلبك إلى لوحة المتابعة. الحالة: قيد المراجعة.';
+    const link = document.createElement('a');
+    link.className = 'btn btn-orange';
+    link.textContent = 'متابعة طلباتي ←';
+    link.href = new URL(
+      'Account/Dashboard/dashboard.html?tab=application',
+      new URL(
+        '../',
+        [...document.scripts].find((script) =>
+          script.src.endsWith('/assets/application-form.js')
+        ).src
+      )
+    ).href;
     success.append(message, link);
-    success.hidden = false; success.tabIndex = -1; success.focus();
+    success.hidden = false;
+    success.tabIndex = -1;
+    success.focus();
   });
   form.addEventListener('reset', () => {
-    review.hidden = true; review.querySelector('dl').replaceChildren();
-    fileInfo.textContent = ''; remove.hidden = true;
-    fields.forEach(field => { field.setCustomValidity(''); field.removeAttribute('aria-invalid'); errors.get(field).hidden = true; });
+    review.hidden = true;
+    review.querySelector('dl').replaceChildren();
+    fileInfo.textContent = '';
+    remove.hidden = true;
+    fields.forEach((field) => {
+      field.setCustomValidity('');
+      field.removeAttribute('aria-invalid');
+      errors.get(field).hidden = true;
+    });
   });
 })();

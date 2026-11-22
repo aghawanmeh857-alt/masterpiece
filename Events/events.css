@@ -1,10 +1,8 @@
-
 /* events.css */
 /* الثيم المشترك + تنسيق بطاقات هذه الصفحة. */
 /* الثيم والنافبار والبحث من صفحة Freelance الموجودة. */
 
 /* Shared page foundation: assets/site-base.css */
-
 
 /* مقدمة الصفحة */
 .section-note {
@@ -44,7 +42,9 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   background: linear-gradient(115deg, var(--surface-raised), var(--surface));
-  transition: border-color .2s, transform .2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 }
 .listing-card:hover {
   border-color: #ff783d66;
@@ -216,8 +216,6 @@
   }
 }
 
-
-
 /* details.css */
 /* Small additions to the shared account-page layout. */
 .details-link {
@@ -292,7 +290,7 @@
 }
 
 .lesson-list input {
-  accent-color: #FF783D;
+  accent-color: #ff783d;
 }
 
 .detail-comment {
@@ -332,7 +330,6 @@
   }
 }
 
-
 /* theme.css */
 /* Shared colors: day is light; night keeps SAEI navy and orange. */
 :root {
@@ -353,7 +350,7 @@
   --green-text: #147454;
   --night-overlay: 0;
 }
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   color-scheme: dark;
   --page-bg: #0b1526;
   --page-rgb: 11, 21, 38;
@@ -377,46 +374,94 @@ body {
   --bs-secondary-color: var(--text-muted);
   color: var(--text-main);
 }
-html.theme-transition :is(body, header, footer, aside, article, section, nav, form,
-button, input, select, textarea, a, p, h1, h2, h3, span, small,
-.panel, .story, .modal-content, .account-menu-links, .day-night-controls) {
-  transition: color 1.4s ease, background-color 1.4s ease, border-color 1.4s ease;
+html.theme-transition
+  :is(
+    body,
+    header,
+    footer,
+    aside,
+    article,
+    section,
+    nav,
+    form,
+    button,
+    input,
+    select,
+    textarea,
+    a,
+    p,
+    h1,
+    h2,
+    h3,
+    span,
+    small,
+    .panel,
+    .story,
+    .modal-content,
+    .account-menu-links,
+    .day-night-controls
+  ) {
+  transition:
+    color 1.4s ease,
+    background-color 1.4s ease,
+    border-color 1.4s ease;
 }
-html[data-theme="light"] .btn-close-white { filter: none; }
-html[data-theme="light"] .form-select {
+html[data-theme='light'] .btn-close-white {
+  filter: none;
+}
+html[data-theme='light'] .form-select {
   --bs-form-select-bg-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2352647b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
 }
 /* Fade the two gradient layers instead of abruptly swapping a gradient. */
-body[data-section="hero"] .scene-vignette { background: transparent; }
-.scene-vignette::before, .scene-vignette::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
+body[data-section='hero'] .scene-vignette {
+  background: transparent;
+}
+.scene-vignette::before,
+.scene-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 .scene-vignette::before {
   background: linear-gradient(0deg, #f3f6fbb0, transparent 28%, transparent 85%, #f3f6fb66);
   opacity: calc(1 - var(--night-overlay));
-
 }
 .scene-vignette::after {
   background: linear-gradient(0deg, #0b1526d9, transparent 28%, transparent 85%, #0b152677);
   opacity: var(--night-overlay);
-
 }
 html.theme-transition .scene-vignette::before,
-html.theme-transition .scene-vignette::after { transition: opacity 4s ease; }
+html.theme-transition .scene-vignette::after {
+  transition: opacity 4s ease;
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
 }
 @media (max-width: 767px) {
-  .topbar .brand { flex: 1; margin-inline-end: 0; }
-  .topbar > .theme-toggle { font-size: 10px; padding: 8px; }
-  .topbar .account-links { width: 100%; justify-content: flex-end; }
+  .topbar .brand {
+    flex: 1;
+    margin-inline-end: 0;
+  }
+  .topbar > .theme-toggle {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .topbar .account-links {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 /* Keep the daytime sky clear of the night overlay. */
-html[data-theme="light"] body[data-section="hero"] .scene-vignette::after {
+html[data-theme='light'] body[data-section='hero'] .scene-vignette::after {
   opacity: 0;
 }
-html[data-theme="light"] body[data-section="hero"] .scene-vignette::before {
+html[data-theme='light'] body[data-section='hero'] .scene-vignette::before {
   background: linear-gradient(0deg, #f3f6fb66, transparent 24%);
 }
 
@@ -430,14 +475,29 @@ body {
   --bs-link-color: var(--accent-text);
   --bs-link-hover-color: var(--text-main);
 }
-body:not([data-section="hero"]) {
+body:not([data-section='hero']) {
   background-color: var(--page-bg);
-  --border: rgba(var(--border-rgb), .16);
+  --border: rgba(var(--border-rgb), 0.16);
 }
-body:not([data-section="hero"]) :is(.eyebrow, .listing-category, .section-nav a[aria-current],
-.page-heading h1 em, .account-heading h1 em, .auth-story h1 span, .auth-switch a,
-.auth-benefits span, .auth-monogram, .breadcrumb-item.active, .project-icon.orange,
-.art-note, .code-window pre span, .idea-avatar, .empty-ideas > span, .empty-state > span) {
+body:not([data-section='hero'])
+  :is(
+    .eyebrow,
+    .listing-category,
+    .section-nav a[aria-current],
+    .page-heading h1 em,
+    .account-heading h1 em,
+    .auth-story h1 span,
+    .auth-switch a,
+    .auth-benefits span,
+    .auth-monogram,
+    .breadcrumb-item.active,
+    .project-icon.orange,
+    .art-note,
+    .code-window pre span,
+    .idea-avatar,
+    .empty-ideas > span,
+    .empty-state > span
+  ) {
   color: var(--accent-text);
 }
 .modal-content {
@@ -447,12 +507,17 @@ body:not([data-section="hero"]) :is(.eyebrow, .listing-category, .section-nav a[
   --bs-modal-header-border-color: var(--field-border);
   --bs-modal-footer-border-color: var(--field-border);
 }
-.form-control:disabled, .form-select:disabled {
+.form-control:disabled,
+.form-select:disabled {
   color: var(--text-muted);
   background-color: var(--surface-raised);
 }
-input, select, textarea { accent-color: #ff783d; }
-html[data-theme="light"] .btn-outline-light {
+input,
+select,
+textarea {
+  accent-color: #ff783d;
+}
+html[data-theme='light'] .btn-outline-light {
   --bs-btn-color: var(--text-main);
   --bs-btn-border-color: var(--field-border);
   --bs-btn-hover-color: var(--text-main);
@@ -461,30 +526,73 @@ html[data-theme="light"] .btn-outline-light {
   --bs-btn-active-color: var(--text-main);
   --bs-btn-active-bg: var(--surface-raised);
 }
-html.theme-transition :is(.project-card, .listing-card, .course-card, .account-panel,
-.stat-card, .auth-shell, .auth-tabs, .chat-bubble, .conversation-list button, .code-window,
-.filter-chip, .category-badge, .modal-content, .modal-header, .modal-footer) {
-  transition: color 1.4s ease, background-color 1.4s ease, border-color 1.4s ease, transform .2s ease;
+html.theme-transition
+  :is(
+    .project-card,
+    .listing-card,
+    .course-card,
+    .account-panel,
+    .stat-card,
+    .auth-shell,
+    .auth-tabs,
+    .chat-bubble,
+    .conversation-list button,
+    .code-window,
+    .filter-chip,
+    .category-badge,
+    .modal-content,
+    .modal-header,
+    .modal-footer
+  ) {
+  transition:
+    color 1.4s ease,
+    background-color 1.4s ease,
+    border-color 1.4s ease,
+    transform 0.2s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after {
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
     transition: none !important;
   }
 }
 
-
 /* Display the approved artwork without its presentation margins. */
-.brand .ofoq-brand, .auth-monogram.ofoq-brand {
-  position: relative; display: block; overflow: hidden; flex: 0 0 auto;
-  width: 76px; height: 80px; background: #fffdf9; border-radius: 10px;
-  padding: 0; border: 1px solid rgba(var(--border-rgb), .16);
+.brand .ofoq-brand,
+.auth-monogram.ofoq-brand {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: 0 0 auto;
+  width: 76px;
+  height: 80px;
+  background: #fffdf9;
+  border-radius: 10px;
+  padding: 0;
+  border: 1px solid rgba(var(--border-rgb), 0.16);
 }
 .ofoq-brand .ofoq-logo {
-  position: absolute; width: 129px; height: 129px; max-width: none;
-  left: -27px; top: -24px; object-fit: contain;
+  position: absolute;
+  width: 129px;
+  height: 129px;
+  max-width: none;
+  left: -27px;
+  top: -24px;
+  object-fit: contain;
 }
-.auth-monogram.ofoq-brand { inset: 30px auto auto 54px; width: 92px; height: 98px; transform: none; }
-.auth-monogram.ofoq-brand .ofoq-logo { width: 157px; height: 157px; left: -33px; top: -29px; }
+.auth-monogram.ofoq-brand {
+  inset: 30px auto auto 54px;
+  width: 92px;
+  height: 98px;
+  transform: none;
+}
+.auth-monogram.ofoq-brand .ofoq-logo {
+  width: 157px;
+  height: 157px;
+  left: -33px;
+  top: -29px;
+}
 
 @media (max-width: 767px) {
   .topbar .brand {
@@ -503,7 +611,6 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 }
 
 @media (max-width: 767px) {
-
   .topbar {
     flex-wrap: wrap;
   }
@@ -513,7 +620,7 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
   }
 }
 /* Event cards: date beside title, price above actions. */
-html[lang="ar"] .event-list .listing-card {
+html[lang='ar'] .event-list .listing-card {
   grid-template-columns: minmax(0, 1fr) 92px;
   align-content: start;
   gap: 20px 16px;
@@ -526,11 +633,24 @@ html[lang="ar"] .event-list .listing-card {
   padding: 14px 8px;
   text-align: center;
 }
-.event-list .event-date span { font-size: 11px; line-height: 1.8; }
-.event-list .listing-details { grid-column: 1; grid-row: 1; min-width: 0; }
-.event-list .listing-date { display: flex; flex-wrap: wrap; gap: 2px 12px; }
-.event-list .event-timezone { display: block; }
-html[lang="ar"] .event-list .listing-offer {
+.event-list .event-date span {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.event-list .listing-details {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.event-list .listing-date {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+.event-list .event-timezone {
+  display: block;
+}
+html[lang='ar'] .event-list .listing-offer {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -539,7 +659,7 @@ html[lang="ar"] .event-list .listing-offer {
   text-align: start;
   padding-top: 18px;
 }
-html[lang="ar"] .event-list .listing-offer > strong {
+html[lang='ar'] .event-list .listing-offer > strong {
   grid-column: 1 / -1;
   font-size: 18px;
   line-height: 1.8;
@@ -559,10 +679,25 @@ html[lang="ar"] .event-list .listing-offer > strong {
   border-radius: 9px;
 }
 @media (max-width: 480px) {
-  html[lang="ar"] .event-list .listing-card { grid-template-columns: minmax(0, 1fr) 74px; gap: 16px 10px; }
-  .event-list .event-date { width: 74px; padding: 12px 6px; }
-  .event-list .event-date strong { font-size: 26px; }
-  .event-list .event-date span { font-size: 10px; }
-  html[lang="ar"] .event-list .listing-details h2 { font-size: 18px; }
-  .event-list .listing-offer .btn, .event-list .listing-offer .details-link { padding: 10px 6px; }
+  html[lang='ar'] .event-list .listing-card {
+    grid-template-columns: minmax(0, 1fr) 74px;
+    gap: 16px 10px;
+  }
+  .event-list .event-date {
+    width: 74px;
+    padding: 12px 6px;
+  }
+  .event-list .event-date strong {
+    font-size: 26px;
+  }
+  .event-list .event-date span {
+    font-size: 10px;
+  }
+  html[lang='ar'] .event-list .listing-details h2 {
+    font-size: 18px;
+  }
+  .event-list .listing-offer .btn,
+  .event-list .listing-offer .details-link {
+    padding: 10px 6px;
+  }
 }

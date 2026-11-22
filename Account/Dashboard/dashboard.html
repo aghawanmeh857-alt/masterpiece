@@ -1,87 +1,117 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <script src="../../assets/frontend-runtime.js"></script>
-  <script src="../../assets/platform-data.js"></script>
-  <meta charset="UTF-8">
-    
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1526">
-  <title>لوحة متابعتي — سعي</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
-  
-  
-  <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg">
-    
-  <link rel="stylesheet" href="../../assets/site-base.css">
-<link rel="stylesheet" href="dashboard.css">
-  <link rel="stylesheet" href="../../assets/arabic-ui.css">
-  <script defer src="../../assets/arabic-ui.js"></script>
-  <script defer src="../../assets/demo-auth.js"></script>
-<link rel="stylesheet" href="../../assets/cards.css">
-<link rel="stylesheet" href="../../assets/fonts.css">
-  <link rel="stylesheet" href="../../assets/popup-ui.css">
-  <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6">
-</head>
-<body data-section="lobby">
-  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-  <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
-  <main id="mainContent" tabindex="-1" class="container-xl account-page">
-    <div class="account-heading">
-      <div>
-        <p class="eyebrow mb-3">سعي / مساحتي</p>
-        <h1>خطوتك القادمة. <em>كل شيء في مكان واحد.</em></h1>
-        <p>نظرة واضحة على مشاريعك وطلباتك وتعلّمك.</p>
-      </div>
-      <a class="btn btn-orange" href="../../Freelance/freelance.html#shareTitle">+ شارك فكرة مشروع</a>
-    </div>
-    <p class="preview-note">معاينة تجريبية. الأرقام والأنشطة أمثلة توضيحية وليست بيانات حساب حقيقي، ولا ترتبط بالمنشورات أو تعديلات الملف.</p>
+  <head>
+    <script src="../../assets/frontend-runtime.js"></script>
+    <script src="../../assets/platform-data.js"></script>
+    <meta charset="UTF-8" />
 
-    <section class="stats-grid" aria-label="ملخص نشاط توضيحي">
-      <div class="account-panel stat-card"><span>مشاريعي</span><strong>2</strong><small>منشورات توضيحية</small></div>
-      <div class="account-panel stat-card"><span>طلباتي</span><strong>1</strong><small>طلب توضيحي</small></div>
-      <div class="account-panel stat-card"><span>المسارات</span><strong>1</strong><small>مسار توضيحي</small></div>
-      <div class="account-panel stat-card"><span>تقدّم التعلّم</span><strong>40%</strong><small>تقدّم توضيحي</small></div>
-    </section>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1526" />
+    <title>لوحة متابعتي — سعي</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+    />
 
-    <div class="dashboard-grid">
-      <section class="account-panel" aria-labelledby="activityTitle">
-        <h2 id="activityTitle">مشاريعي</h2>
-        <p id="activityDescription" class="demo-note">المشاريع التي نشرتها، ومتابعة المتقدّمين عليها.</p>
-        <div class="activity-toolbar" role="group" aria-label="أقسام حسابي">
-          <button type="button" data-filter="project" aria-pressed="true">مشاريعي</button>
-          <button type="button" data-filter="application" aria-pressed="false">طلباتي</button>
-          <button type="button" data-filter="course" aria-pressed="false">تعلّمي</button>
+    <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg" />
+
+    <link rel="stylesheet" href="../../assets/site-base.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="../../assets/arabic-ui.css" />
+    <script defer src="../../assets/arabic-ui.js"></script>
+    <script defer src="../../assets/demo-auth.js"></script>
+    <link rel="stylesheet" href="../../assets/cards.css" />
+    <link rel="stylesheet" href="../../assets/fonts.css" />
+    <link rel="stylesheet" href="../../assets/popup-ui.css" />
+    <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6" />
+  </head>
+  <body data-section="lobby">
+    <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+    <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
+    <main id="mainContent" tabindex="-1" class="container-xl account-page">
+      <div class="account-heading">
+        <div>
+          <p class="eyebrow mb-3">سعي / مساحتي</p>
+          <h1>خطوتك القادمة. <em>كل شيء في مكان واحد.</em></h1>
+          <p>نظرة واضحة على مشاريعك وطلباتك وتعلّمك.</p>
         </div>
-        <p id="activityCount" class="activity-count" role="status">مشروعان توضيحيان</p>
+        <a class="btn btn-orange" href="../../Freelance/freelance.html#shareTitle"
+          >+ شارك فكرة مشروع</a
+        >
+      </div>
+      <p class="preview-note"
+        >معاينة تجريبية. الأرقام والأنشطة أمثلة توضيحية وليست بيانات حساب حقيقي، ولا ترتبط
+        بالمنشورات أو تعديلات الملف.</p
+      >
+
+      <section class="stats-grid" aria-label="ملخص نشاط توضيحي">
+        <div class="account-panel stat-card"
+          ><span>مشاريعي</span><strong>2</strong><small>منشورات توضيحية</small></div
+        >
+        <div class="account-panel stat-card"
+          ><span>طلباتي</span><strong>1</strong><small>طلب توضيحي</small></div
+        >
+        <div class="account-panel stat-card"
+          ><span>المسارات</span><strong>1</strong><small>مسار توضيحي</small></div
+        >
+        <div class="account-panel stat-card"
+          ><span>تقدّم التعلّم</span><strong>40%</strong><small>تقدّم توضيحي</small></div
+        >
       </section>
 
-      <aside class="account-stack" aria-label="روابط مفيدة">
-        <section class="account-panel">
-          <h2>خذ خطوتك القادمة.</h2>
-          <a class="quick-link" href="../Messages/messages.html">الرسائل <span aria-hidden="true">↗</span></a>
-          <a class="quick-link" href="../Settings/settings.html">الإعدادات <span aria-hidden="true">↗</span></a>
-          <a class="quick-link" href="../Profile/profile.html">ملفي الشخصي <span aria-hidden="true">↗</span></a>
-          <a class="quick-link" href="../../Freelance/freelance.html">ابحث عن مشروع <span aria-hidden="true">↗</span></a>
-          <a class="quick-link" href="../../Internships/internships.html">ابحث عن فرصة تدريب <span aria-hidden="true">↗</span></a>
-          <a class="quick-link" href="../../Events/events.html">استكشف الفعاليات <span aria-hidden="true">↗</span></a>
+      <div class="dashboard-grid">
+        <section class="account-panel" aria-labelledby="activityTitle">
+          <h2 id="activityTitle">مشاريعي</h2>
+          <p id="activityDescription" class="demo-note"
+            >المشاريع التي نشرتها، ومتابعة المتقدّمين عليها.</p
+          >
+          <div class="activity-toolbar" role="group" aria-label="أقسام حسابي">
+            <button type="button" data-filter="project" aria-pressed="true">مشاريعي</button>
+            <button type="button" data-filter="application" aria-pressed="false">طلباتي</button>
+            <button type="button" data-filter="course" aria-pressed="false">تعلّمي</button>
+          </div>
+          <p id="activityCount" class="activity-count" role="status">مشروعان توضيحيان</p>
         </section>
-        <section class="account-panel next-step">
-          <p class="eyebrow mb-3">ابدأ بقصتك</p>
-          <h2>دع مهاراتك تتحدث عنك.</h2>
-          <p>عاين ملفك الشخصي وعرّف الآخرين بالعمل الذي تطمح لتنفيذه.</p>
-          <a class="btn btn-orange w-100" href="../Profile/profile.html">معاينة ملفي الشخصي ←</a>
-        </section>
-      </aside>
-    </div>
-  </main>
-  <footer class="page-footer container-xl">
-  <span>© SAEI <span id="year"></span></span>
-  <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
-</footer>
-  
-  
-  <script src="../../assets/theme.js"></script>
-<script src="dashboard.js"></script>
-</body>
+
+        <aside class="account-stack" aria-label="روابط مفيدة">
+          <section class="account-panel">
+            <h2>خذ خطوتك القادمة.</h2>
+            <a class="quick-link" href="../Messages/messages.html"
+              >الرسائل <span aria-hidden="true">↗</span></a
+            >
+            <a class="quick-link" href="../Settings/settings.html"
+              >الإعدادات <span aria-hidden="true">↗</span></a
+            >
+            <a class="quick-link" href="../Profile/profile.html"
+              >ملفي الشخصي <span aria-hidden="true">↗</span></a
+            >
+            <a class="quick-link" href="../../Freelance/freelance.html"
+              >ابحث عن مشروع <span aria-hidden="true">↗</span></a
+            >
+            <a class="quick-link" href="../../Internships/internships.html"
+              >ابحث عن فرصة تدريب <span aria-hidden="true">↗</span></a
+            >
+            <a class="quick-link" href="../../Events/events.html"
+              >استكشف الفعاليات <span aria-hidden="true">↗</span></a
+            >
+          </section>
+          <section class="account-panel next-step">
+            <p class="eyebrow mb-3">ابدأ بقصتك</p>
+            <h2>دع مهاراتك تتحدث عنك.</h2>
+            <p>عاين ملفك الشخصي وعرّف الآخرين بالعمل الذي تطمح لتنفيذه.</p>
+            <a class="btn btn-orange w-100" href="../Profile/profile.html">معاينة ملفي الشخصي ←</a>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <footer class="page-footer container-xl">
+      <span>© SAEI <span id="year"></span></span>
+      <a data-room-link href="../../hero/userHero.html#lobby"
+        >العودة إلى قسم <span data-room-name>الرئيسية</span> <span aria-hidden="true">↗</span></a
+      >
+    </footer>
+
+    <script src="../../assets/theme.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
 </html>

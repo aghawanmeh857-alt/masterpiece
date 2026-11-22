@@ -1,199 +1,688 @@
 /* This file owns the public navbar layout on every page. */
-html body .shared-navbar{direction:rtl;font-family:var(--font-site,'Tajawal',sans-serif);color:var(--text-main,#17263b);z-index:40;box-sizing:border-box}
-html body .site-header.shared-navbar{position:relative;margin:0;padding:0;background:var(--surface,#fff);border:0;border-bottom:1px solid var(--field-border,#cbd5e1);border-radius:0;box-shadow:none}
-html body .shared-navbar .header-inner{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:18px;width:100%;max-width:1440px;min-height:88px;margin-inline:auto;padding:16px 24px;box-sizing:border-box}
-html body .shared-navbar .brand{display:block;flex:0 0 124px;margin:0!important;padding:0;text-decoration:none}
-html body .shared-navbar .brand .ofoq-brand{position:relative;inset:auto;display:block;width:124px;height:54px;transform:none;border-radius:9px;background:#fff;overflow:hidden}
-html body .shared-navbar .brand .ofoq-logo{position:static!important;inset:auto!important;display:block;width:100%!important;height:100%!important;padding:3px;object-fit:contain!important;transform:none!important}
-html body .shared-navbar .site-navigation{position:relative;flex:1;min-width:0;margin:0;padding:0}
-html body .shared-navbar .site-navigation>summary{display:none}
-html body .shared-navbar :is(.section-nav,.room-nav){position:static;display:flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:2px;margin:0;padding:0;max-width:none;border:0;background:none;box-shadow:none}
-html body .shared-navbar :is(.section-nav,.room-nav)>a{display:flex;align-items:center;justify-content:center;min-height:40px;padding:8px 9px;margin:0;border:1px solid transparent;border-radius:9px;color:var(--text-muted,#52647b);text-decoration:none;white-space:nowrap;font-size:12px;font-weight:700;line-height:1.5}
-html body .shared-navbar :is(.section-nav,.room-nav)>a:is(:hover,[aria-current],.active){background:#ff783d12;border-color:#ff783d30;color:var(--accent-text,#a43e13)}
-html body .shared-navbar .header-actions{display:flex;flex:0 0 auto;align-items:center;gap:7px;width:auto;margin:0;padding:0}
-html body .shared-navbar .header-actions>:is(a,button),html body .shared-navbar .account-menu>summary{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 10px;margin:0;border:1px solid var(--field-border,#cbd5e1);border-radius:10px;background:var(--field-bg,#f8fafc);color:var(--text-main,#17263b);text-decoration:none;white-space:nowrap;font-family:inherit;font-size:12px;font-weight:700;line-height:1.5;box-sizing:border-box;cursor:pointer}
-html body .shared-navbar .theme-toggle{border-color:#ff783d70!important}
-html body .shared-navbar .account-menu{position:relative;margin:0}
-html body .shared-navbar .account-menu-links{position:absolute;top:calc(100% + 10px);inset-inline-end:0;inset-inline-start:auto;display:grid;gap:5px;min-width:185px;max-width:calc(100vw - 28px);padding:10px;border:1px solid var(--field-border,#cbd5e1);border-radius:13px;background:var(--surface,#fff);box-shadow:0 15px 40px #0002;z-index:60}
-html body .shared-navbar .account-menu:not([open]) .account-menu-links{display:none}
-html body .shared-navbar .account-menu-links :is(a,button){padding:9px 10px;border:0;border-radius:7px;background:transparent;color:var(--text-main,#17263b);font:inherit;font-size:12px;text-align:start;text-decoration:none}
-html body .shared-navbar .account-menu-links :is(a,button):hover{background:#ff783d12;color:var(--accent-text,#a43e13)}
-html body .shared-navbar [hidden]{display:none!important}
-html body .shared-navbar a:focus-visible,html body .shared-navbar button:focus-visible,html body .shared-navbar summary:focus-visible{outline:2px solid #ff783d;outline-offset:3px}
-html body .shared-navbar[data-navbar-mode=auth] .header-inner{max-width:1280px}
-@media(max-width:1199px){html body .shared-navbar .header-inner{gap:12px;padding:14px 18px}html body .shared-navbar :is(.section-nav,.room-nav)>a{padding:8px 6px;font-size:11px}html body .shared-navbar .header-actions>:is(a,button),html body .shared-navbar .account-menu>summary{font-size:11px;padding:8px}}
-@media(max-width:991px){
-html body .shared-navbar .header-inner{flex-wrap:wrap;gap:10px;min-height:74px;padding:12px 16px}
-html body .shared-navbar .brand{flex-basis:104px}html body .shared-navbar .brand .ofoq-brand{width:104px;height:46px}
-html body .shared-navbar .site-navigation{flex:0 0 auto;margin-inline-start:auto}
-html body .shared-navbar .site-navigation>summary{display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:8px 12px;border:1px solid var(--field-border,#cbd5e1);border-radius:9px;background:var(--field-bg,#f8fafc);font-size:12px;list-style:none}
-html body .shared-navbar .site-navigation>summary::before,html body .shared-navbar .site-navigation>summary::after{content:none}
-html body .shared-navbar .site-navigation>summary::-webkit-details-marker{display:none}
-html body .shared-navbar .site-navigation:not([open]) :is(.section-nav,.room-nav){display:none}
-html body .shared-navbar .site-navigation[open] :is(.section-nav,.room-nav){position:absolute;top:calc(100% + 10px);inset-inline-end:0;inset-inline-start:auto;display:grid;min-width:190px;max-height:65dvh;overflow-y:auto;padding:10px;border:1px solid var(--field-border,#cbd5e1);border-radius:13px;background:var(--surface,#fff);box-shadow:0 15px 40px #0002;z-index:60}
-html body .shared-navbar .site-navigation[open] :is(.section-nav,.room-nav)>a{justify-content:flex-start;padding:10px 12px;font-size:12px}
-html body .shared-navbar .header-actions{gap:6px;flex-wrap:wrap}
-html body .hero-navbar.shared-navbar{flex-wrap:wrap;gap:10px;padding:12px 16px}
+html body .shared-navbar {
+  direction: rtl;
+  font-family: var(--font-site, 'Tajawal', sans-serif);
+  color: var(--text-main, #17263b);
+  z-index: 40;
+  box-sizing: border-box;
 }
-@media(max-width:600px){html body .shared-navbar .header-actions{width:100%;justify-content:flex-start}html body .shared-navbar .header-actions>:is(a,button),html body .shared-navbar .account-menu>summary{min-height:36px;font-size:11px;padding:7px 9px}html body .shared-navbar .header-actions svg{width:18px;height:18px}html body .shared-navbar[data-navbar-mode=auth] .header-inner{flex-wrap:nowrap}}
+html body .site-header.shared-navbar {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background: var(--surface, #fff);
+  border: 0;
+  border-bottom: 1px solid var(--field-border, #cbd5e1);
+  border-radius: 0;
+  box-shadow: none;
+}
+html body .shared-navbar .header-inner {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  max-width: 1440px;
+  min-height: 88px;
+  margin-inline: auto;
+  padding: 16px 24px;
+  box-sizing: border-box;
+}
+html body .shared-navbar .brand {
+  display: block;
+  flex: 0 0 124px;
+  margin: 0 !important;
+  padding: 0;
+  text-decoration: none;
+}
+html body .shared-navbar .brand .ofoq-brand {
+  position: relative;
+  inset: auto;
+  display: block;
+  width: 124px;
+  height: 54px;
+  transform: none;
+  border-radius: 9px;
+  background: #fff;
+  overflow: hidden;
+}
+html body .shared-navbar .brand .ofoq-logo {
+  position: static !important;
+  inset: auto !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 3px;
+  object-fit: contain !important;
+  transform: none !important;
+}
+html body .shared-navbar .site-navigation {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+html body .shared-navbar .site-navigation > summary {
+  display: none;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) {
+  position: static;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 9px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--text-muted, #52647b);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) > a:is(:hover, [aria-current], .active) {
+  background: #ff783d12;
+  border-color: #ff783d30;
+  color: var(--accent-text, #a43e13);
+}
+html body .shared-navbar .header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+html body .shared-navbar .header-actions > :is(a, button),
+html body .shared-navbar .account-menu > summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 10px;
+  margin: 0;
+  border: 1px solid var(--field-border, #cbd5e1);
+  border-radius: 10px;
+  background: var(--field-bg, #f8fafc);
+  color: var(--text-main, #17263b);
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+html body .shared-navbar .theme-toggle {
+  border-color: #ff783d70 !important;
+}
+html body .shared-navbar .account-menu {
+  position: relative;
+  margin: 0;
+}
+html body .shared-navbar .account-menu-links {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  inset-inline-start: auto;
+  display: grid;
+  gap: 5px;
+  min-width: 185px;
+  max-width: calc(100vw - 28px);
+  padding: 10px;
+  border: 1px solid var(--field-border, #cbd5e1);
+  border-radius: 13px;
+  background: var(--surface, #fff);
+  box-shadow: 0 15px 40px #0002;
+  z-index: 60;
+}
+html body .shared-navbar .account-menu:not([open]) .account-menu-links {
+  display: none;
+}
+html body .shared-navbar .account-menu-links :is(a, button) {
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-main, #17263b);
+  font: inherit;
+  font-size: 12px;
+  text-align: start;
+  text-decoration: none;
+}
+html body .shared-navbar .account-menu-links :is(a, button):hover {
+  background: #ff783d12;
+  color: var(--accent-text, #a43e13);
+}
+html body .shared-navbar [hidden] {
+  display: none !important;
+}
+html body .shared-navbar a:focus-visible,
+html body .shared-navbar button:focus-visible,
+html body .shared-navbar summary:focus-visible {
+  outline: 2px solid #ff783d;
+  outline-offset: 3px;
+}
+html body .shared-navbar[data-navbar-mode='auth'] .header-inner {
+  max-width: 1280px;
+}
+@media (max-width: 1199px) {
+  html body .shared-navbar .header-inner {
+    gap: 12px;
+    padding: 14px 18px;
+  }
+  html body .shared-navbar :is(.section-nav, .room-nav) > a {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  html body .shared-navbar .header-actions > :is(a, button),
+  html body .shared-navbar .account-menu > summary {
+    font-size: 11px;
+    padding: 8px;
+  }
+}
+@media (max-width: 991px) {
+  html body .shared-navbar .header-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 74px;
+    padding: 12px 16px;
+  }
+  html body .shared-navbar .brand {
+    flex-basis: 104px;
+  }
+  html body .shared-navbar .brand .ofoq-brand {
+    width: 104px;
+    height: 46px;
+  }
+  html body .shared-navbar .site-navigation {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+  }
+  html body .shared-navbar .site-navigation > summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--field-border, #cbd5e1);
+    border-radius: 9px;
+    background: var(--field-bg, #f8fafc);
+    font-size: 12px;
+    list-style: none;
+  }
+  html body .shared-navbar .site-navigation > summary::before,
+  html body .shared-navbar .site-navigation > summary::after {
+    content: none;
+  }
+  html body .shared-navbar .site-navigation > summary::-webkit-details-marker {
+    display: none;
+  }
+  html body .shared-navbar .site-navigation:not([open]) :is(.section-nav, .room-nav) {
+    display: none;
+  }
+  html body .shared-navbar .site-navigation[open] :is(.section-nav, .room-nav) {
+    position: absolute;
+    top: calc(100% + 10px);
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    display: grid;
+    min-width: 190px;
+    max-height: 65dvh;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid var(--field-border, #cbd5e1);
+    border-radius: 13px;
+    background: var(--surface, #fff);
+    box-shadow: 0 15px 40px #0002;
+    z-index: 60;
+  }
+  html body .shared-navbar .site-navigation[open] :is(.section-nav, .room-nav) > a {
+    justify-content: flex-start;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  html body .shared-navbar .header-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  html body .hero-navbar.shared-navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+}
+@media (max-width: 600px) {
+  html body .shared-navbar .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  html body .shared-navbar .header-actions > :is(a, button),
+  html body .shared-navbar .account-menu > summary {
+    min-height: 36px;
+    font-size: 11px;
+    padding: 7px 9px;
+  }
+  html body .shared-navbar .header-actions svg {
+    width: 18px;
+    height: 18px;
+  }
+  html body .shared-navbar[data-navbar-mode='auth'] .header-inner {
+    flex-wrap: nowrap;
+  }
+}
 /* Prevent legacy page nav spacing from stretching the shared component. */
-html body .shared-navbar :is(.section-nav,.room-nav){gap:2px!important;width:auto;min-width:0}
-html body .shared-navbar :is(.section-nav,.room-nav)>a::after{content:none!important}
-html body .shared-navbar .site-navigation>summary{width:auto;height:auto;max-width:none}
-body[data-section=credits] .shared-navbar{--surface:var(--card);--field-bg:var(--background);--field-border:var(--border);--text-main:var(--text);--text-muted:var(--muted);--accent-text:var(--accent)}
+html body .shared-navbar :is(.section-nav, .room-nav) {
+  gap: 2px !important;
+  width: auto;
+  min-width: 0;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) > a::after {
+  content: none !important;
+}
+html body .shared-navbar .site-navigation > summary {
+  width: auto;
+  height: auto;
+  max-width: none;
+}
+body[data-section='credits'] .shared-navbar {
+  --surface: var(--card);
+  --field-bg: var(--background);
+  --field-border: var(--border);
+  --text-main: var(--text);
+  --text-muted: var(--muted);
+  --accent-text: var(--accent);
+}
 
 /* Reserve real columns for the full wordmark, menu and account controls. */
-@media(max-width:767px){
-html body[data-section=hero] .shared-navbar.hero-navbar{display:grid;grid-template-columns:104px 38px minmax(0,1fr);align-items:center;gap:8px;padding:8px;inset:8px 3% auto;border-radius:16px}
-html body[data-section=hero] .shared-navbar .brand{grid-column:1;grid-row:1;min-width:0}
-html body[data-section=hero] .shared-navbar .site-navigation{grid-column:2;grid-row:1;position:relative;order:0;min-width:0;margin:0}
-html body[data-section=hero] .shared-navbar .site-navigation>summary{width:38px;height:38px;min-height:38px;padding:0;gap:0;font-size:18px}
-html body[data-section=hero] .shared-navbar .hero-menu-label{display:none}
-html body[data-section=hero] .shared-navbar .header-actions{grid-column:3;grid-row:1;display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:6px;width:auto;min-width:0;margin:0}
-html body[data-section=hero] .shared-navbar .header-actions>:is(a,button),html body[data-section=hero] .shared-navbar .account-menu>summary{height:36px;min-height:36px;padding:7px 9px;font-size:11px;line-height:1;white-space:nowrap}
-html body[data-section=hero] .shared-navbar .header-actions .theme-toggle{display:flex;width:36px;min-width:36px;height:36px;padding:0!important;font-size:0!important;line-height:0;overflow:hidden;align-items:center;justify-content:center}
-html body[data-section=hero] .shared-navbar .theme-toggle::before{content:'☾';display:block;font-size:20px;line-height:1}
-html[data-theme=dark] body[data-section=hero] .shared-navbar .theme-toggle::before{content:'☀'}
-html body[data-section=hero] .shared-navbar .theme-toggle>*{display:none}
-html body[data-section=hero] .shared-navbar .navbar-login{background:#ff783d;border-color:#ff783d;color:#10243a}
+@media (max-width: 767px) {
+  html body[data-section='hero'] .shared-navbar.hero-navbar {
+    display: grid;
+    grid-template-columns: 104px 38px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    inset: 8px 3% auto;
+    border-radius: 16px;
+  }
+  html body[data-section='hero'] .shared-navbar .brand {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  html body[data-section='hero'] .shared-navbar .site-navigation {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    order: 0;
+    min-width: 0;
+    margin: 0;
+  }
+  html body[data-section='hero'] .shared-navbar .site-navigation > summary {
+    width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0;
+    gap: 0;
+    font-size: 18px;
+  }
+  html body[data-section='hero'] .shared-navbar .hero-menu-label {
+    display: none;
+  }
+  html body[data-section='hero'] .shared-navbar .header-actions {
+    grid-column: 3;
+    grid-row: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 6px;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+  }
+  html body[data-section='hero'] .shared-navbar .header-actions > :is(a, button),
+  html body[data-section='hero'] .shared-navbar .account-menu > summary {
+    height: 36px;
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  html body[data-section='hero'] .shared-navbar .header-actions .theme-toggle {
+    display: flex;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 !important;
+    font-size: 0 !important;
+    line-height: 0;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+  }
+  html body[data-section='hero'] .shared-navbar .theme-toggle::before {
+    content: '☾';
+    display: block;
+    font-size: 20px;
+    line-height: 1;
+  }
+  html[data-theme='dark'] body[data-section='hero'] .shared-navbar .theme-toggle::before {
+    content: '☀';
+  }
+  html body[data-section='hero'] .shared-navbar .theme-toggle > * {
+    display: none;
+  }
+  html body[data-section='hero'] .shared-navbar .navbar-login {
+    background: #ff783d;
+    border-color: #ff783d;
+    color: #10243a;
+  }
 }
-@media(max-width:480px){
-html body[data-section=hero] .shared-navbar.hero-navbar{grid-template-columns:minmax(0,1fr) 38px;row-gap:6px}
-html body[data-section=hero] .shared-navbar .header-actions{grid-column:1/-1;grid-row:2;justify-content:space-between}
-html body[data-section=hero] .shared-navbar .header-actions .navbar-login{flex:1;max-width:170px}
+@media (max-width: 480px) {
+  html body[data-section='hero'] .shared-navbar.hero-navbar {
+    grid-template-columns: minmax(0, 1fr) 38px;
+    row-gap: 6px;
+  }
+  html body[data-section='hero'] .shared-navbar .header-actions {
+    grid-column: 1/-1;
+    grid-row: 2;
+    justify-content: space-between;
+  }
+  html body[data-section='hero'] .shared-navbar .header-actions .navbar-login {
+    flex: 1;
+    max-width: 170px;
+  }
 }
 
 /* Contain page-specific button, icon and form styles inside one navbar design. */
-html body .shared-navbar .header-actions > :is(a,button),
+html body .shared-navbar .header-actions > :is(a, button),
 html body .shared-navbar .account-menu > summary {
-  height:40px;
-  min-width:0;
-  max-width:none;
-  width:auto;
-  box-shadow:none;
-  letter-spacing:normal;
-  text-transform:none;
+  height: 40px;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+  box-shadow: none;
+  letter-spacing: normal;
+  text-transform: none;
 }
-html body .shared-navbar .header-actions svg { display:block; width:20px; height:20px; flex:0 0 20px; margin:0; }
-html body .shared-navbar .header-actions > a > span { font:inherit; color:inherit; background:none; padding:0; border:0; }
-html body .shared-navbar .account-menu > summary { list-style:none; }
-html body .shared-navbar .account-menu > summary::-webkit-details-marker { display:none; }
-html body .shared-navbar .account-menu > summary::after { content:'▾'; font-size:10px; color:var(--accent-text); }
-@media(max-width:600px) {
-  html body .shared-navbar .header-actions > :is(a,button),
-  html body .shared-navbar .account-menu > summary { height:36px; }
-  html body .shared-navbar .header-actions { flex-wrap:wrap; row-gap:7px; }
+html body .shared-navbar .header-actions svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  margin: 0;
+}
+html body .shared-navbar .header-actions > a > span {
+  font: inherit;
+  color: inherit;
+  background: none;
+  padding: 0;
+  border: 0;
+}
+html body .shared-navbar .account-menu > summary {
+  list-style: none;
+}
+html body .shared-navbar .account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+html body .shared-navbar .account-menu > summary::after {
+  content: '▾';
+  font-size: 10px;
+  color: var(--accent-text);
+}
+@media (max-width: 600px) {
+  html body .shared-navbar .header-actions > :is(a, button),
+  html body .shared-navbar .account-menu > summary {
+    height: 36px;
+  }
+  html body .shared-navbar .header-actions {
+    flex-wrap: wrap;
+    row-gap: 7px;
+  }
 }
 
 /* Keep the navigation geometry stable between pages and active sections. */
-html:has(.shared-navbar) { scrollbar-gutter: stable; }
-html body .shared-navbar :is(.section-nav,.room-nav)>a { box-sizing:border-box; font-weight:700; letter-spacing:0; transform:none; }
-html body .shared-navbar :is(.section-nav,.room-nav)>a:hover:not([aria-current]):not(.active) { background:#ff783d08; border-color:transparent; color:var(--text-main); }
-@media(min-width:992px) {
-  html body .site-header.shared-navbar .header-inner { width:100%; max-width:1440px; min-height:88px; margin-inline:auto; }
-  html body .site-header.shared-navbar .site-navigation { flex:1 1 0; }
-  html body .site-header.shared-navbar .section-nav { display:flex; justify-content:flex-start; gap:4px!important; width:auto; }
-  html body .site-header.shared-navbar .section-nav>a { flex:0 0 auto; width:auto; height:40px; min-height:40px; padding-inline:10px; }
+html:has(.shared-navbar) {
+  scrollbar-gutter: stable;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) > a {
+  box-sizing: border-box;
+  font-weight: 700;
+  letter-spacing: 0;
+  transform: none;
+}
+html body .shared-navbar :is(.section-nav, .room-nav) > a:hover:not([aria-current]):not(.active) {
+  background: #ff783d08;
+  border-color: transparent;
+  color: var(--text-main);
+}
+@media (min-width: 992px) {
+  html body .site-header.shared-navbar .header-inner {
+    width: 100%;
+    max-width: 1440px;
+    min-height: 88px;
+    margin-inline: auto;
+  }
+  html body .site-header.shared-navbar .site-navigation {
+    flex: 1 1 0;
+  }
+  html body .site-header.shared-navbar .section-nav {
+    display: flex;
+    justify-content: flex-start;
+    gap: 4px !important;
+    width: auto;
+  }
+  html body .site-header.shared-navbar .section-nav > a {
+    flex: 0 0 auto;
+    width: auto;
+    height: 40px;
+    min-height: 40px;
+    padding-inline: 10px;
+  }
 }
 
 /* Compact account dropdown, shared by the scene and all public pages. */
 html body .shared-navbar .account-menu-links {
-  width:238px;
-  min-width:220px;
-  gap:3px;
-  padding:8px;
-  border-radius:16px;
-  border-color:var(--field-border);
-  box-shadow:0 16px 45px #14263d20;
-  max-height:calc(100dvh - 140px);
-  overflow-y:auto;
-  scrollbar-width:thin;
+  width: 238px;
+  min-width: 220px;
+  gap: 3px;
+  padding: 8px;
+  border-radius: 16px;
+  border-color: var(--field-border);
+  box-shadow: 0 16px 45px #14263d20;
+  max-height: calc(100dvh - 140px);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 html body .shared-navbar .account-dropdown-heading {
-  padding:10px 12px 14px;
-  margin:0 0 4px;
-  border-bottom:1px solid var(--field-border);
-  color:var(--text-main);
-  font-size:13px;
-  font-weight:700;
-  line-height:1.6;
-  text-align:start;
+  padding: 10px 12px 14px;
+  margin: 0 0 4px;
+  border-bottom: 1px solid var(--field-border);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: start;
 }
-html body .shared-navbar .account-dropdown-heading small { display:block; margin-top:3px; font-size:11px; font-weight:400; color:var(--text-muted); }
-html body .shared-navbar .account-menu-links :is(a,button) {
-  display:flex;
-  align-items:center;
-  gap:11px;
-  width:100%;
-  min-height:42px;
-  margin:0;
-  padding:10px 12px;
-  border-radius:9px;
-  font-size:12px;
-  font-weight:500;
-  line-height:1.5;
-  transition:background .15s ease,color .15s ease;
+html body .shared-navbar .account-dropdown-heading small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
 }
-html body .shared-navbar .account-item-icon { width:18px; height:18px; flex:0 0 18px; margin:0; opacity:.8; }
-html body .shared-navbar .account-menu-links .register-link { margin-bottom:6px; }
-html body .shared-navbar .account-menu-links [data-logout] { margin-top:6px; border-top:1px solid var(--field-border); border-radius:0 0 9px 9px; color:#c43d32; }
-html body .shared-navbar .account-menu-links [data-logout]:hover { background:#d94b4110; color:#c43d32; }
-html body .shared-navbar .account-menu[open]>summary { border-color:#ff783d70; background:#ff783d0c; }
-html body .shared-navbar .account-menu[open]>summary::after { transform:rotate(180deg); }
-@media(max-width:600px) {
-  html body .shared-navbar .account-menu-links { width:224px; min-width:200px; padding:7px; }
-  html body .shared-navbar .account-menu-links :is(a,button) { min-height:42px; }
+html body .shared-navbar .account-menu-links :is(a, button) {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 42px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
-@media(prefers-reduced-motion:reduce) { html body .shared-navbar .account-menu-links :is(a,button) { transition:none; } }
+html body .shared-navbar .account-item-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+  opacity: 0.8;
+}
+html body .shared-navbar .account-menu-links .register-link {
+  margin-bottom: 6px;
+}
+html body .shared-navbar .account-menu-links [data-logout] {
+  margin-top: 6px;
+  border-top: 1px solid var(--field-border);
+  border-radius: 0 0 9px 9px;
+  color: #c43d32;
+}
+html body .shared-navbar .account-menu-links [data-logout]:hover {
+  background: #d94b4110;
+  color: #c43d32;
+}
+html body .shared-navbar .account-menu[open] > summary {
+  border-color: #ff783d70;
+  background: #ff783d0c;
+}
+html body .shared-navbar .account-menu[open] > summary::after {
+  transform: rotate(180deg);
+}
+@media (max-width: 600px) {
+  html body .shared-navbar .account-menu-links {
+    width: 224px;
+    min-width: 200px;
+    padding: 7px;
+  }
+  html body .shared-navbar .account-menu-links :is(a, button) {
+    min-height: 42px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .shared-navbar .account-menu-links :is(a, button) {
+    transition: none;
+  }
+}
 
 /* Daytime account menu keeps the same compact layout on a white surface. */
-html body .shared-navbar .account-menu-links { background:var(--surface,#fff); border-color:var(--field-border); gap:2px; padding:10px; }
-html body .shared-navbar .account-dropdown-heading { color:var(--text-main); background:none; border-color:var(--field-border); padding:8px 10px 13px; }
-html body .shared-navbar .account-dropdown-heading small { color:var(--text-muted); }
-html body .shared-navbar .account-menu-links :is(a,button) { color:var(--text-main); background:transparent; min-height:42px; border-radius:8px; padding:9px 10px; }
-html body .shared-navbar .account-menu-links .account-item-icon { width:18px; height:18px; flex:0 0 18px; color:var(--accent-text,#b6481b); opacity:1; padding:0; background:none; }
-html body .shared-navbar .account-menu-links :is(a,button):hover { background:#ff783d0c; color:var(--accent-text); }
-html body .shared-navbar .account-menu-links [data-logout] { color:#bd3c32; border-color:var(--field-border); }
+html body .shared-navbar .account-menu-links {
+  background: var(--surface, #fff);
+  border-color: var(--field-border);
+  gap: 2px;
+  padding: 10px;
+}
+html body .shared-navbar .account-dropdown-heading {
+  color: var(--text-main);
+  background: none;
+  border-color: var(--field-border);
+  padding: 8px 10px 13px;
+}
+html body .shared-navbar .account-dropdown-heading small {
+  color: var(--text-muted);
+}
+html body .shared-navbar .account-menu-links :is(a, button) {
+  color: var(--text-main);
+  background: transparent;
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+html body .shared-navbar .account-menu-links .account-item-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: var(--accent-text, #b6481b);
+  opacity: 1;
+  padding: 0;
+  background: none;
+}
+html body .shared-navbar .account-menu-links :is(a, button):hover {
+  background: #ff783d0c;
+  color: var(--accent-text);
+}
+html body .shared-navbar .account-menu-links [data-logout] {
+  color: #bd3c32;
+  border-color: var(--field-border);
+}
 /* Account menu uses one navy surface and restrained brand accents. */
-html[data-theme="dark"] body .shared-navbar .account-menu-links {
-  background:#15283e;
-  border-color:#2a4058;
-  padding:10px;
-  gap:2px;
-  box-shadow:0 16px 42px #08132330;
+html[data-theme='dark'] body .shared-navbar .account-menu-links {
+  background: #15283e;
+  border-color: #2a4058;
+  padding: 10px;
+  gap: 2px;
+  box-shadow: 0 16px 42px #08132330;
 }
-html[data-theme="dark"] body .shared-navbar .account-dropdown-heading {
-  color:#f6f8fc;
-  background:none;
-  border-color:#ffffff18;
-  padding:8px 10px 13px;
+html[data-theme='dark'] body .shared-navbar .account-dropdown-heading {
+  color: #f6f8fc;
+  background: none;
+  border-color: #ffffff18;
+  padding: 8px 10px 13px;
 }
-html[data-theme="dark"] body .shared-navbar .account-dropdown-heading small { color:#aabbd0; }
-html[data-theme="dark"] body .shared-navbar .account-menu-links :is(a,button) {
-  color:#e9eff7;
-  background:transparent;
-  min-height:42px;
-  border-radius:8px;
-  padding:9px 10px;
+html[data-theme='dark'] body .shared-navbar .account-dropdown-heading small {
+  color: #aabbd0;
 }
-html[data-theme="dark"] body .shared-navbar .account-menu-links .account-item-icon {
-  width:18px;
-  height:18px;
-  flex:0 0 18px;
-  color:#ffa578;
-  opacity:1;
-  background:none;
-  padding:0;
+html[data-theme='dark'] body .shared-navbar .account-menu-links :is(a, button) {
+  color: #e9eff7;
+  background: transparent;
+  min-height: 42px;
+  border-radius: 8px;
+  padding: 9px 10px;
 }
-html[data-theme="dark"] body .shared-navbar .account-menu-links :is(a,button):hover {
-  background:#ffffff0d;
-  color:#fff;
+html[data-theme='dark'] body .shared-navbar .account-menu-links .account-item-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: #ffa578;
+  opacity: 1;
+  background: none;
+  padding: 0;
 }
-html[data-theme="dark"] body .shared-navbar .account-menu-links .register-link { margin-bottom:5px; }
-html[data-theme="dark"] body .shared-navbar .account-menu-links [data-logout] {
-  color:#ffb5a8;
-  border-color:#ffffff18;
+html[data-theme='dark'] body .shared-navbar .account-menu-links :is(a, button):hover {
+  background: #ffffff0d;
+  color: #fff;
 }
-html[data-theme="dark"] body .shared-navbar .account-menu-links [data-logout] .account-item-icon { color:#ffb5a8; }
-html[data-theme="dark"] body .shared-navbar .account-menu-links [data-logout]:hover { color:#ffc5bc; background:#ff817112; }
-html[data-theme="dark"] body .shared-navbar .account-menu-links :is(a,button):focus-visible { outline-color:#ffab82; }
+html[data-theme='dark'] body .shared-navbar .account-menu-links .register-link {
+  margin-bottom: 5px;
+}
+html[data-theme='dark'] body .shared-navbar .account-menu-links [data-logout] {
+  color: #ffb5a8;
+  border-color: #ffffff18;
+}
+html[data-theme='dark'] body .shared-navbar .account-menu-links [data-logout] .account-item-icon {
+  color: #ffb5a8;
+}
+html[data-theme='dark'] body .shared-navbar .account-menu-links [data-logout]:hover {
+  color: #ffc5bc;
+  background: #ff817112;
+}
+html[data-theme='dark'] body .shared-navbar .account-menu-links :is(a, button):focus-visible {
+  outline-color: #ffab82;
+}

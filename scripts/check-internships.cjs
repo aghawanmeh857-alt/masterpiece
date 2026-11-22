@@ -10,13 +10,35 @@ const pageData = vm.runInNewContext(source.slice(start, runtimeStart) + '\npageD
 const runtime = source.slice(runtimeStart);
 
 class Element {
-  constructor() { this.value = ''; this.textContent = ''; this.listeners = {}; this.hidden = false; this.dataset = {}; this.attributes = {}; }
-  set innerHTML(value) { this.html = value; }
-  get innerHTML() { return this.html ?? this.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-  addEventListener(name, fn) { (this.listeners[name] ||= []).push(fn); }
-  fire(name, event = {}) { for (const fn of this.listeners[name] || []) fn(event); }
-  setAttribute(name, value) { this.attributes[name] = value; }
-  querySelector() { return null; }
+  constructor() {
+    this.value = '';
+    this.textContent = '';
+    this.listeners = {};
+    this.hidden = false;
+    this.dataset = {};
+    this.attributes = {};
+  }
+  set innerHTML(value) {
+    this.html = value;
+  }
+  get innerHTML() {
+    return (
+      this.html ??
+      this.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    );
+  }
+  addEventListener(name, fn) {
+    (this.listeners[name] ||= []).push(fn);
+  }
+  fire(name, event = {}) {
+    for (const fn of this.listeners[name] || []) fn(event);
+  }
+  setAttribute(name, value) {
+    this.attributes[name] = value;
+  }
+  querySelector() {
+    return null;
+  }
   append() {}
   after() {}
   focus() {}
@@ -25,32 +47,62 @@ class Element {
 }
 
 async function fixture(memory = new Map(), blocked = false) {
-  const elements = new Map([...html.matchAll(/\bid="([^"]+)"/g)].map(match => [match[1], new Element()]));
+  const elements = new Map(
+    [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => [match[1], new Element()])
+  );
   elements.get('sortBy').value = 'recent';
-  elements.get('filterForm').reset = () => { for (const id of ['category', 'location', 'itemType', 'extra']) elements.get(id).value = ''; };
+  elements.get('filterForm').reset = () => {
+    for (const id of ['category', 'location', 'itemType', 'extra']) elements.get(id).value = '';
+  };
   let modalOpens = 0;
   const context = vm.createContext({
-    pageData, console, URL,
-    location: {search: '', href: 'https://ofoq.example/Internships/internships.html'},
-    window: {componentsReady: Promise.resolve(), OfoqPublishers: {card: () => '', forRecord: () => ({})}},
-    document: {getElementById: id => elements.get(id), createElement: () => new Element(), documentElement: {dataset: {theme: 'light'}}},
-    localStorage: {
-      getItem(key) { if (blocked) throw Error('blocked'); return memory.get(key) || null; },
-      setItem(key, value) { if (blocked) throw Error('blocked'); memory.set(key, value); }
+    pageData,
+    console,
+    URL,
+    location: { search: '', href: 'https://ofoq.example/Internships/internships.html' },
+    window: {
+      componentsReady: Promise.resolve(),
+      OfoqPublishers: { card: () => '', forRecord: () => ({}) }
     },
-    bootstrap: {Modal: {getOrCreateInstance: () => ({show() { modalOpens++; }})}},
-    matchMedia: () => ({matches: true}), addEventListener() {}
+    document: {
+      getElementById: (id) => elements.get(id),
+      createElement: () => new Element(),
+      documentElement: { dataset: { theme: 'light' } }
+    },
+    localStorage: {
+      getItem(key) {
+        if (blocked) throw Error('blocked');
+        return memory.get(key) || null;
+      },
+      setItem(key, value) {
+        if (blocked) throw Error('blocked');
+        memory.set(key, value);
+      }
+    },
+    bootstrap: {
+      Modal: {
+        getOrCreateInstance: () => ({
+          show() {
+            modalOpens++;
+          }
+        })
+      }
+    },
+    matchMedia: () => ({ matches: true }),
+    addEventListener() {}
   });
   context.window.OfoqFrontend = { memory: context.localStorage };
   vm.runInContext(runtime, context);
   await new Promise(setImmediate);
-  const get = id => elements.get(id);
+  const get = (id) => elements.get(id);
   const count = () => (get('itemList').innerHTML.match(/class="listing-card"/g) || []).length;
   function save(id) {
-    const button = {dataset: {saveId: id}};
-    get('itemList').fire('click', {target: {closest: selector => selector === 'button[data-save-id]' ? button : null}});
+    const button = { dataset: { saveId: id } };
+    get('itemList').fire('click', {
+      target: { closest: (selector) => (selector === 'button[data-save-id]' ? button : null) }
+    });
   }
-  return {get, count, save, memory, modalOpens: () => modalOpens};
+  return { get, count, save, memory, modalOpens: () => modalOpens };
 }
 
 (async () => {
@@ -90,5 +142,10 @@ async function fixture(memory = new Map(), blocked = false) {
   const corrupt = await fixture(new Map([['ofoq-saved-internships-v1', '{invalid']]));
   assert.equal(corrupt.count(), 4);
   assert.equal(corrupt.get('savedCount').textContent, 0);
-  console.log('Passed: internship cards/routes, instant search and filters, favorites toggle/count/reload, application isolation, empty states and storage fallbacks.');
-})().catch(error => { console.error(error); process.exitCode = 1; });
+  console.log(
+    'Passed: internship cards/routes, instant search and filters, favorites toggle/count/reload, application isolation, empty states and storage fallbacks.'
+  );
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

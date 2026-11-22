@@ -9,6 +9,6 @@ export function doorProximity(camera, doorway) {
 }
 
 export function advanceDoor(current, target, dt, reducedMotion = false) {
-  if (reducedMotion || Math.abs(target - current) < .001) return target;
-  return current + (target - current) * (1 - Math.exp(-Math.max(0, Math.min(dt, .2)) / .16));
+  if (reducedMotion || Math.abs(target - current) < 0.001) return target;
+  return current + (target - current) * (1 - Math.exp(-Math.max(0, Math.min(dt, 0.2)) / 0.16));
 }

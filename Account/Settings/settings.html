@@ -1,66 +1,119 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <script src="../../assets/frontend-runtime.js"></script>
-  <script src="../../assets/platform-data.js"></script>
-  <meta charset="UTF-8">
-    
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1526">
-  <title>الإعدادات — سعي</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
-  
-  
-  
-  <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg">
-    
-  <link rel="stylesheet" href="../../assets/site-base.css">
-<link rel="stylesheet" href="settings.css">
-  <link rel="stylesheet" href="../../assets/arabic-ui.css">
-  <script defer src="../../assets/arabic-ui.js"></script>
-  <script defer src="../../assets/demo-auth.js"></script>
-<link rel="stylesheet" href="../../assets/cards.css">
-<link rel="stylesheet" href="../../assets/fonts.css">
-  <link rel="stylesheet" href="../../assets/popup-ui.css">
-  <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6">
-</head>
-<body data-section="lobby" data-page="settings">
-  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-  <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
-  <main id="mainContent" tabindex="-1" class="container-xl account-page">
-    <div class="account-heading">
-      <div><p class="eyebrow mb-3">سعي / مساحتي</p><h1>مساحتك. <em>وتفضيلاتك.</em></h1></div>
-      <a class="btn btn-orange" href="../Profile/profile.html">ملفي الشخصي ←</a>
-    </div>
-    <p class="preview-note">عدّل بياناتك وتفضيلاتك خلال هذه الزيارة؛ تظهر التعديلات في ملفك الشخصي ولا تُحفظ بعد تحديث الصفحة.</p>
-    <section class="account-panel settings-shell" aria-label="إعدادات توضيحية">
-      <form autocomplete="off" id="settingsForm" novalidate>
-        <fieldset class="settings-group">
-          <legend>بيانات الحساب</legend>
-          <div class="form-row">
-            <div class="field"><label for="settingsName">الاسم الظاهر</label><input id="settingsName" class="form-control" dir="auto" value="أليكس مورغان" autocomplete="name" minlength="2" maxlength="80" required></div>
-            <div class="field"><label for="settingsEmail">البريد الإلكتروني</label><input id="settingsEmail" class="form-control" type="email" value="alex@example.com" autocomplete="email" maxlength="200" required dir="ltr"></div>
-          </div>
-          <div class="field"><label for="settingsAvailability">حالة التفرّغ</label><select id="settingsAvailability" class="form-select"><option>متاح للعمل الحر</option><option>أبحث عن وظيفة</option><option>غير متاح حاليًا</option></select></div>
-        </fieldset>
-        <fieldset class="settings-group">
-          <legend>تفضيلات الإشعارات</legend>
-          <label class="settings-option"><input type="checkbox" id="projectUpdates" checked><span>تحديثات المشاريع<small>تفضيل توضيحي لإشعارات النشاط على مشاريعك.</small></span></label>
-          <label class="settings-option"><input type="checkbox" id="courseUpdates" checked><span>تذكيرات التعلّم<small>تفضيل توضيحي للمسارات وورش العمل.</small></span></label>
-          <label class="settings-option"><input type="checkbox" id="communityUpdates"><span>أخبار المجتمع<small>تفضيل توضيحي للفعاليات والفرص الجديدة.</small></span></label>
-        </fieldset>
-        <div class="form-actions"><button class="btn btn-orange" type="submit">تطبيق التغييرات</button><button id="resetSettings" class="text-button" type="button">إلغاء التعديلات</button></div>
-        <p id="settingsStatus" class="profile-status" role="status"></p>
-      </form>
-    </section>
-  </main>
-  <footer class="page-footer container-xl">
-  <span>© SAEI <span id="year"></span></span>
-  <a data-room-link href="../../hero/userHero.html#lobby">العودة إلى قسم <span data-room-name>الرئيسية</span>  <span aria-hidden="true">↗</span></a>
-</footer>
-  
-  
-  <script src="../../assets/theme.js"></script>
-<script src="settings.js"></script>
-</body>
+  <head>
+    <script src="../../assets/frontend-runtime.js"></script>
+    <script src="../../assets/platform-data.js"></script>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1526" />
+    <title>الإعدادات — سعي</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+    />
+
+    <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg" />
+
+    <link rel="stylesheet" href="../../assets/site-base.css" />
+    <link rel="stylesheet" href="settings.css" />
+    <link rel="stylesheet" href="../../assets/arabic-ui.css" />
+    <script defer src="../../assets/arabic-ui.js"></script>
+    <script defer src="../../assets/demo-auth.js"></script>
+    <link rel="stylesheet" href="../../assets/cards.css" />
+    <link rel="stylesheet" href="../../assets/fonts.css" />
+    <link rel="stylesheet" href="../../assets/popup-ui.css" />
+    <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6" />
+  </head>
+  <body data-section="lobby" data-page="settings">
+    <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+    <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
+    <main id="mainContent" tabindex="-1" class="container-xl account-page">
+      <div class="account-heading">
+        <div
+          ><p class="eyebrow mb-3">سعي / مساحتي</p><h1>مساحتك. <em>وتفضيلاتك.</em></h1></div
+        >
+        <a class="btn btn-orange" href="../Profile/profile.html">ملفي الشخصي ←</a>
+      </div>
+      <p class="preview-note"
+        >عدّل بياناتك وتفضيلاتك خلال هذه الزيارة؛ تظهر التعديلات في ملفك الشخصي ولا تُحفظ بعد تحديث
+        الصفحة.</p
+      >
+      <section class="account-panel settings-shell" aria-label="إعدادات توضيحية">
+        <form autocomplete="off" id="settingsForm" novalidate>
+          <fieldset class="settings-group">
+            <legend>بيانات الحساب</legend>
+            <div class="form-row">
+              <div class="field"
+                ><label for="settingsName">الاسم الظاهر</label
+                ><input
+                  id="settingsName"
+                  class="form-control"
+                  dir="auto"
+                  value="أليكس مورغان"
+                  autocomplete="name"
+                  minlength="2"
+                  maxlength="80"
+                  required
+              /></div>
+              <div class="field"
+                ><label for="settingsEmail">البريد الإلكتروني</label
+                ><input
+                  id="settingsEmail"
+                  class="form-control"
+                  type="email"
+                  value="alex@example.com"
+                  autocomplete="email"
+                  maxlength="200"
+                  required
+                  dir="ltr"
+              /></div>
+            </div>
+            <div class="field"
+              ><label for="settingsAvailability">حالة التفرّغ</label
+              ><select id="settingsAvailability" class="form-select"
+                ><option>متاح للعمل الحر</option
+                ><option>أبحث عن وظيفة</option
+                ><option>غير متاح حاليًا</option></select
+              ></div
+            >
+          </fieldset>
+          <fieldset class="settings-group">
+            <legend>تفضيلات الإشعارات</legend>
+            <label class="settings-option"
+              ><input type="checkbox" id="projectUpdates" checked /><span
+                >تحديثات المشاريع<small>تفضيل توضيحي لإشعارات النشاط على مشاريعك.</small></span
+              ></label
+            >
+            <label class="settings-option"
+              ><input type="checkbox" id="courseUpdates" checked /><span
+                >تذكيرات التعلّم<small>تفضيل توضيحي للمسارات وورش العمل.</small></span
+              ></label
+            >
+            <label class="settings-option"
+              ><input type="checkbox" id="communityUpdates" /><span
+                >أخبار المجتمع<small>تفضيل توضيحي للفعاليات والفرص الجديدة.</small></span
+              ></label
+            >
+          </fieldset>
+          <div class="form-actions"
+            ><button class="btn btn-orange" type="submit">تطبيق التغييرات</button
+            ><button id="resetSettings" class="text-button" type="button"
+              >إلغاء التعديلات</button
+            ></div
+          >
+          <p id="settingsStatus" class="profile-status" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <footer class="page-footer container-xl">
+      <span>© SAEI <span id="year"></span></span>
+      <a data-room-link href="../../hero/userHero.html#lobby"
+        >العودة إلى قسم <span data-room-name>الرئيسية</span> <span aria-hidden="true">↗</span></a
+      >
+    </footer>
+
+    <script src="../../assets/theme.js"></script>
+    <script src="settings.js"></script>
+  </body>
 </html>

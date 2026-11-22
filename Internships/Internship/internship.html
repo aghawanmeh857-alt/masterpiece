@@ -1,76 +1,154 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <script src="../../assets/frontend-runtime.js"></script>
-  <script src="../../assets/platform-data.js"></script>
-  <meta charset="UTF-8">
-    
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b1526">
-  <title>تفاصيل التدريب — سعي</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css">
-  
-  
-  
-  <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg">
-    
-  <link rel="stylesheet" href="../../assets/site-base.css">
-<link rel="stylesheet" href="../../assets/detail-page.css">
-  <link rel="stylesheet" href="../../assets/arabic-ui.css">
-  <link rel="stylesheet" href="detail-layout.css">
-  <script src="../../assets/publishers.js"></script>
-  <script defer src="../../assets/arabic-ui.js"></script>
-  <script defer src="../../assets/demo-auth.js"></script>
-<link rel="stylesheet" href="../../assets/cards.css">
-<link rel="stylesheet" href="../../assets/fonts.css">
-  <link rel="stylesheet" href="../../assets/popup-ui.css">
-  <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6">
-<link rel="stylesheet" href="../../assets/payment.css">
-</head>
-<body data-section="internships" data-kind="internship">
-  <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-  <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
-  <main id="mainContent" tabindex="-1" class="container-xl account-page">
-    <a class="details-link mb-4" href="../internships.html">→ العودة إلى فرص التدريب</a>
-    <p class="preview-note">فرصة توضيحية. يمكنك تجربة نموذج التقديم؛ لا يُرسل طلب فعلي ولا تُحفظ معلوماتك.</p>
-    <section id="notFound" class="account-panel" tabindex="-1" hidden>
-      <h1>لم نعثر على هذا العنصر.</h1><p>استخدم الرابط بالأعلى لاختيار عنصر من القائمة.</p>
-    </section>
-    <div id="detailContent">
-      <section class="account-heading internship-detail-heading" aria-labelledby="detailTitle">
-        <div><p class="eyebrow">سعي / تفاصيل فرصة التدريب</p><h1 id="detailTitle">جارٍ تحميل التفاصيل…</h1><p id="detailDescription"></p></div>
-        <a href="#internshipApplication" class="btn btn-orange application-shortcut">قدّم على فرصة التدريب ↓</a>
+  <head>
+    <script src="../../assets/frontend-runtime.js"></script>
+    <script src="../../assets/platform-data.js"></script>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1526" />
+    <title>تفاصيل التدريب — سعي</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
+    />
+
+    <link rel="icon" type="image/png" href="../../assets/branding/saei-logo.svg" />
+
+    <link rel="stylesheet" href="../../assets/site-base.css" />
+    <link rel="stylesheet" href="../../assets/detail-page.css" />
+    <link rel="stylesheet" href="../../assets/arabic-ui.css" />
+    <link rel="stylesheet" href="detail-layout.css" />
+    <script src="../../assets/publishers.js"></script>
+    <script defer src="../../assets/arabic-ui.js"></script>
+    <script defer src="../../assets/demo-auth.js"></script>
+    <link rel="stylesheet" href="../../assets/cards.css" />
+    <link rel="stylesheet" href="../../assets/fonts.css" />
+    <link rel="stylesheet" href="../../assets/popup-ui.css" />
+    <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6" />
+    <link rel="stylesheet" href="../../assets/payment.css" />
+  </head>
+  <body data-section="internships" data-kind="internship">
+    <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
+    <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
+    <main id="mainContent" tabindex="-1" class="container-xl account-page">
+      <a class="details-link mb-4" href="../internships.html">→ العودة إلى فرص التدريب</a>
+      <p class="preview-note"
+        >فرصة توضيحية. يمكنك تجربة نموذج التقديم؛ لا يُرسل طلب فعلي ولا تُحفظ معلوماتك.</p
+      >
+      <section id="notFound" class="account-panel" tabindex="-1" hidden>
+        <h1>لم نعثر على هذا العنصر.</h1><p>استخدم الرابط بالأعلى لاختيار عنصر من القائمة.</p>
       </section>
-      <div class="detail-grid internship-information">
-        <div class="account-stack internship-main-details">
-          <section class="account-panel" aria-labelledby="tasksTitle"><h2 id="tasksTitle">ما الذي ستعمل عليه؟</h2><ul id="detailTasks" class="detail-list"></ul></section>
-          <section class="account-panel" aria-labelledby="requirementsTitle"><h2 id="requirementsTitle">المهارات والمتطلبات</h2><ul id="detailRequirements" class="detail-list"></ul></section>
-        </div>
-        <aside class="account-panel internship-facts" aria-labelledby="factsTitle"><h2 id="factsTitle">معلومات التدريب</h2><dl id="detailFacts" class="detail-facts"></dl><a href="#internshipApplication" class="details-link">انتقل إلى نموذج التقديم ↓</a></aside>
-      </div>
-      <section class="account-panel internship-application" id="internshipApplication" aria-labelledby="previewFormTitle">
-        <div class="application-heading"><div><p class="eyebrow">خطوتك الأولى / عرّف عن نفسك</p><h2 id="previewFormTitle">التقديم على فرصة التدريب</h2><p>أضف معلوماتك واهتمامك بالتدريب، ثم تابع طلبك من لوحة حسابك.</p></div><span class="application-demo-label">معاينة تجريبية</span></div>
-        <form autocomplete="off" id="previewForm" novalidate>
-          <div class="application-fields">
-            <div class="field"><label for="previewName">الاسم الكامل</label><input id="previewName" class="form-control" dir="auto" autocomplete="name" placeholder="اكتب اسمك الكامل" minlength="2" maxlength="80" required></div>
-            <div class="field"><label for="previewEmail">البريد الإلكتروني</label><input id="previewEmail" class="form-control" type="email" autocomplete="email" placeholder="name@example.com" maxlength="200" required dir="ltr"></div>
-            <div id="messageField" class="field application-message"><label for="previewMessage">لماذا أنت مهتم بهذه الفرصة؟</label><textarea id="previewMessage" class="form-control" dir="auto" rows="4" maxlength="1000" placeholder="احكِ لنا عن مهاراتك وما تتطلّع لتعلّمه خلال التدريب…" required></textarea><small>حتى 1000 حرف. لا تُحفظ أو تُرسل معلوماتك.</small></div>
+      <div id="detailContent">
+        <section class="account-heading internship-detail-heading" aria-labelledby="detailTitle">
+          <div
+            ><p class="eyebrow">سعي / تفاصيل فرصة التدريب</p
+            ><h1 id="detailTitle">جارٍ تحميل التفاصيل…</h1><p id="detailDescription"></p
+          ></div>
+          <a href="#internshipApplication" class="btn btn-orange application-shortcut"
+            >قدّم على فرصة التدريب ↓</a
+          >
+        </section>
+        <div class="detail-grid internship-information">
+          <div class="account-stack internship-main-details">
+            <section class="account-panel" aria-labelledby="tasksTitle"
+              ><h2 id="tasksTitle">ما الذي ستعمل عليه؟</h2
+              ><ul id="detailTasks" class="detail-list"></ul
+            ></section>
+            <section class="account-panel" aria-labelledby="requirementsTitle"
+              ><h2 id="requirementsTitle">المهارات والمتطلبات</h2
+              ><ul id="detailRequirements" class="detail-list"></ul
+            ></section>
           </div>
-          <div class="application-footer"><button class="btn btn-orange" type="submit">تأكيد التقديم ←</button><p>نموذج تجريبي؛ لا يُرسل طلب فعلي إلى الجهة.</p></div>
-        </form>
-        <div id="previewSuccess" class="internship-application-success" role="status" tabindex="-1" hidden><span aria-hidden="true">✓</span><h3>اكتملت معاينة طلبك</h3><p>اجتازت البيانات التحقق ثم مُسحت دون حفظ أو إرسال.</p><button id="previewAgain" class="btn btn-orange" type="button">تجربة النموذج مجددًا</button></div>
-      </section>
-    </div>
-  </main>
-  <footer class="page-footer container-xl">
-  <span>© SAEI <span id="year"></span></span>
-  <a data-room-link href="../../hero/userHero.html#internships">العودة إلى قسم <span data-room-name>فرص التدريب</span>  <span aria-hidden="true">↗</span></a>
-</footer>
-  
-  
-  
-  <script src="../../assets/payment.js"></script>
-<script src="../../assets/theme.js"></script>
-<script src="internship.js"></script>
-</body>
+          <aside class="account-panel internship-facts" aria-labelledby="factsTitle"
+            ><h2 id="factsTitle">معلومات التدريب</h2><dl id="detailFacts" class="detail-facts"></dl
+            ><a href="#internshipApplication" class="details-link"
+              >انتقل إلى نموذج التقديم ↓</a
+            ></aside
+          >
+        </div>
+        <section
+          class="account-panel internship-application"
+          id="internshipApplication"
+          aria-labelledby="previewFormTitle"
+        >
+          <div class="application-heading"
+            ><div
+              ><p class="eyebrow">خطوتك الأولى / عرّف عن نفسك</p
+              ><h2 id="previewFormTitle">التقديم على فرصة التدريب</h2
+              ><p>أضف معلوماتك واهتمامك بالتدريب، ثم تابع طلبك من لوحة حسابك.</p></div
+            ><span class="application-demo-label">معاينة تجريبية</span></div
+          >
+          <form autocomplete="off" id="previewForm" novalidate>
+            <div class="application-fields">
+              <div class="field"
+                ><label for="previewName">الاسم الكامل</label
+                ><input
+                  id="previewName"
+                  class="form-control"
+                  dir="auto"
+                  autocomplete="name"
+                  placeholder="اكتب اسمك الكامل"
+                  minlength="2"
+                  maxlength="80"
+                  required
+              /></div>
+              <div class="field"
+                ><label for="previewEmail">البريد الإلكتروني</label
+                ><input
+                  id="previewEmail"
+                  class="form-control"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="name@example.com"
+                  maxlength="200"
+                  required
+                  dir="ltr"
+              /></div>
+              <div id="messageField" class="field application-message"
+                ><label for="previewMessage">لماذا أنت مهتم بهذه الفرصة؟</label
+                ><textarea
+                  id="previewMessage"
+                  class="form-control"
+                  dir="auto"
+                  rows="4"
+                  maxlength="1000"
+                  placeholder="احكِ لنا عن مهاراتك وما تتطلّع لتعلّمه خلال التدريب…"
+                  required
+                ></textarea
+                ><small>حتى 1000 حرف. لا تُحفظ أو تُرسل معلوماتك.</small></div
+              >
+            </div>
+            <div class="application-footer"
+              ><button class="btn btn-orange" type="submit">تأكيد التقديم ←</button
+              ><p>نموذج تجريبي؛ لا يُرسل طلب فعلي إلى الجهة.</p></div
+            >
+          </form>
+          <div
+            id="previewSuccess"
+            class="internship-application-success"
+            role="status"
+            tabindex="-1"
+            hidden
+            ><span aria-hidden="true">✓</span><h3>اكتملت معاينة طلبك</h3
+            ><p>اجتازت البيانات التحقق ثم مُسحت دون حفظ أو إرسال.</p
+            ><button id="previewAgain" class="btn btn-orange" type="button"
+              >تجربة النموذج مجددًا</button
+            ></div
+          >
+        </section>
+      </div>
+    </main>
+    <footer class="page-footer container-xl">
+      <span>© SAEI <span id="year"></span></span>
+      <a data-room-link href="../../hero/userHero.html#internships"
+        >العودة إلى قسم <span data-room-name>فرص التدريب</span>
+        <span aria-hidden="true">↗</span></a
+      >
+    </footer>
+
+    <script src="../../assets/payment.js"></script>
+    <script src="../../assets/theme.js"></script>
+    <script src="internship.js"></script>
+  </body>
 </html>

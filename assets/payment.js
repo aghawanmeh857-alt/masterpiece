@@ -39,17 +39,24 @@
   const summaryTitle = document.createElement('h3');
   summaryTitle.textContent = 'ملخص الطلب';
   summary.append(summaryTitle, dialog.querySelector('.payment-summary'));
-  for (const selector of ['.payment-billing', '.payment-methods', '.payment-card-fields', '.payment-hint']) details.append(dialog.querySelector(selector));
-  for (const selector of ['.payment-notice', '.payment-status', '.payment-actions']) summary.append(dialog.querySelector(selector));
+  for (const selector of [
+    '.payment-billing',
+    '.payment-methods',
+    '.payment-card-fields',
+    '.payment-hint'
+  ])
+    details.append(dialog.querySelector(selector));
+  for (const selector of ['.payment-notice', '.payment-status', '.payment-actions'])
+    summary.append(dialog.querySelector(selector));
   layout.append(details, summary);
   dialog.append(layout);
-  const get = id => dialog.querySelector('#' + id);
+  const get = (id) => dialog.querySelector('#' + id);
   let opener = null;
   let completion = null;
   let orderRecorded = false;
   let orderItems = [];
   window.OfoqPayment = {
-    open({title, amount, kind = 'رسوم المشاركة', onComplete, items = []}) {
+    open({ title, amount, kind = 'رسوم المشاركة', onComplete, items = [] }) {
       const trigger = document.createElement('button');
       trigger.dataset.paymentAmount = String(amount);
       trigger.dataset.paymentTitle = title;
@@ -70,7 +77,8 @@
     dialog.querySelector('.payment-cancel').textContent = 'إلغاء';
     get('paymentKind').textContent = trigger.dataset.paymentKind || 'تفاصيل الدفع';
     get('paymentItem').textContent = trigger.dataset.paymentTitle;
-    get('paymentAmount').textContent = new Intl.NumberFormat('ar-JO', {maximumFractionDigits: 2}).format(amount) + ' دولار';
+    get('paymentAmount').textContent =
+      new Intl.NumberFormat('ar-JO', { maximumFractionDigits: 2 }).format(amount) + ' دولار';
     dialog.querySelector('[value="card"]').checked = true;
     get('paymentCardPreview').hidden = false;
     for (const id of ['billingName', 'billingAddress', 'billingInvoiceName']) get(id).value = '';
@@ -81,46 +89,85 @@
     dialog.showModal();
   }
 
-  document.addEventListener('click', event => {
+  document.addEventListener('click', (event) => {
     const trigger = event.target.closest('button[data-payment-title]');
     if (!trigger) return;
     event.preventDefault();
     const modal = trigger.closest('.modal.show');
     if (modal && window.bootstrap) {
-      modal.addEventListener('hidden.bs.modal', () => openPayment(trigger), {once: true});
+      modal.addEventListener('hidden.bs.modal', () => openPayment(trigger), { once: true });
       window.bootstrap.Modal.getInstance(modal).hide();
     } else openPayment(trigger);
   });
-  dialog.addEventListener('change', event => {
+  dialog.addEventListener('change', (event) => {
     if (event.target.name !== 'paymentMethod') return;
     get('paymentCardPreview').hidden = event.target.value !== 'card';
-    get('paymentMethodHint').textContent = event.target.value === 'card' ? 'يمكنك استخدام بطاقة Visa أو Mastercard.' : 'ستُكمل الدفع من محفظتك عند تفعيل خدمة الدفع.';
+    get('paymentMethodHint').textContent =
+      event.target.value === 'card'
+        ? 'يمكنك استخدام بطاقة Visa أو Mastercard.'
+        : 'ستُكمل الدفع من محفظتك عند تفعيل خدمة الدفع.';
     get('paymentStatus').hidden = true;
   });
   dialog.querySelector('.payment-continue').addEventListener('click', () => {
     if (dialog.querySelector('.payment-continue').disabled) return;
     const card = dialog.querySelector('[value="card"]').checked;
-    if(!orderRecorded){window.OfoqFrontend.recordOrder?.({title:opener.dataset.paymentTitle,amount:Number(opener.dataset.paymentAmount),method:card?'card':'wallet',items:orderItems.length?orderItems:[{kind:'events',id:opener.closest('[data-item]')?.dataset.item || new URLSearchParams(location.search).get('id')}]});orderRecorded=true;}
-    if (completion) {
-      const finish = completion; completion = null;
-      dialog.close(); finish(); return;
+    if (!orderRecorded) {
+      window.OfoqFrontend.recordOrder?.({
+        title: opener.dataset.paymentTitle,
+        amount: Number(opener.dataset.paymentAmount),
+        method: card ? 'card' : 'wallet',
+        items: orderItems.length
+          ? orderItems
+          : [
+              {
+                kind: 'events',
+                id:
+                  opener.closest('[data-item]')?.dataset.item ||
+                  new URLSearchParams(location.search).get('id')
+              }
+            ]
+      });
+      orderRecorded = true;
     }
-    const id = opener.closest('[data-item]')?.dataset.item || new URLSearchParams(location.search).get('id') || opener.dataset.paymentTitle;
-    const path = new URL('../Events/Event/event.html', [...document.scripts].find(script => script.src.endsWith('/assets/payment.js')).src);
+    if (completion) {
+      const finish = completion;
+      completion = null;
+      dialog.close();
+      finish();
+      return;
+    }
+    const id =
+      opener.closest('[data-item]')?.dataset.item ||
+      new URLSearchParams(location.search).get('id') ||
+      opener.dataset.paymentTitle;
+    const path = new URL(
+      '../Events/Event/event.html',
+      [...document.scripts].find((script) => script.src.endsWith('/assets/payment.js')).src
+    );
     path.searchParams.set('id', id);
     window.OfoqFrontend.register(id, opener.dataset.paymentTitle, path.href);
-    get('paymentStatus').textContent = 'تم تأكيد التسجيل ضمن التجربة باستخدام ' + (card ? 'البطاقة البنكية.' : 'المحفظة الإلكترونية.') + ' لم يُخصم أي مبلغ. تجد الفعالية في لوحة متابعتك.';
+    get('paymentStatus').textContent =
+      'تم تأكيد التسجيل ضمن التجربة باستخدام ' +
+      (card ? 'البطاقة البنكية.' : 'المحفظة الإلكترونية.') +
+      ' لم يُخصم أي مبلغ. تجد الفعالية في لوحة متابعتك.';
     get('paymentStatus').hidden = false;
     opener.textContent = '✓ مسجّل';
     dialog.querySelector('.payment-continue').disabled = true;
     dialog.querySelector('.payment-continue').textContent = '✓ تم التسجيل';
     dialog.querySelector('.payment-cancel').textContent = 'إغلاق';
   });
-  for (const button of dialog.querySelectorAll('.payment-close, .payment-cancel')) button.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', event => {
+  for (const button of dialog.querySelectorAll('.payment-close, .payment-cancel'))
+    button.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    )
+      dialog.close();
   });
   dialog.addEventListener('close', () => {
     get('paymentStatus').textContent = '';

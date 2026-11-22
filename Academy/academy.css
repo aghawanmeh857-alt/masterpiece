@@ -1,13 +1,23 @@
-
 /* academy.css */
 /* أساس الثيم والنافبار والفلاتر من صفحة Freelance. */
 
 /* Native anchors work with keyboard navigation and without JavaScript. */
-html { scroll-behavior: smooth; }
-#trainingCourses { scroll-margin-top: 24px; }
-.training-courses-title { margin: 0 0 18px; font-size: 24px; font-weight: 800; line-height: 1.6; }
+html {
+  scroll-behavior: smooth;
+}
+#trainingCourses {
+  scroll-margin-top: 24px;
+}
+.training-courses-title {
+  margin: 0 0 18px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.6;
+}
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Shared page foundation: assets/site-base.css */
@@ -18,7 +28,7 @@ html { scroll-behavior: smooth; }
   grid-template-columns: 1.1fr 1fr;
   gap: 32px;
   padding: 34px 38px;
-  background: radial-gradient(ellipse at 90% 50%,#ff783d13,transparent 65%),var(--surface);
+  background: radial-gradient(ellipse at 90% 50%, #ff783d13, transparent 65%), var(--surface);
   overflow: hidden;
 }
 
@@ -29,7 +39,7 @@ html { scroll-behavior: smooth; }
   letter-spacing: -1px;
 }
 
-.featured-copy>p:not(.eyebrow) {
+.featured-copy > p:not(.eyebrow) {
   max-width: 440px;
   color: var(--muted);
   line-height: 1.9;
@@ -60,7 +70,8 @@ html { scroll-behavior: smooth; }
   min-width: 0;
 }
 
-.art-label,.art-note {
+.art-label,
+.art-note {
   font-size: 8px;
   letter-spacing: 2px;
   color: var(--muted);
@@ -95,11 +106,11 @@ html { scroll-behavior: smooth; }
 }
 
 .window-dots i:nth-child(2) {
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .window-dots i:nth-child(3) {
-  opacity: .25;
+  opacity: 0.25;
 }
 
 .window-dots span {
@@ -134,25 +145,25 @@ html { scroll-behavior: smooth; }
   border-radius: 6px;
 }
 
-.art-progress span:nth-child(n+4) {
+.art-progress span:nth-child(n + 4) {
   background: var(--surface-raised);
 }
 
 .academy-stats {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   padding: 26px 0 30px;
 }
 
-.academy-stats>div {
+.academy-stats > div {
   display: flex;
   flex-direction: column;
   gap: 6px;
   border-right: 1px solid var(--border);
 }
 
-.academy-stats>div:last-child {
+.academy-stats > div:last-child {
   border: 0;
 }
 
@@ -169,7 +180,7 @@ html { scroll-behavior: smooth; }
 /* بطاقات المسارات */
 .course-grid {
   display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -180,7 +191,9 @@ html { scroll-behavior: smooth; }
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--panel);
-  transition: border-color .2s,transform .2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .course-card:hover {
@@ -195,19 +208,19 @@ html { scroll-behavior: smooth; }
   display: flex;
   align-items: center;
   gap: 17px;
-  background: linear-gradient(120deg,#ff783d1a,var(--surface-raised));
+  background: linear-gradient(120deg, #ff783d1a, var(--surface-raised));
 }
 
 .course-cover.design {
-  background: linear-gradient(120deg,#62b5ff1a,var(--surface-raised));
+  background: linear-gradient(120deg, #62b5ff1a, var(--surface-raised));
 }
 
 .course-cover.marketing {
-  background: linear-gradient(120deg,#ad91ff1a,var(--surface-raised));
+  background: linear-gradient(120deg, #ad91ff1a, var(--surface-raised));
 }
 
 .course-cover.career {
-  background: linear-gradient(120deg,#46d2ab1a,var(--surface-raised));
+  background: linear-gradient(120deg, #46d2ab1a, var(--surface-raised));
 }
 
 .course-symbol {
@@ -249,7 +262,7 @@ html { scroll-behavior: smooth; }
   font-size: 17px;
 }
 
-.save-course[aria-pressed=true] {
+.save-course[aria-pressed='true'] {
   color: var(--orange);
   border-color: #ff783d88;
 }
@@ -370,7 +383,7 @@ html { scroll-behavior: smooth; }
 /* أحجام الشاشات الصغيرة */
 @media (max-width: 991px) {
   /* القسم التعريفي */
-.featured-path {
+  .featured-path {
     padding: 28px;
     gap: 20px;
   }
@@ -380,15 +393,14 @@ html { scroll-behavior: smooth; }
   }
 
   /* بطاقات المسارات */
-.course-grid {
+  .course-grid {
     grid-template-columns: 1fr;
   }
-
 }
 
 @media (max-width: 767px) {
   /* القسم التعريفي */
-.featured-path {
+  .featured-path {
     grid-template-columns: 1fr;
     padding: 24px;
   }
@@ -423,20 +435,19 @@ html { scroll-behavior: smooth; }
   }
 
   /* بطاقات المسارات */
-.course-grid {
-    grid-template-columns: repeat(2,minmax(0,1fr));
+  .course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .enroll-fields {
     grid-template-columns: 1fr;
     gap: 0;
   }
-
 }
 
 @media (max-width: 540px) {
   /* بطاقات المسارات */
-.course-grid {
+  .course-grid {
     grid-template-columns: 1fr;
   }
 
@@ -453,7 +464,7 @@ html { scroll-behavior: smooth; }
     gap: 14px;
   }
 
-  .academy-stats>div {
+  .academy-stats > div {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -469,15 +480,11 @@ html { scroll-behavior: smooth; }
   .filter-panel .btn {
     font-size: 10px;
   }
-
 }
 
-.cover-caption  {
+.cover-caption {
   white-space: pre-line;
 }
-
-
-
 
 /* details.css */
 /* Small additions to the shared account-page layout. */
@@ -553,7 +560,7 @@ html { scroll-behavior: smooth; }
 }
 
 .lesson-list input {
-  accent-color: #FF783D;
+  accent-color: #ff783d;
 }
 
 .detail-comment {
@@ -593,7 +600,6 @@ html { scroll-behavior: smooth; }
   }
 }
 
-
 /* theme.css */
 /* Shared colors: day is light; night keeps SAEI navy and orange. */
 :root {
@@ -614,7 +620,7 @@ html { scroll-behavior: smooth; }
   --green-text: #147454;
   --night-overlay: 0;
 }
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   color-scheme: dark;
   --page-bg: #0b1526;
   --page-rgb: 11, 21, 38;
@@ -638,46 +644,94 @@ body {
   --bs-secondary-color: var(--text-muted);
   color: var(--text-main);
 }
-html.theme-transition :is(body, header, footer, aside, article, section, nav, form,
-button, input, select, textarea, a, p, h1, h2, h3, span, small,
-.panel, .story, .modal-content, .account-menu-links, .day-night-controls) {
-  transition: color 1.4s ease, background-color 1.4s ease, border-color 1.4s ease;
+html.theme-transition
+  :is(
+    body,
+    header,
+    footer,
+    aside,
+    article,
+    section,
+    nav,
+    form,
+    button,
+    input,
+    select,
+    textarea,
+    a,
+    p,
+    h1,
+    h2,
+    h3,
+    span,
+    small,
+    .panel,
+    .story,
+    .modal-content,
+    .account-menu-links,
+    .day-night-controls
+  ) {
+  transition:
+    color 1.4s ease,
+    background-color 1.4s ease,
+    border-color 1.4s ease;
 }
-html[data-theme="light"] .btn-close-white { filter: none; }
-html[data-theme="light"] .form-select {
+html[data-theme='light'] .btn-close-white {
+  filter: none;
+}
+html[data-theme='light'] .form-select {
   --bs-form-select-bg-img: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%2352647b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
 }
 /* Fade the two gradient layers instead of abruptly swapping a gradient. */
-body[data-section="hero"] .scene-vignette { background: transparent; }
-.scene-vignette::before, .scene-vignette::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
+body[data-section='hero'] .scene-vignette {
+  background: transparent;
+}
+.scene-vignette::before,
+.scene-vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 .scene-vignette::before {
   background: linear-gradient(0deg, #f3f6fbb0, transparent 28%, transparent 85%, #f3f6fb66);
   opacity: calc(1 - var(--night-overlay));
-
 }
 .scene-vignette::after {
   background: linear-gradient(0deg, #0b1526d9, transparent 28%, transparent 85%, #0b152677);
   opacity: var(--night-overlay);
-
 }
 html.theme-transition .scene-vignette::before,
-html.theme-transition .scene-vignette::after { transition: opacity 4s ease; }
+html.theme-transition .scene-vignette::after {
+  transition: opacity 4s ease;
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
 }
 @media (max-width: 767px) {
-  .topbar .brand { flex: 1; margin-inline-end: 0; }
-  .topbar > .theme-toggle { font-size: 10px; padding: 8px; }
-  .topbar .account-links { width: 100%; justify-content: flex-end; }
+  .topbar .brand {
+    flex: 1;
+    margin-inline-end: 0;
+  }
+  .topbar > .theme-toggle {
+    font-size: 10px;
+    padding: 8px;
+  }
+  .topbar .account-links {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 /* Keep the daytime sky clear of the night overlay. */
-html[data-theme="light"] body[data-section="hero"] .scene-vignette::after {
+html[data-theme='light'] body[data-section='hero'] .scene-vignette::after {
   opacity: 0;
 }
-html[data-theme="light"] body[data-section="hero"] .scene-vignette::before {
+html[data-theme='light'] body[data-section='hero'] .scene-vignette::before {
   background: linear-gradient(0deg, #f3f6fb66, transparent 24%);
 }
 
@@ -691,14 +745,29 @@ body {
   --bs-link-color: var(--accent-text);
   --bs-link-hover-color: var(--text-main);
 }
-body:not([data-section="hero"]) {
+body:not([data-section='hero']) {
   background-color: var(--page-bg);
-  --border: rgba(var(--border-rgb), .16);
+  --border: rgba(var(--border-rgb), 0.16);
 }
-body:not([data-section="hero"]) :is(.eyebrow, .listing-category, .section-nav a[aria-current],
-.page-heading h1 em, .account-heading h1 em, .auth-story h1 span, .auth-switch a,
-.auth-benefits span, .auth-monogram, .breadcrumb-item.active, .project-icon.orange,
-.art-note, .code-window pre span, .idea-avatar, .empty-ideas > span, .empty-state > span) {
+body:not([data-section='hero'])
+  :is(
+    .eyebrow,
+    .listing-category,
+    .section-nav a[aria-current],
+    .page-heading h1 em,
+    .account-heading h1 em,
+    .auth-story h1 span,
+    .auth-switch a,
+    .auth-benefits span,
+    .auth-monogram,
+    .breadcrumb-item.active,
+    .project-icon.orange,
+    .art-note,
+    .code-window pre span,
+    .idea-avatar,
+    .empty-ideas > span,
+    .empty-state > span
+  ) {
   color: var(--accent-text);
 }
 .modal-content {
@@ -708,12 +777,17 @@ body:not([data-section="hero"]) :is(.eyebrow, .listing-category, .section-nav a[
   --bs-modal-header-border-color: var(--field-border);
   --bs-modal-footer-border-color: var(--field-border);
 }
-.form-control:disabled, .form-select:disabled {
+.form-control:disabled,
+.form-select:disabled {
   color: var(--text-muted);
   background-color: var(--surface-raised);
 }
-input, select, textarea { accent-color: #ff783d; }
-html[data-theme="light"] .btn-outline-light {
+input,
+select,
+textarea {
+  accent-color: #ff783d;
+}
+html[data-theme='light'] .btn-outline-light {
   --bs-btn-color: var(--text-main);
   --bs-btn-border-color: var(--field-border);
   --bs-btn-hover-color: var(--text-main);
@@ -722,30 +796,73 @@ html[data-theme="light"] .btn-outline-light {
   --bs-btn-active-color: var(--text-main);
   --bs-btn-active-bg: var(--surface-raised);
 }
-html.theme-transition :is(.project-card, .listing-card, .course-card, .account-panel,
-.stat-card, .auth-shell, .auth-tabs, .chat-bubble, .conversation-list button, .code-window,
-.filter-chip, .category-badge, .modal-content, .modal-header, .modal-footer) {
-  transition: color 1.4s ease, background-color 1.4s ease, border-color 1.4s ease, transform .2s ease;
+html.theme-transition
+  :is(
+    .project-card,
+    .listing-card,
+    .course-card,
+    .account-panel,
+    .stat-card,
+    .auth-shell,
+    .auth-tabs,
+    .chat-bubble,
+    .conversation-list button,
+    .code-window,
+    .filter-chip,
+    .category-badge,
+    .modal-content,
+    .modal-header,
+    .modal-footer
+  ) {
+  transition:
+    color 1.4s ease,
+    background-color 1.4s ease,
+    border-color 1.4s ease,
+    transform 0.2s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after {
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
     transition: none !important;
   }
 }
 
-
 /* Display the approved artwork without its presentation margins. */
-.brand .ofoq-brand, .auth-monogram.ofoq-brand {
-  position: relative; display: block; overflow: hidden; flex: 0 0 auto;
-  width: 76px; height: 80px; background: #fffdf9; border-radius: 10px;
-  padding: 0; border: 1px solid rgba(var(--border-rgb), .16);
+.brand .ofoq-brand,
+.auth-monogram.ofoq-brand {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: 0 0 auto;
+  width: 76px;
+  height: 80px;
+  background: #fffdf9;
+  border-radius: 10px;
+  padding: 0;
+  border: 1px solid rgba(var(--border-rgb), 0.16);
 }
 .ofoq-brand .ofoq-logo {
-  position: absolute; width: 129px; height: 129px; max-width: none;
-  left: -27px; top: -24px; object-fit: contain;
+  position: absolute;
+  width: 129px;
+  height: 129px;
+  max-width: none;
+  left: -27px;
+  top: -24px;
+  object-fit: contain;
 }
-.auth-monogram.ofoq-brand { inset: 30px auto auto 54px; width: 92px; height: 98px; transform: none; }
-.auth-monogram.ofoq-brand .ofoq-logo { width: 157px; height: 157px; left: -33px; top: -29px; }
+.auth-monogram.ofoq-brand {
+  inset: 30px auto auto 54px;
+  width: 92px;
+  height: 98px;
+  transform: none;
+}
+.auth-monogram.ofoq-brand .ofoq-logo {
+  width: 157px;
+  height: 157px;
+  left: -33px;
+  top: -29px;
+}
 
 @media (max-width: 767px) {
   .topbar .brand {
@@ -764,7 +881,6 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 }
 
 @media (max-width: 767px) {
-
   .topbar {
     flex-wrap: wrap;
   }

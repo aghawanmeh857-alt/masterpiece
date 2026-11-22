@@ -18,20 +18,20 @@ export function placeHeadquartersModel(THREE, model) {
   const officeBase = 7;
   const scale = Math.min(55 / (bounds.max.y - officeBase), 18.5 / (bounds.max.x - bounds.min.x));
   const roofPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -4.9);
-  model.traverse(node => {
+  model.traverse((node) => {
     if (!node.isMesh) return;
     // Omit the detached source pavement and lower lobby altogether.
     const sourceBounds = new THREE.Box3().setFromObject(node);
     if (sourceBounds.max.y < officeBase) node.visible = false;
     const materials = Array.isArray(node.material) ? node.material : [node.material];
-    materials.forEach(material => {
+    materials.forEach((material) => {
       // The exterior is a closed model: avoid drawing its transparent back faces twice.
       if (material.transparent) material.forceSinglePass = true;
       if (material.clearcoat > 0) material.clearcoat = 0;
       material.clippingPlanes = [roofPlane];
       material.clipShadows = true;
     });
-    if (materials.every(material => material.opacity === 0)) node.visible = false;
+    if (materials.every((material) => material.opacity === 0)) node.visible = false;
     node.castShadow = true;
     node.receiveShadow = true;
   });

@@ -1,14 +1,33 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {canopyDetailVisible,canopyTile} from '../3D/tree-billboards.js';
-assert.equal(canopyDetailVisible(40**2,false),false);
-assert.equal(canopyDetailVisible(20**2,true),true);
-assert.equal(canopyDetailVisible(27**2,false),true);
-assert.equal(canopyDetailVisible(27**2,true),false,'LOD hysteresis prevents repeated switching at a boundary');
-assert.equal(canopyDetailVisible(15**2,false,.43),false,'A constrained render can keep the light tree image at a moderate distance');
-assert.equal(canopyDetailVisible(8**2,true,.43),true,'The nearest tree still uses its original geometry');
-for(let i=-100;i<=100;i++)assert(canopyTile(i, .12)>=0 && canopyTile(i,.12)<8);
-assert.equal(canopyTile(0,0),0); assert.equal(canopyTile(Math.PI*2,0),0);
-const bytes=fs.readFileSync(new URL('../3D/maple-canopy-atlas.webp',import.meta.url));
-assert.equal(bytes.subarray(0,4).toString(),'RIFF');assert.equal(bytes.subarray(8,12).toString(),'WEBP');
+import { canopyDetailVisible, canopyTile } from '../3D/tree-billboards.js';
+import { showsExteriorDetail } from '../hero/exterior-lod.js';
+assert.equal(showsExteriorDetail(200 ** 2, true, 150), false);
+assert.equal(showsExteriorDetail(70 ** 2, false, 150), true);
+assert.equal(showsExteriorDetail(150 ** 2, false, 150), false);
+assert.equal(showsExteriorDetail(150 ** 2, true, 150), true);
+assert.equal(canopyDetailVisible(40 ** 2, false), false);
+assert.equal(canopyDetailVisible(20 ** 2, true), true);
+assert.equal(canopyDetailVisible(27 ** 2, false), true);
+assert.equal(
+  canopyDetailVisible(27 ** 2, true),
+  false,
+  'LOD hysteresis prevents repeated switching at a boundary'
+);
+assert.equal(
+  canopyDetailVisible(15 ** 2, false, 0.43),
+  false,
+  'A constrained render can keep the light tree image at a moderate distance'
+);
+assert.equal(
+  canopyDetailVisible(8 ** 2, true, 0.43),
+  true,
+  'The nearest tree still uses its original geometry'
+);
+for (let i = -100; i <= 100; i++) assert(canopyTile(i, 0.12) >= 0 && canopyTile(i, 0.12) < 8);
+assert.equal(canopyTile(0, 0), 0);
+assert.equal(canopyTile(Math.PI * 2, 0), 0);
+const bytes = fs.readFileSync(new URL('../3D/maple-canopy-atlas.webp', import.meta.url));
+assert.equal(bytes.subarray(0, 4).toString(), 'RIFF');
+assert.equal(bytes.subarray(8, 12).toString(), 'WEBP');
 console.log('Passed: tree photo atlas, camera-angle wrapping and stable near/far LOD.');

@@ -1,12 +1,20 @@
 export const TOUR_STOPS = [0, 27, 36, 45, 54, 64];
+export const RECEPTION_TIME = 19;
+export const TOUR_END = 68;
 
-export function tourTarget(raw, reducedMotion = false) {
-  const progress = Math.max(0, Math.min(5, raw));
-  const index = Math.min(4, Math.floor(progress));
-  const fraction = progress - index;
-  const transition = Math.max(0, Math.min(1, (fraction - .12) / .76));
-  const eased = reducedMotion ? fraction : transition ** 3 * (transition * (transition * 6 - 15) + 10);
-  return TOUR_STOPS[index] + (TOUR_STOPS[index + 1] - TOUR_STOPS[index]) * eased;
+const clampProgress = value => Math.max(0, Math.min(1, value));
+const smoothProgress = value => value * value * (3 - 2 * value);
+
+export function stationTourTime(index, opening, reading, travel, reducedMotion = false) {
+  if (index === 0 && !reducedMotion && opening < 1) return RECEPTION_TIME * clampProgress(opening);
+  const start = index === 0 ? RECEPTION_TIME : TOUR_STOPS[index];
+  const end = TOUR_STOPS[index + 1] ?? TOUR_END;
+  // Keep the subject in frame while the card is read, with just enough
+  // movement to give feedback that scrolling is still advancing the tour.
+  const drift = reducedMotion ? 0 : index === 0 ? .66 : index === 5 ? 1.65 : 1.05;
+  const transition = clampProgress(travel);
+  return start + drift * smoothProgress(clampProgress(reading))
+    + (end - start - drift) * (reducedMotion ? transition : smoothProgress(transition));
 }
 
 // Frame-rate independent easing. A scroll event only updates the destination;
@@ -31,9 +39,51 @@ export function roomAtTourTime(time) {
   return room;
 }
 
+// Interpolate each coordinate using slopes in tour seconds. The shared slope
+// on either side of a key keeps the speed continuous, even when key spacing
+// changes. Bounding each coordinate also keeps the camera inside doorways.
+export function createTourPath(keys) {
+  const times = keys.map(key => key[0]);
+  const last = keys.length - 1;
+  const durations = times.slice(1).map((time, index) => time - times[index]);
+  const tracks = [1, 2].map(column => [0, 1, 2].map(axis => {
+    const values = keys.map(key => key[column][axis]);
+    const segments = durations.map((duration, i) => (values[i + 1] - values[i]) / duration);
+    const slopes = values.map((_, i) => {
+      if (i === 0) return segments[0];
+      if (i === last) return segments[last - 1];
+      const before = segments[i - 1], after = segments[i];
+      if (before * after <= 0) return 0;
+      const left = durations[i - 1], right = durations[i];
+      const firstWeight = 2 * right + left, secondWeight = right + 2 * left;
+      return (firstWeight + secondWeight) / (firstWeight / before + secondWeight / after);
+    });
+    return { values, slopes };
+  }));
+  return (time, position, aim) => {
+    const next = times.findIndex(key => key > time);
+    const index = next === -1 ? last - 1 : Math.max(0, next - 1);
+    const duration = durations[index];
+    const t = Math.max(0, Math.min(1, (time - times[index]) / duration));
+    const t2 = t * t, t3 = t2 * t;
+    const start = 2 * t3 - 3 * t2 + 1, end = 3 * t2 - 2 * t3;
+    const startSlope = (t3 - 2 * t2 + t) * duration, endSlope = (t3 - t2) * duration;
+    function evaluate(track, dest) {
+      for (let axis = 0; axis < 3; axis++) {
+        const { values, slopes } = track[axis];
+        dest[axis] = start * values[index] + end * values[index + 1]
+          + startSlope * slopes[index] + endSlope * slopes[index + 1];
+      }
+    }
+    evaluate(tracks[0], position);
+    evaluate(tracks[1], aim);
+  };
+}
+
 // Lower pixel work only after sustained slow frames, including severe stalls.
 export function nextRenderScale(scale, averageFrameMs, viewportPixels) {
   if (!Number.isFinite(averageFrameMs) || averageFrameMs <= 28) return scale;
-  const minimum = Math.min(.65, Math.sqrt(280000 / Math.max(1, viewportPixels)));
+  const pixelBudget = averageFrameMs >= 95 ? 95000 : averageFrameMs >= 48 ? 155000 : 280000;
+  const minimum = Math.min(.65, Math.sqrt(pixelBudget / Math.max(1, viewportPixels)));
   return scale <= minimum ? scale : Math.max(minimum, scale * .8);
 }

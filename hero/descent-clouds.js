@@ -2,6 +2,8 @@
 // The two small textures contain baked density and sunlight, including alpha at the edges.
 const banks = [
   // x, altitude, z, width, height, texture, opacity
+  [-55, 121, 149, 107, 28, 1, .88],
+  [100, 116, 134, 100, 30, 0, .81],
   [-3, 98, 78, 66, 29, 0, .98],
   [46, 90, 82, 57, 25, 1, .96],
   [9, 83, 58, 40, 14, 1, .71],

@@ -1,6 +1,6 @@
 // Eight photographs of the original model; close trees keep their real geometry.
-export function canopyDetailVisible(distanceSquared, wasBillboard) {
-  const threshold = wasBillboard ? 24 : 30;
+export function canopyDetailVisible(distanceSquared, wasBillboard, detail = 1) {
+  const threshold = (wasBillboard ? 24 : 30) * detail;
   return distanceSquared < threshold * threshold;
 }
 
@@ -24,13 +24,14 @@ export async function createTreeBillboards(THREE, template, trees, parent) {
   });
   let previousCount = -1;
   return {
-    update(camera, nightAmount) {
+    update(camera, nightAmount, detail) {
       material.color.setScalar(1 - .95 * nightAmount);
       let count = 0;
       for (const record of records) {
         const {tree, image} = record;
         const dx = camera.position.x - tree.position.x, dz = camera.position.z - tree.position.z;
-        tree.visible = canopyDetailVisible(dx * dx + dz * dz, image.visible);
+        const aboveCanopy = Math.max(0, camera.position.y - tree.position.y - height * .6);
+        tree.visible = canopyDetailVisible(dx * dx + dz * dz + aboveCanopy * aboveCanopy, image.visible, detail);
         image.visible = !tree.visible;
         if (!image.visible) continue;
         count++;

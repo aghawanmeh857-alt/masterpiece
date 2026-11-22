@@ -879,7 +879,6 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
   padding: 48px max(6%, calc((100% - 1180px) / 2)) 24px;
   background: rgba(var(--surface-rgb), .97);
   border-top: 1px solid var(--field-border);
-  backdrop-filter: blur(20px);
   color: var(--text-main);
 }
 .journey-end-content {
@@ -949,7 +948,7 @@ html.theme-transition :is(.project-card, .listing-card, .course-card, .account-p
 @media(prefers-reduced-motion:reduce){.station-content .room-sections>a{transition:none}.station-content .room-sections>a:hover{transform:none}}
 /* Keep each reading panel in view until its reading interval ends. */
 .chapter{overflow:visible;padding-top:130px}
-.station-content{position:sticky;top:130px;width:min(560px,100%);padding:28px 30px;border-radius:22px;background:rgba(var(--surface-rgb),.94);box-shadow:0 12px 40px #00000014;transition:opacity .28s ease,visibility .28s ease;backdrop-filter:blur(12px)}
+.station-content{position:sticky;top:130px;width:min(560px,100%);padding:28px 30px;border-radius:22px;background:rgba(var(--surface-rgb),.94);box-shadow:0 12px 40px #00000014;transition:opacity .28s ease,visibility .28s ease;backdrop-filter:none}
 .station-title{font-size:clamp(27px,2.6vw,35px);line-height:1.4;margin-bottom:14px}.station-title br{display:none}.station-title em{display:block;margin-top:5px}.station-label{margin-bottom:20px;padding:5px 10px}.station-description{font-size:13px;line-height:1.9;margin-bottom:20px}
 .station-content .room-sections{gap:10px;margin-bottom:20px}.station-content .room-sections>a{padding:14px;gap:12px;background:rgba(var(--page-rgb),.55);border-radius:12px}.station-content .room-sections strong{font-size:14px}.station-content .room-sections small{font-size:11px;line-height:1.8}.station-content .room-sections>h2{padding-bottom:10px}
 .station-action{min-height:46px;padding:11px;font-size:13px}.station-scroll-hint{font-size:10px;margin-top:14px}
@@ -982,8 +981,6 @@ html:has(.station-active) .scene-caption{opacity:0;visibility:hidden}
   background: var(--station-glass);
   color: var(--station-ink);
   box-shadow: 0 16px 46px #10253b25, inset 0 1px 0 #ffffff80;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 .station-content::before { display: none; }
 .station-content .station-label {

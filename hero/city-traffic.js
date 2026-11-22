@@ -170,16 +170,30 @@ export async function createCityTraffic(THREE, scene, { loader, mergeGeometries,
         const distance = record.car.position.distanceToSquared(camera.position);
         record.car.visible = distance < 90 * 90;
         // Hysteresis prevents flicker when the camera sits near the LOD boundary.
-        const threshold = record.distant.visible ? 30 : 36;
+        // Keep the high-poly car for genuinely close views. The tour sees
+        // most road traffic from across the plaza or from above.
+        const threshold = record.distant.visible ? 18 : 23;
         const detailed = distance < threshold * threshold;
         record.detailedParts.forEach(part => { part.visible = detailed; });
         record.distant.visible = !detailed;
       }
-      // All cars show their lamps; only the nearest two project light onto
-      // the road, avoiding twelve simultaneous spotlights on slower devices.
-      const nearest = new Set(visible && camera.position.y < 8 && nightAmount > .001 ? [...cars].sort((a, b) => a.car.position.distanceToSquared(camera.position) - b.car.position.distanceToSquared(camera.position)).filter(record => record.car.position.distanceToSquared(camera.position) < 35 * 35).slice(0, 1) : []);
-      cars.forEach(record => record.headlights.forEach(light => { light.visible = nearest.has(record); light.intensity = 55 * nightAmount; }));
-      document.documentElement.dataset.activeCarHeadlights = String(nearest.size * 2);
+      // Emissive lenses remain visible across the plaza. Real beams only
+      // matter next to a car, where they will light visible ground.
+      let nearest = null, nearestDistance = 18 * 18;
+      if (camera.position.y < 8 && nightAmount > .001) {
+        for (const record of cars) {
+          const distance = record.car.position.distanceToSquared(camera.position);
+          if (distance < nearestDistance) {
+            nearest = record;
+            nearestDistance = distance;
+          }
+        }
+      }
+      for (const record of cars) for (const light of record.headlights) {
+        light.visible = record === nearest;
+        light.intensity = 55 * nightAmount;
+      }
+      document.documentElement.dataset.activeCarHeadlights = nearest ? '2' : '0';
       document.documentElement.dataset.trafficTime = elapsed.toFixed(2);
       document.documentElement.dataset.trafficPosition = `${cars[0].car.position.x.toFixed(2)},${cars[0].car.position.z.toFixed(2)}`;
     },

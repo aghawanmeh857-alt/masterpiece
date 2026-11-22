@@ -5,6 +5,8 @@ assert.equal(canopyDetailVisible(40**2,false),false);
 assert.equal(canopyDetailVisible(20**2,true),true);
 assert.equal(canopyDetailVisible(27**2,false),true);
 assert.equal(canopyDetailVisible(27**2,true),false,'LOD hysteresis prevents repeated switching at a boundary');
+assert.equal(canopyDetailVisible(15**2,false,.43),false,'A constrained render can keep the light tree image at a moderate distance');
+assert.equal(canopyDetailVisible(8**2,true,.43),true,'The nearest tree still uses its original geometry');
 for(let i=-100;i<=100;i++)assert(canopyTile(i, .12)>=0 && canopyTile(i,.12)<8);
 assert.equal(canopyTile(0,0),0); assert.equal(canopyTile(Math.PI*2,0),0);
 const bytes=fs.readFileSync(new URL('../3D/maple-canopy-atlas.webp',import.meta.url));

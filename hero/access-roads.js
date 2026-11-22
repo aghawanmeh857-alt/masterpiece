@@ -1,6 +1,6 @@
 import { mergeStaticMeshes } from './static-meshes.js';
-// Lightweight access roads and street lighting; no imported city model.
 import { addCityAppearance } from './city-appearance.js';
+import { addCitySkyline } from './city-skyline.js';
 export async function createAccessRoads(THREE, scene, { mergeGeometries }) {
   const city = new THREE.Group(); city.name = 'OFOQCity';
   city.userData.dynamicScene = true;
@@ -37,17 +37,23 @@ export async function createAccessRoads(THREE, scene, { mergeGeometries }) {
   scene.add(city);
   mergeStaticMeshes(THREE, city, mergeGeometries).geometries.forEach(item => geometry.add(item));
   const state = document.documentElement.dataset;
-  state.cityStatus = 'removed'; state.cityModel = 'none';
-  state.cityBuildings = '0'; state.rearCityBuildings = '0';
+  const skyline = addCitySkyline(THREE, city);
+  state.cityStatus = 'ready';
+  state.cityModel = 'lit-skyline';
+  state.cityBuildings = String(skyline.count);
+  state.rearCityBuildings = String(skyline.rearCount);
   return {
     group: city,
+    updateCamera: skyline.updateCamera,
     setNight(amount) {
       appearance.setNight(amount);
+      skyline.setNight(amount);
       state.cityLightLevel = Number(amount).toFixed(4);
     },
     destroy() {
       scene.remove(city); geometry.forEach(item => item.dispose());
       appearance.destroy();
+      skyline.destroy();
       const textures = new Set();
       roadMaterials.forEach(material => {
         for (const value of Object.values(material)) if (value?.isTexture) textures.add(value);

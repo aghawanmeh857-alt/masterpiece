@@ -105,8 +105,8 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
   catch (error) { console.warn('SAEI: keeping full tree geometry because the photographs are unavailable.', error); }
   scene.add(group);
   let elapsed = 0;
-  function update(dt, outside = true, camera) {
-    if (outside && camera) billboards?.update(camera, Number(document.documentElement.dataset.dayNightProgress || 0));
+  function update(dt, outside = true, camera, detail = 1) {
+    if (outside && camera) billboards?.update(camera, Number(document.documentElement.dataset.dayNightProgress || 0), detail);
     group.visible = outside;
     falling.visible = !reducedMotion;
     if (!outside || reducedMotion) return;

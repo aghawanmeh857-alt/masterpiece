@@ -1,5 +1,5 @@
-// Stepped apartment blocks and service roofs share one draw in either theme.
-export function createCityNeighborhood(THREE, existing, random) {
+// Offices and apartment blocks share one window atlas and draw in either theme.
+export function createCityNeighborhood(THREE, existing, offices, random) {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 256;
@@ -76,14 +76,31 @@ export function createCityNeighborhood(THREE, existing, random) {
   for (let z = -244; z <= -143; z += 34) {
     for (const x of [-48, -14, 18, 51]) block(x, z, 11, 8, 3+Math.floor(random()*5));
   }
+  const firstOfficePiece = pieces.length;
+  for (const { x, z, width, depth, height, finish, setback } of offices) {
+    const podium = Math.min(4.5, height * 0.24);
+    const crown = setback ? height * 0.22 : 1.3;
+    const shaft = height - podium - crown;
+    pieces.push(
+      [x, podium / 2, z, width, podium, depth, finish],
+      [x, podium + shaft / 2, z, width * 0.88, shaft, depth * 0.88, finish],
+      [x - width * 0.06, height - crown / 2, z, width * 0.60, crown, depth * 0.66, finish]
+    );
+  }
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(), material, pieces.length);
   mesh.name = 'ResidentialBlocks';
   const pose = new THREE.Object3D();
-  pieces.forEach(([x,y,z,w,h,d], i) => {
+  const finishes = [
+    new THREE.Color(0.86, 0.96, 1.05),
+    new THREE.Color(1.08, 1.01, 0.92),
+    new THREE.Color(0.94, 0.98, 1.01)
+  ];
+  pieces.forEach(([x, y, z, width, height, depth, finish], i) => {
     pose.position.set(x,y,z);
-    pose.scale.set(w,h,d);
+    pose.scale.set(width, height, depth);
     pose.updateMatrix();
     mesh.setMatrixAt(i,pose.matrix);
+    if (i >= firstOfficePiece) mesh.setColorAt(i, finishes[finish]);
   });
   mesh.computeBoundingSphere();
   return { mesh, windows, setNight(amount) {

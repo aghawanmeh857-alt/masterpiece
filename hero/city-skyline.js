@@ -5,6 +5,7 @@ import { addSelectedCity, officeHeightsByLot } from '../3D/city/selected-city.js
 const eastAvenues = [71, 105, 139, 173];
 const crossStreets = [-31, -65, -99, -133, -167, -201, -235];
 const rearAvenues = [-26, 8];
+const districtLots = [17, 20, 24, 26, 28, 31, 33, 35, 37, 39, 42, 44, 45, 47, 49, 51, 54, 56, 59, 65];
 
 function seededRandom(seed) {
   return () => {
@@ -306,7 +307,10 @@ export function addCitySkyline(THREE, city, loader) {
     scene.name = 'SketchfabCityDistricts';
     drawGroup.add(scene);
   }).catch(error => console.warn('SAEI: Sketchfab city districts unavailable.', error));
-  const neighborhood = createCityNeighborhood(THREE, blocks, seededRandom(8412));
+  const neighborhood = createCityNeighborhood(
+    THREE, blocks, districtLots.map(index => blocks[index]), seededRandom(8412)
+  );
+  towers.replaceLots(districtLots);
   drawGroup.add(neighborhood.mesh);
   textures.push(neighborhood.windows);
   const dayGround = ground.color.clone(), nightGround = new THREE.Color('#222633');

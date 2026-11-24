@@ -30,7 +30,7 @@ export function addCityTowers(THREE, parent, blocks, loader) {
   const shapes = new Set();
   const imageLoader = new THREE.TextureLoader();
   const maps = ['day', 'night'].map(async phase => {
-    const url = new URL(`./assets/sky/harbor-towers-${phase}.webp`, import.meta.url);
+    const url = new URL(`../3D/city/harbor-towers-${phase}.webp`, import.meta.url);
     const image = await imageLoader.loadAsync(url.href);
     image.colorSpace = THREE.SRGBColorSpace;
     textures.add(image);
@@ -51,7 +51,7 @@ export function addCityTowers(THREE, parent, blocks, loader) {
     };
     atlasReady = true;
   });
-  const models = loader.loadAsync(new URL('./assets/3d/neighborhood-towers.glb', import.meta.url).href)
+  const models = loader.loadAsync(new URL('../3D/city/neighborhood-towers.glb', import.meta.url).href)
     .then(({ scene }) => {
       const types = scene.children.slice().sort((a, b) => a.name.localeCompare(b.name));
       surface = types[0].material;

@@ -60,7 +60,7 @@ export function addCitySkyline(THREE, city, loader) {
   city.add(drawGroup);
   const blocks = skylineBlocks();
   const textures = [];
-  const ridgeReady = loader.loadAsync(new URL('./assets/3d/coastal-ridge.glb', import.meta.url).href)
+  const ridgeReady = loader.loadAsync(new URL('../3D/city/coastal-ridge.glb', import.meta.url).href)
     .then(({ scene }) => {
       const ridge = scene.getObjectByName('DistantCoastalRidge');
       const imported = ridge.material;
@@ -280,7 +280,7 @@ export function addCitySkyline(THREE, city, loader) {
   let districtNight = 0;
   let disposed = false;
   const districtsReady = loader.loadAsync(
-    new URL('./assets/3d/environment/night-city-districts.glb', import.meta.url).href
+    new URL('../3D/city/night-city-districts.glb', import.meta.url).href
   ).then(({ scene }) => {
     scene.traverse(mesh => {
       if (!mesh.isMesh) return;

@@ -29,10 +29,11 @@
     <link rel="stylesheet" href="../../assets/fonts.css" />
     <link rel="stylesheet" href="../../assets/popup-ui.css" />
     <link rel="stylesheet" href="../../assets/shared-navbar.css?v=account-dropdown-6" />
+    <link rel="stylesheet" href="../../assets/workspace-theme.css" />
   </head>
   <body data-section="lobby">
     <a class="skip-content" href="#mainContent">انتقل إلى المحتوى</a>
-    <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site"></script>
+    <script src="../../assets/shared-navbar.js?v=account-dropdown-6" data-mode="site" data-workspace></script>
     <main id="mainContent" tabindex="-1" class="container-xl account-page">
       <div class="account-heading">
         <div>
@@ -143,6 +144,13 @@
             </form>
           </section>
 
+          <section id="activityPreview" class="account-panel" aria-labelledby="activityPreviewTitle" hidden>
+            <div class="profile-panel-heading">
+              <h2 id="activityPreviewTitle">نشاطي وطلباتي</h2>
+              <a href="#activity">عرض الكل ←</a>
+            </div>
+            <div id="activityPreviewList"></div>
+          </section>
           <section
             id="profileActivity"
             class="account-panel"

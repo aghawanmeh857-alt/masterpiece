@@ -1,7 +1,7 @@
 import { createScenicPlantings } from '../3D/scenic-plantings.js';
 import { mergeStaticMeshes } from './static-meshes.js';
 import { createRoomArt } from './room-art.js';
-import { loadInteriorPeople } from './interior-people.js';
+import { createWelcome, isPresenter, loadInteriorPeople } from './interior-people.js';
 import { addTowerBillboard } from './exterior-lod.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -45,15 +45,17 @@ export async function createBuildingTour(
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#c9dce9');
   scene.fog = new THREE.Fog('#c9dce9', 100, 340);
-  const camera = new THREE.PerspectiveCamera(54, innerWidth / innerHeight, 0.08, 590);
+  const camera = new THREE.PerspectiveCamera(54, innerWidth / innerHeight, 0.08, 820);
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance'
   });
   renderer.localClippingEnabled = true;
+  // Keep a bounded framebuffer so the glass, clouds and foliage don't compete
+  // for fill rate during the descent on integrated graphics.
   const maxPixelRatio = () =>
-    Math.min(devicePixelRatio, 1.2, Math.sqrt(1000000 / (innerWidth * innerHeight)));
+    Math.min(devicePixelRatio, 1.2, Math.sqrt(850000 / (innerWidth * innerHeight)));
   let renderScale = maxPixelRatio();
   renderer.setPixelRatio(renderScale);
   let viewportWidth = innerWidth,
@@ -251,9 +253,11 @@ export async function createBuildingTour(
       ctx.fillRect(0, 0, c.width, c.height);
     }
     ctx.fillStyle = television ? '#111e30' : '#f5f8ff';
+    ctx.direction = 'rtl';
     ctx.textAlign = 'center';
-    ctx.font = 'bold 80px Arial';
-    ctx.fillText('SAEI', 370, 175);
+    ctx.textBaseline = 'middle';
+    ctx.font = '700 165px Tajawal, Segoe UI, Arial';
+    ctx.fillText('سعي', c.width / 2, c.height / 2);
     const fallback = new THREE.CanvasTexture(c);
     fallback.colorSpace = THREE.SRGBColorSpace;
     const material = new THREE.MeshBasicMaterial({
@@ -281,6 +285,7 @@ export async function createBuildingTour(
     const plaque = new THREE.Mesh(new THREE.PlaneGeometry(width, width * 0.3999), material);
     plaque.position.set(x, y, z);
     scene.add(plaque);
+    return plaque;
   }
 
   function plant(x, z) {
@@ -297,11 +302,12 @@ export async function createBuildingTour(
     deskGroups = [],
     interiorProps = [];
 
-  function person(x, z, { seat = null, rotation = 0, elevation = INTERIOR_FLOOR } = {}) {
+  function person(x, z, { seat = null, rotation = 0, elevation = INTERIOR_FLOOR, role = 'listener' } = {}) {
     const group = new THREE.Group();
     group.position.set(x, elevation, z);
     group.rotation.y = rotation;
     group.userData.seat = seat;
+    group.userData.role = role;
     scene.add(group);
     people.push(group);
     return group;
@@ -324,12 +330,12 @@ export async function createBuildingTour(
     box(0.82, 0.48, 0.06, 0, 1.1, -0.16, black, g);
     box(0.72, 0.38, 0.012, 0, 1.1, -0.122, glass, g);
     box(0.07, 0.14, 0.07, 0, 0.85, -0.16, steel, g);
-    box(0.48, 0.026, 0.16, 0, 0.793, 0.18, navy, g);
+    box(0.48, 0.026, 0.16, 0, 0.793, 0.39, navy, g);
     box(0.56, 0.11, 0.59, 0, 0.425, 0.98, black, g);
     box(0.56, 0.61, 0.11, 0, 0.78, 1.23, navy, g);
     cylinder(0.045, 0.36, 0, 0.2, 0.98, steel, g);
     cylinder(0.28, 0.06, 0, 0.04, 0.98, steel, g);
-    interior.sit(g, { z: 1.05, height: 0.48, pose });
+    interior.sit(g, { z: 1.05, height: 0.48, pose, role: 'typist' });
     interior.contact(g, 2.35, 1.9, 0.25);
     deskGroups.push(g);
   }
@@ -345,17 +351,9 @@ export async function createBuildingTour(
   box(20, 0.2, 20, 0, 0.02, 10, mat('#b4b8bd'));
   box(5, 0.04, 20, 0, 0.15, 10, mat('#d8d6cd'));
   // Enclosed podium and a slender, closed skyscraper facade above its entrance.
-  logo(13.2, 0, 43, 2.3);
-  const skylineFallback = [];
-  for (const [x, z, h] of [
-    [60, -75, 27],
-    [40, -45, 36],
-    [50, -110, 45],
-    [34, 9, 22]
-  ]) {
-    skylineFallback.push(box(16, h, 16, x, h / 2, z, mat('#263c53')));
-    for (let y = 2; y < h; y += 3) skylineFallback.push(box(16.1, 0.15, 16.1, x, y, z, steel));
-  }
+  const towerWordmark = logo(13.2, 0, 43, 2.65);
+  towerWordmark.name = 'SaeiTowerWordmark';
+  towerWordmark.userData.dynamicScene = true;
   box(0.3, 4.8, 86, -10, 2.4, -40, wall);
   box(0.3, 4.8, 86, 10, 2.4, -40, wall);
   box(20, 4.8, 0.3, 0, 2.4, -83, wall);
@@ -424,14 +422,25 @@ export async function createBuildingTour(
     box(0.07, 0.015, 8, 1.75, 0.14, z, orange);
   }
   // Lobby: reception, waiting lounge and a clear passage into the corridor.
-  interior.reception(5, -8.7);
-  person(5, -9.85);
-  box(5.15, 4.67, 0.18, 5, 2.35, -12.03, wood);
+  const receptionDesk = interior.reception(5, -8.7);
+  const receptionSurfaces = new Map();
+  receptionDesk.traverse((mesh) => {
+    if (!mesh.isMesh || !mesh.material.isMeshStandardMaterial) return;
+    if (!receptionSurfaces.has(mesh.material)) {
+      const surface = mesh.material.clone();
+      receptionSurfaces.set(mesh.material, { surface, dayColor: surface.color.clone() });
+    }
+    mesh.material = receptionSurfaces.get(mesh.material).surface;
+  });
+  const receptionPanel = wood.clone();
+  receptionSurfaces.set(wood, { surface: receptionPanel, dayColor: receptionPanel.color.clone() });
+  person(5, -9.85, { role: 'reception' });
+  box(5.15, 4.67, 0.18, 5, 2.35, -12.03, receptionPanel);
   box(4.2, 1.58, 0.075, 5, 2.8, -11.87, navy);
-  logo(3.6, 5, 2.8, -11.81);
+  const receptionWordmark = logo(3.6, 5, 2.8, -11.81);
   plant(-7, -4);
   plant(8, -4);
-  const lobbySofas = [
+  const loungeSofas = [
     interior.sofa(-7.8, -6.4, Math.PI / 2, false),
     interior.sofa(7.3, -4.8, -Math.PI / 2, true)
   ];
@@ -485,6 +494,17 @@ export async function createBuildingTour(
     hallwaySign.rotation.y = (-side * Math.PI) / 2;
     hallwaySign.scale.set(0.73, 0.69, 1);
     scene.add(hallwaySign);
+    // The open bay across from each classroom forms a waiting area, clear of its doorway.
+    const facing = side * Math.PI / 2;
+    const wallX = -side * 9.78;
+    box(0.12, 2.85, 5.4, wallX, 1.85, r.z, wood);
+    const directory = sign(r.name + '   •   المدخل المقابل', 4.4, 0.65,
+      wallX + side * 0.08, 2.55, r.z, { rotation: facing });
+    directory.name = 'CorridorDirectory-' + r.id;
+    loungeSofas.push(interior.sofa(-side * 8.55, r.z, facing, false));
+    interior.coffeeTable(-side * 7.15, r.z + 0.35, facing);
+    interior.carpet(-side * 7.9, r.z, 3.2, 4.2);
+    plant(-side * 8.8, r.z - 2.15);
     plant(side * 8.7, r.z - 5);
     box(5, 0.04, 2.4, r.x, 4.69, r.z, lightMat);
     const l = new THREE.PointLight('#fff0dc', 17, 14, 2);
@@ -502,7 +522,7 @@ export async function createBuildingTour(
   interior.classroom(4.25, -33.3, 1);
   interior.classroom(7.5, -33.3, 2);
   interior.podium(7.05, -40.4);
-  person(7.05, -41.02);
+  person(7.05, -41.02, { role: 'teacher' });
   interior.cabinet(7.8, -29.6, 2, Math.PI);
   desk(-7.5, -53.7, 1);
   interior.mentorTable(-4.25, -53.45);
@@ -527,7 +547,7 @@ export async function createBuildingTour(
   interior.carpet(4.48, -75.03, 4.15, 6, true);
   interior.podium(2.25, -79.3, stageTop);
   roomArt.hang('events', 6.75, 2.65, -82.81, 0);
-  person(2.25, -79.94, { elevation: stageTop });
+  person(2.25, -79.94, { elevation: stageTop, role: 'speaker' });
   for (let row = 0; row < 3; row++) {
     for (const [seat, x] of [-5.7, -3.25, 3.25, 5.7].entries()) {
       interior.theatreSeat(x, -73.05 - 1.9 * row, (seat + row) % 4 !== 0, ((seat + row) % 3) + 1);
@@ -550,7 +570,7 @@ export async function createBuildingTour(
   let cityLightLevel = Number(document.documentElement.dataset.theme === 'dark');
   const localLights = [];
   function batchStaticMeshes() {
-    const excluded = new Set([doorLeft, doorRight, ...skylineFallback]);
+    const excluded = new Set([doorLeft, doorRight]);
     const result = mergeStaticMeshes(THREE, scene, mergeGeometries, excluded, {
       cellSize: 20,
       disposeUnused: true
@@ -642,8 +662,32 @@ export async function createBuildingTour(
   const pathPosition = new Float64Array(3);
   const pathAim = new Float64Array(3);
   const lookTarget = new THREE.Vector3();
+  const floorDayColor = floor.color.clone();
+  let interiorNight = -1;
+  function renderTour() {
+    const daylight = 1 - cityLightLevel;
+    const indoors = 1 - THREE.MathUtils.smoothstep(camera.position.z, -2, 1.85);
+    const nightEntrance = (1 - THREE.MathUtils.smoothstep(camera.position.z, 2.05, 5.2)) * cityLightLevel;
+    const exteriorFill = ambient.intensity;
+    const exteriorEnvironment = scene.environmentIntensity;
+    // Compensate for the daylight blocked by the roof and facade.
+    ambient.intensity = exteriorFill * (1 - 0.72 * nightEntrance) + 1.35 * indoors * daylight;
+    scene.environmentIntensity *= 1 - 0.85 * nightEntrance;
+    // The lobby materials are dark even when viewed from outside the entrance.
+    if (interiorNight !== cityLightLevel) {
+      interiorNight = cityLightLevel;
+      floor.color.copy(floorDayColor).multiplyScalar(1 - 0.985 * interiorNight);
+      for (const { surface, dayColor } of receptionSurfaces.values()) {
+        surface.color.copy(dayColor).multiplyScalar(1 - 0.96 * interiorNight);
+      }
+      receptionWordmark.material.opacity = 1 - interiorNight;
+    }
+    renderer.render(scene, camera);
+    ambient.intensity = exteriorFill;
+    scene.environmentIntensity = exteriorEnvironment;
+  }
 
-  function seek(t) {
+  function seek(t, notify = true) {
     time = Math.max(0, Math.min(TOUR_END, t));
     cameraPath(time, pathPosition, pathAim);
     camera.position.fromArray(pathPosition);
@@ -666,6 +710,7 @@ export async function createBuildingTour(
       camera.fov = fov;
       camera.updateProjectionMatrix();
     }
+    if (!notify) return;
     document.documentElement.dataset.tourTime = time.toFixed(2);
     if (!adminPreview) {
       onRoomChange(roomAtTourTime(time));
@@ -769,6 +814,11 @@ export async function createBuildingTour(
           : advanceTour(time, targetTime, elapsedMs / 1000, cameraSmoothness)
       );
     }
+    drawTourFrame(now, dt, elapsedMs);
+    adaptRenderScale(frameMs);
+  }
+
+  function drawTourFrame(now, dt, elapsedMs) {
     screenBrightness = THREE.MathUtils.damp(screenBrightness, requestedNight ? 0 : 1, 3.5, dt);
     logoMaterials.forEach((material) => {
       if (!material.userData.television) return;
@@ -832,7 +882,6 @@ export async function createBuildingTour(
     aircraft.update(elapsedMs / 1000, camera.position.z > 4, previewCity);
     const entranceTarget = Math.max(
       doorProximity(camera.position, entrance),
-      streetLife?.entranceProximity() || 0,
       employeeDoorProximity(entrance)
     );
     const mainDoorNext = advanceDoor(
@@ -875,18 +924,28 @@ export async function createBuildingTour(
       characterBounds.center.y += 1;
       const distance = camera.position.distanceToSquared(characterBounds.center);
       holder.visible = distance < 28 * 28 && frustum.intersectsSphere(characterBounds);
-      if (!mixer || reducedMotion || !holder.visible || distance > 18 * 18) return;
-      mixer.update(dt);
+      if (holder.userData.welcome) {
+        if (!reducedMotion && holder.userData.welcome(dt, holder.visible, distance)) activePeople++;
+        return;
+      }
+      if (reducedMotion || !holder.visible || distance > 18 * 18) return;
+      if (holder.userData.updateGesture) holder.userData.updateGesture(dt);
+      else if (mixer) mixer.update(dt);
+      else return;
       activePeople++;
     });
-    // Interior furniture is occluded outside and in distant rooms.
+    // Keep the high-detail furniture out of the draw list until the entrance opens.
+    const interiorVisible = camera.position.z < entrance.z + entrance.fullyOpen;
     for (const group of interiorProps)
-      group.visible = time > 9 && camera.position.distanceToSquared(group.position) < 30 * 30;
+      group.visible = interiorVisible && camera.position.distanceToSquared(group.position) < 30 * 30;
     // Stop invisible ocean geometry updates after entering the building.
     descentClouds.update(camera, reducedMotion ? 0 : dt);
     coastal.update(dt, camera, camera.position.z > -2, previewPeople && !requestedNight);
     const outsideEntrance = camera.position.z > 1.85;
-    const landscapeDetail = renderScale < 0.62 ? 0.27 : 1;
+    // Keep the full maple meshes for the trees nearest the walkway camera.
+    const landscapeDetail = THREE.MathUtils.lerp(
+      0.42, 0.6, THREE.MathUtils.smoothstep(renderScale, 0.5, 0.85)
+    );
     autumnWalk?.update(dt, outsideEntrance, camera, landscapeDetail);
     scenicPlantings?.update(
       camera,
@@ -895,8 +954,11 @@ export async function createBuildingTour(
     );
     plazaFountain?.update(dt, outsideEntrance, camera, cityLightLevel);
     updateLocalLights(now);
-    renderer.render(scene, camera);
+    renderTour();
     document.documentElement.dataset.activePeople = String(activePeople);
+  }
+
+  function adaptRenderScale(frameMs) {
     // Adapt to several slow frames, rather than treating a single loading
     // stall as a reason to change quality during the tour.
     if (frameMs > 0) {
@@ -987,8 +1049,10 @@ export async function createBuildingTour(
         renderer,
         tower,
         scene,
+        towerWordmark,
         headquartersLighting.setNight,
-        cityLightLevel
+        cityLightLevel,
+        reducedMotion
       );
       await yieldToTour();
       if (disposed) return;
@@ -1052,11 +1116,11 @@ export async function createBuildingTour(
         box(0.747, 0.364, 0.009, 0, 1.1, -0.166, glass, g);
         box(0.07, 0.114, 0.07, 0, 0.84, -0.19, steel, g);
         box(0.25, 0.022, 0.16, 0, 0.804, -0.19, black, g);
-        box(0.48, 0.025, 0.16, 0, 0.805, 0.2, navy, g);
+        box(0.48, 0.025, 0.16, 0, 0.805, 0.39, navy, g);
         interior.contact(g, 2.35, 1.9, 0.25);
       }
       if (furnitureAssets)
-        for (const sofa of lobbySofas) {
+        for (const sofa of loungeSofas) {
           sofa.clear();
           const model = furnitureAssets.sofa.clone(true);
           // Align the imported cushion height with the lounge seat anchor.
@@ -1096,7 +1160,8 @@ export async function createBuildingTour(
         }
         const holder = people[n],
           seat = holder.userData.seat,
-          asset = seat ? boss : standingAssets[standingIndex++ % standingAssets.length];
+          standingAsset = seat ? null : standingAssets[standingIndex++ % standingAssets.length],
+          asset = seat || holder.userData.role === 'reception' ? boss : standingAsset;
         holder.clear();
         const posedFigure = interiorPeople?.createFigure(holder, n);
         if (posedFigure) {
@@ -1163,6 +1228,20 @@ export async function createBuildingTour(
         });
         holder.userData.fadeMaterials = fadeMaterials;
         holder.add(model);
+        if (holder.userData.role === 'reception') {
+          const clip = asset.animations.find((action) => action.name.endsWith('Wave'));
+          if (clip) {
+            const wave = mixer.clipAction(clip).setEffectiveWeight(0).play();
+            holder.userData.welcome = createWelcome((progress, weight) => {
+              idleAction.setEffectiveWeight(1 - weight);
+              wave.setEffectiveWeight(weight);
+              wave.time = clip.duration * progress;
+              mixer.update(0);
+            });
+          }
+        }
+        // The mixer above sampled the fallback pose. Only presenters advance it.
+        if (!isPresenter(holder.userData.role)) continue;
         holder.userData.mixer = mixer;
         holder.userData.idleAction = idleAction;
         holder.userData.restAction = mixer.clipAction(restClip);
@@ -1191,7 +1270,7 @@ export async function createBuildingTour(
       document.documentElement.dataset.interiorFigureModels = String(interiorPeople?.count ?? 0);
       document.documentElement.dataset.furnitureModels = furnitureAssets ? '4' : '1';
       document.documentElement.dataset.realisticFurniture = furnitureAssets ? 'ready' : 'fallback';
-      streetLife = createStreetLife(THREE, scene, { boss, woman, colleague, clone, reducedMotion });
+      streetLife = createStreetLife(THREE, scene, { woman, colleague, clone, reducedMotion });
 
       renderer.shadowMap.needsUpdate = true;
       document.documentElement.dataset.modelLoad = 'ready';
@@ -1202,7 +1281,7 @@ export async function createBuildingTour(
   }
   // The street grid and city silhouettes are available before the GLBs load.
   document.documentElement.dataset.cityStatus = 'loading';
-  const streetsReady = createAccessRoads(THREE, scene, { mergeGeometries })
+  const streetsReady = createAccessRoads(THREE, scene, { mergeGeometries, loader: new GLTFLoader() })
     .then((neighborhood) => {
       if (disposed) {
         neighborhood.destroy();
@@ -1213,10 +1292,6 @@ export async function createBuildingTour(
       city.setNight(cityLightLevel);
       city.updateCamera(camera);
       renderer.shadowMap.needsUpdate = true;
-      skylineFallback.forEach((mesh) => {
-        scene.remove(mesh);
-        mesh.geometry.dispose();
-      });
     })
     .catch((error) => {
       if (!disposed) document.documentElement.dataset.cityStatus = 'roads-unavailable';
@@ -1305,19 +1380,23 @@ export async function createBuildingTour(
         // Warm the material programs and the entrance textures while the logo is still on screen.
         await renderer.compileAsync(scene, camera);
         if (disposed) return;
-        const warmCamera = camera.clone();
-        const warmPosition = new Float64Array(3);
-        const warmAim = new Float64Array(3);
-        for (const stop of [7.1, 11.5, 19, 36, 64]) {
-          cameraPath(stop, warmPosition, warmAim);
-          warmCamera.position.fromArray(warmPosition);
-          warmCamera.lookAt(...warmAim);
-          const outside = warmCamera.position.z > 6.2;
-          headquartersExterior?.update(warmCamera, outside, cityLightLevel);
-          plazaFountain?.update(0, outside, warmCamera, cityLightLevel);
-          renderer.render(scene, warmCamera);
-          await yieldToTour();
-          if (disposed) return;
+        const savedTime = time;
+        try {
+          // Use the live render path so each preview warms the same LOD and light variants.
+          const warmStops = [5.6, 7.7, 9.9, 10.6, 11.5, 12.5, 13.5, 14.2, 16.6, 17.6, 19, 62.5];
+          for (const stop of [...warmStops, ...stops, TOUR_END]) {
+            seek(stop, false);
+            nextLightSelection = 0;
+            drawTourFrame(performance.now(), 0, 0);
+            await yieldToTour();
+            if (disposed) return;
+          }
+        } finally {
+          if (!disposed) {
+            seek(savedTime, false);
+            nextLightSelection = 0;
+            drawTourFrame(performance.now(), 0, 0);
+          }
         }
       }
     })
@@ -1326,6 +1405,7 @@ export async function createBuildingTour(
     })
     .then(async () => {
       if (disposed) return;
+      lastRender = performance.now();
       preparing = false;
       // Give the viewer one complete frame at the restored tour position before revealing it.
       await yieldToTour();
@@ -1356,9 +1436,6 @@ export async function createBuildingTour(
         : 0.65;
       previewCity = config.city !== false;
       previewPeople = config.people !== false;
-      skylineFallback.forEach((mesh) => {
-        mesh.visible = previewCity;
-      });
       const cityGroup = scene.getObjectByName('OFOQCity');
       if (cityGroup) cityGroup.visible = previewCity;
       people.forEach((holder) => {
@@ -1408,6 +1485,7 @@ export async function createBuildingTour(
       headquartersLighting.destroy();
       headquartersExterior?.destroy();
       interior.destroy();
+      for (const { surface } of receptionSurfaces.values()) surface.dispose();
       interiorPeople?.destroy();
       roomArt.destroy();
       autumnWalk?.destroy();

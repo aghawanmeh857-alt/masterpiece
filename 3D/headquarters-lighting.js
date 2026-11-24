@@ -55,18 +55,19 @@ export function createHeadquartersLighting(THREE, scene) {
         material.onBeforeCompile = (shader) => {
           shader.uniforms.headquartersNight = night;
           shader.fragmentShader = 'uniform float headquartersNight;\n' + shader.fragmentShader;
+          shader.vertexShader = 'varying vec3 headquartersPosition;\n' + shader.vertexShader;
+          shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>',
+            '#include <begin_vertex>\nheadquartersPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+          shader.fragmentShader = `varying vec3 headquartersPosition;
+            vec3 crownLighting(float height) {
+              float wash = smoothstep(46.0, 53.0, height);
+              float rim = smoothstep(0.84, 0.97, fract((height - 4.90) / 1.545));
+              return mix(vec3(0.014, 0.18, 0.78), vec3(0.08, 0.74, 1.0), rim) * wash;
+            }
+          ` + shader.fragmentShader;
           if (glazing) {
             // Place the light in the glass behind the existing metal window
             // frames. The floor spacing comes from the source tower geometry.
-            shader.vertexShader = 'varying vec3 headquartersPosition;\n' + shader.vertexShader;
-            shader.vertexShader = shader.vertexShader.replace(
-              '#include <begin_vertex>',
-              `
-              #include <begin_vertex>
-              headquartersPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;
-            `
-            );
-            shader.fragmentShader = 'varying vec3 headquartersPosition;\n' + shader.fragmentShader;
             shader.fragmentShader = shader.fragmentShader.replace(
               '#include <emissivemap_fragment>',
               `
@@ -77,9 +78,12 @@ export function createHeadquartersLighting(THREE, scene) {
                 float office = floor((headquartersPosition.x + headquartersPosition.z * 0.73) * 0.68);
                 float variation = fract(sin(office * 17.13 + floorNumber * 31.29 + 15.4) * 17931.17);
                 float ceilingBounce = mix(0.64, 1.0, smoothstep(0.18, 0.91, fract(level)));
-                float occupied = mix(0.025, 1.0, smoothstep(0.43, 0.72, variation));
-                vec3 tungsten = mix(vec3(0.95, 0.49, 0.21), vec3(1.0, 0.79, 0.54), variation);
-                totalEmissiveRadiance += tungsten * headquartersNight * occupied * ceilingBounce * 1.48;
+                float occupied = smoothstep(0.63, 0.88, variation);
+                float crown = smoothstep(46.0, 53.0, headquartersPosition.y);
+                vec3 windowLight = mix(vec3(0.026, 0.048, 0.095),
+                  vec3(0.88, 0.57, 0.30), occupied * (1.0 - crown));
+                totalEmissiveRadiance += headquartersNight * (windowLight * ceilingBounce
+                  + crownLighting(headquartersPosition.y) * (0.68 + 0.32 * variation));
               }
             `
             );
@@ -104,7 +108,8 @@ export function createHeadquartersLighting(THREE, scene) {
                 float occupied = mix(0.04, 1.0, smoothstep(0.36, 0.65, variation));
                 float windowLight = glazing * headquartersNight * occupied;
                 vec3 tungsten = mix(vec3(1.0, 0.39, 0.12), vec3(1.0, 0.7, 0.36), variation);
-                totalEmissiveRadiance += tungsten * windowLight * 0.42;
+                totalEmissiveRadiance += tungsten * windowLight * 0.25
+                  + crownLighting(headquartersPosition.y) * glazing * headquartersNight;
                 diffuseColor.a = mix(diffuseColor.a, 0.42, windowLight * 0.35);
               }
             #endif

@@ -177,6 +177,16 @@
               }))
           : rows.filter(entry.matches);
       entry.section.dataset.count = String(items.length);
+      if (entry.id === 'activity') {
+        const preview = document.getElementById('activityPreviewList');
+        preview.replaceChildren();
+        for (const item of items.slice(0, 3)) {
+          const row = node('article', undefined, 'activity-preview-row');
+          row.append(node('h3', item.title), node('p', item.status), node('small', item.label));
+          preview.append(row);
+        }
+        if (!items.length) preview.append(node('p', 'ستظهر هنا آخر طلباتك وتحديثاتها.', 'demo-note'));
+      }
       entry.count.textContent = items.length === 1 ? 'عنصر واحد' : items.length + ' عناصر';
       entry.list.replaceChildren();
       if (!items.length) {
@@ -221,5 +231,7 @@
     dispatchEvent(new Event('ofoq:profile-activity'));
   }
   addEventListener('pageshow', render);
+  addEventListener('saei:profile-updated', render);
+  addEventListener('saei:profile-documents', render);
   render();
 })();

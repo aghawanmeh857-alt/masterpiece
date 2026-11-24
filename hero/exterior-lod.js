@@ -62,7 +62,7 @@ export function bakeExteriorImage(THREE, renderer, source) {
   };
 }
 
-export function addTowerBillboard(THREE, renderer, tower, scene, setFacadeNight, initialNight) {
+export function addTowerBillboard(THREE, renderer, tower, scene, wordmark, setFacadeNight, initialNight, reducedMotion) {
   const bounds = new THREE.Box3().setFromObject(tower);
   const center = bounds.getCenter(new THREE.Vector3());
   const size = bounds.getSize(new THREE.Vector3());
@@ -83,7 +83,7 @@ export function addTowerBillboard(THREE, renderer, tower, scene, setFacadeNight,
   const studio = new THREE.Scene();
   studio.environment = scene.environment;
   const towerCopy = tower.clone();
-  studio.add(towerCopy);
+  studio.add(towerCopy, wordmark.clone());
   const light = new THREE.DirectionalLight('#fff0de', 3.5);
   light.position.set(-30, 65, 30);
   const fill = new THREE.HemisphereLight('#d5e6ff', '#747568', 1.65);
@@ -134,17 +134,50 @@ export function addTowerBillboard(THREE, renderer, tower, scene, setFacadeNight,
   plane.name = 'DistantHeadquartersPhotograph';
   plane.position.copy(center);
   scene.add(plane);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const glow = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  glow.addColorStop(0, '#ffe9dd');
+  glow.addColorStop(0.13, '#ff6951');
+  glow.addColorStop(0.31, '#ff3027b0');
+  glow.addColorStop(0.62, '#ff241732');
+  glow.addColorStop(1, '#ff241700');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 64, 64);
+  const beaconTexture = new THREE.CanvasTexture(canvas);
+  beaconTexture.colorSpace = THREE.SRGBColorSpace;
+  const beaconMaterial = new THREE.SpriteMaterial({
+    map: beaconTexture, depthWrite: false, toneMapped: false, blending: THREE.AdditiveBlending
+  });
+  const beacon = new THREE.Sprite(beaconMaterial);
+  beacon.name = 'SaeiRoofAviationBeacon';
+  beacon.visible = false;
+  beacon.position.set(center.x, bounds.max.y + 0.45, center.z);
+  scene.add(beacon);
   let detailed = false;
 
   return {
     update(camera, outside, amount) {
       detailed = showsExteriorDetail(camera.position.distanceToSquared(center), detailed, 118);
       tower.visible = outside && detailed;
+      wordmark.visible = tower.visible;
       plane.visible = outside && !detailed;
       if (plane.visible) {
         plane.rotation.y = Math.atan2(camera.position.x - center.x, camera.position.z - center.z);
       }
       night.value = amount;
+      const phase = (performance.now() % 2400) / 2400;
+      const flash = THREE.MathUtils.smoothstep(phase, 0, 0.07)
+        * (1 - THREE.MathUtils.smoothstep(phase, 0.28, 0.46));
+      beaconMaterial.opacity = THREE.MathUtils.smoothstep(amount, 0.18, 0.8)
+        * (reducedMotion ? 0.75 : flash);
+      beacon.visible = outside && beaconMaterial.opacity > 0.01;
+      if (beacon.visible) {
+        const size = THREE.MathUtils.clamp(camera.position.distanceTo(beacon.position) * 0.017, 0.75, 5);
+        beacon.scale.set(size, size, 1);
+      }
     },
     destroy() {
       plane.removeFromParent();
@@ -152,6 +185,9 @@ export function addTowerBillboard(THREE, renderer, tower, scene, setFacadeNight,
       material.dispose();
       targetDay.dispose();
       targetNight.dispose();
+      beacon.removeFromParent();
+      beaconTexture.dispose();
+      beaconMaterial.dispose();
     }
   };
 }

@@ -1,3 +1,4 @@
+import { mapleLeafGeometry, createMapleLeafFall, walkwaySurface } from './maple-leaf-fall.js';
 import { createTreeBillboards } from './tree-billboards.js';
 // Maple Trees by Jagobo (CC BY 4.0). Original download remains unchanged.
 export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = false }) {
@@ -55,9 +56,16 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
   });
   const canopyTrees = [];
   const crownLift = 3.1;
-  const bark = [...materials].find((material) => /bark/i.test(material.name));
-  const trunkGeometry = new THREE.CylinderGeometry(0.23, 0.36, crownLift + 0.12, 10);
-  geometries.add(trunkGeometry);
+  // Extend the original, off-centre trunk to the soil beneath its own canopy.
+  const trunk = template.children.find(mesh => !/foliage/i.test(mesh.material.name)).geometry;
+  const trunkVertices = trunk.attributes.position;
+  for (let i = 0; i < trunkVertices.count; i++) {
+    const y = trunkVertices.getY(i);
+    trunkVertices.setY(i, y - crownLift * (1 - THREE.MathUtils.smoothstep(y, 0, 3.5)));
+  }
+  trunk.computeVertexNormals();
+  trunk.computeBoundingBox();
+  trunk.computeBoundingSphere();
   for (const side of [-1, 1])
     for (const z of [13, 28]) {
       const tree = template.clone(true);
@@ -66,77 +74,46 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
       tree.rotation.y = side < 0 ? 0.12 : Math.PI + 0.12;
       group.add(tree);
       canopyTrees.push(tree);
-      const trunk = new THREE.Mesh(trunkGeometry, bark);
-      trunk.position.set(side * 8.8, 0.35 + crownLift / 2, z);
-      group.add(trunk);
     }
 
-  const shape = new THREE.Shape();
-  const outline = [
-    [0, -0.6],
-    [-0.12, -0.2],
-    [-0.45, -0.25],
-    [-0.3, 0],
-    [-0.65, 0.15],
-    [-0.35, 0.25],
-    [-0.4, 0.55],
-    [-0.12, 0.4],
-    [0, 0.8],
-    [0.12, 0.4],
-    [0.4, 0.55],
-    [0.35, 0.25],
-    [0.65, 0.15],
-    [0.3, 0],
-    [0.45, -0.25],
-    [0.12, -0.2]
-  ];
-  outline.forEach(([x, y], index) => (index ? shape.lineTo(x, y) : shape.moveTo(x, y)));
-  shape.closePath();
-  const leafGeometry = new THREE.ShapeGeometry(shape);
+  const leafGeometry = mapleLeafGeometry(THREE);
   geometries.add(leafGeometry);
   const leafMaterial = new THREE.MeshStandardMaterial({
     color: '#ffffff',
+    vertexColors: true,
     roughness: 0.95,
     side: THREE.DoubleSide
   });
   materials.add(leafMaterial);
-  const palette = ['#d95916', '#e78b22', '#a83513', '#b54b19', '#e3ad38', '#8e3418'];
+  const palette = ['#a94a23', '#bc662a', '#80341f', '#a65b2b', '#cd983e', '#753a26'];
   let seed = 473;
   const random = () => {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 4294967296;
   };
   const dummy = new THREE.Object3D();
-  const ground = new THREE.InstancedMesh(leafGeometry, leafMaterial, 1500);
+  const ground = new THREE.InstancedMesh(leafGeometry, leafMaterial, 630);
   ground.name = 'AutumnLeavesOnWalkway';
+  const drifts = Array.from({ length: 16 }, (_, i) => ({
+    x: (i % 2 ? 1 : -1) * (2.7 + random()*3.6),
+    z: 7 + random()*24
+  }));
   for (let i = 0; i < ground.count; i++) {
-    const edge = random() < 0.72;
-    const x = edge ? (random() < 0.5 ? -1 : 1) * (2.5 + random() * 2.7) : (random() - 0.5) * 7;
-    dummy.position.set(x, 0.215 + random() * 0.012, 5 + random() * 31);
-    dummy.rotation.set(-Math.PI / 2, 0, random() * Math.PI * 2);
-    dummy.scale.setScalar(0.12 + random() * 0.16);
+    const drift = drifts[i % drifts.length];
+    const clustered = random() < .72;
+    const x = clustered ? drift.x + (random()+random()-1)*1.5 : (random()-.5)*14;
+    const z = clustered ? drift.z + (random()+random()-1)*3.4 : 5+random()*29;
+    const scale = .08 + random()*.066;
+    dummy.position.set(x, walkwaySurface(x,z) + scale*.1 + random()*.008, z);
+    dummy.rotation.set(-Math.PI/2, random()*Math.PI*2, 0, 'YXZ');
+    dummy.scale.setScalar(scale);
     dummy.updateMatrix();
     ground.setMatrixAt(i, dummy.matrix);
     ground.setColorAt(i, new THREE.Color(palette[i % palette.length]));
   }
-  group.add(ground);
-  const falling = new THREE.InstancedMesh(leafGeometry, leafMaterial, 12);
-  falling.name = 'FallingMapleLeaves';
-  falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  // All poses remain within this fixed volume; no per-frame bounds computation.
-  falling.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 6, 20), 25);
-  const particles = Array.from({ length: falling.count }, (_, i) => {
-    falling.setColorAt(i, new THREE.Color(palette[i % palette.length]));
-    return {
-      x: (random() - 0.5) * 10,
-      z: 7 + random() * 27,
-      phase: random() * Math.PI * 2,
-      start: random(),
-      speed: 0.045 + random() * 0.04,
-      scale: 0.13 + random() * 0.1
-    };
-  });
-  group.add(falling);
+  const crown = template.children.find(mesh => /foliage/i.test(mesh.material.name));
+  const fall = createMapleLeafFall(THREE, canopyTrees, crown.geometry, leafGeometry, leafMaterial, palette, random);
+  group.add(ground, fall.mesh);
   let billboards = null;
   try {
     billboards = await createTreeBillboards(THREE, template, canopyTrees, group);
@@ -147,7 +124,7 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
     );
   }
   scene.add(group);
-  let elapsed = 0;
+  const walkCenter = new THREE.Vector3(0, 7, 21);
   function update(dt, outside = true, camera, detail = 1) {
     if (outside && camera)
       billboards?.update(
@@ -156,30 +133,13 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
         detail
       );
     group.visible = outside;
-    falling.visible = !reducedMotion;
-    if (!outside || reducedMotion) return;
-    elapsed += Math.max(0, Math.min(dt, 0.05));
-    particles.forEach((leaf, i) => {
-      const progress = (leaf.start + elapsed * leaf.speed) % 1;
-      dummy.position.set(
-        leaf.x + Math.sin(elapsed * 0.8 + leaf.phase) * 0.8,
-        0.25 + (1 - progress) * 9,
-        leaf.z + Math.sin(elapsed * 0.5 + leaf.phase) * 0.5
-      );
-      dummy.rotation.set(
-        elapsed * 1.4 + leaf.phase,
-        Math.sin(elapsed + leaf.phase) * 0.8,
-        elapsed * 0.7 + leaf.phase
-      );
-      dummy.scale.setScalar(leaf.scale);
-      dummy.updateMatrix();
-      falling.setMatrixAt(i, dummy.matrix);
-    });
-    falling.instanceMatrix.needsUpdate = true;
+    fall.mesh.visible = outside && !reducedMotion && !!camera &&
+      camera.position.distanceToSquared(walkCenter) < 68 * 68;
+    if (fall.mesh.visible) fall.update(Math.max(0, Math.min(dt, .1)));
   }
   update(0);
   document.documentElement.dataset.autumnTrees = '4';
-  document.documentElement.dataset.fallingLeaves = String(falling.count);
+  document.documentElement.dataset.fallingLeaves = String(fall.mesh.count);
   document.documentElement.dataset.autumnWalk = 'ready';
   return {
     update,
@@ -187,7 +147,7 @@ export async function createAutumnWalk(THREE, scene, { loader, reducedMotion = f
       billboards?.destroy();
       scene.remove(group);
       ground.dispose();
-      falling.dispose();
+      fall.mesh.dispose();
       geometries.forEach((geometry) => geometry.dispose());
       const textures = new Set();
       materials.forEach((material) => {

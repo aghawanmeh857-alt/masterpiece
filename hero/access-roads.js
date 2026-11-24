@@ -1,7 +1,7 @@
 import { mergeStaticMeshes } from './static-meshes.js';
 import { addCityAppearance } from './city-appearance.js';
 import { addCitySkyline } from './city-skyline.js';
-export async function createAccessRoads(THREE, scene, { mergeGeometries }) {
+export async function createAccessRoads(THREE, scene, { mergeGeometries, loader }) {
   const city = new THREE.Group();
   city.name = 'OFOQCity';
   city.userData.dynamicScene = true;
@@ -45,7 +45,8 @@ export async function createAccessRoads(THREE, scene, { mergeGeometries }) {
   scene.add(city);
   mergeStaticMeshes(THREE, city, mergeGeometries).geometries.forEach((item) => geometry.add(item));
   const state = document.documentElement.dataset;
-  const skyline = addCitySkyline(THREE, city);
+  const skyline = addCitySkyline(THREE, city, loader);
+  await skyline.ready;
   state.cityStatus = 'ready';
   state.cityModel = 'lit-skyline';
   state.cityBuildings = String(skyline.count);

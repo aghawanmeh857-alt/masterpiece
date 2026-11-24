@@ -1,14 +1,9 @@
-import { showsExteriorDetail } from './exterior-lod.js';
+import { addCityTowers } from './city-towers.js';
+import { createCityNeighborhood } from './night-neighborhood.js';
 
 const eastAvenues = [71, 105, 139, 173];
 const crossStreets = [-31, -65, -99, -133, -167, -201, -235];
 const rearAvenues = [-26, 8];
-
-const finishes = [
-  ['#655f5a', '#638192', '#23313b', [255, 211, 159]],
-  ['#394956', '#7593a2', '#182c39', [198, 225, 246]],
-  ['#7b695e', '#737c80', '#303438', [255, 224, 184]]
-];
 
 function seededRandom(seed) {
   return () => {
@@ -32,7 +27,7 @@ export function skylineBlocks() {
         width: 9.2 + random() * 2.5,
         depth: 10 + random() * 5,
         height,
-        finish: (row + column) % finishes.length,
+        finish: (row + column) % 3,
         setback: height > 30 && random() > 0.3
       });
       if (random() > 0.17)
@@ -42,7 +37,7 @@ export function skylineBlocks() {
           width: 8.7 + random() * 2.5,
           depth: 9 + random() * 5,
           height: 8 + random() * (row === 0 ? 12 : 23),
-          finish: (row + column + 1) % finishes.length,
+          finish: (row + column + 1) % 3,
           setback: false
         });
     }
@@ -58,219 +53,37 @@ export function skylineBlocks() {
   return blocks;
 }
 
-function facadeTextures(THREE, finish, variant) {
-  const [wall, glass, recess, light] = finish;
-  const surface = document.createElement('canvas');
-  const emission = document.createElement('canvas');
-  surface.width = surface.height = emission.width = emission.height = 384;
-  const base = surface.getContext('2d');
-  const glow = emission.getContext('2d');
-  const random = seededRandom(611 + variant * 317);
-  base.fillStyle = wall;
-  base.fillRect(0, 0, 384, 384);
-  glow.fillStyle = '#000';
-  glow.fillRect(0, 0, 384, 384);
-  for (let row = 0; row < 12; row++) {
-    const y = row * 32;
-    base.fillStyle = recess;
-    base.fillRect(0, y + 28, 384, 2);
-    base.fillStyle = 'rgba(244,232,214,.13)';
-    base.fillRect(0, y + 30, 384, 1);
-    const occupiedFloor = random() > 0.36;
-    for (let column = 0; column < 12; column++) {
-      const x = column * 32;
-      const wide = [22, 29, 19][variant];
-      const start = x + (32 - wide) / 2;
-      base.fillStyle = recess;
-      base.fillRect(start - 2, y + 2, wide + 4, 25);
-      const pane = base.createLinearGradient(start, y + 4, start, y + 26);
-      pane.addColorStop(0, glass);
-      pane.addColorStop(0.43, glass);
-      pane.addColorStop(1, recess);
-      base.fillStyle = pane;
-      base.fillRect(start, y + 4, wide, 21);
-      base.fillStyle = wall;
-      base.fillRect(x + 15, y + 4, variant === 2 ? 3 : 1, 21);
-      base.fillStyle = 'rgba(188,215,222,.22)';
-      base.fillRect(start, y + 5, wide, 1);
-      if (variant === 2) {
-        base.fillStyle = 'rgba(44,28,24,.24)';
-        for (let dy = 2; dy < 26; dy += 5) base.fillRect(x, y + dy, 5, 1);
-      }
-
-      if (random() > (occupiedFloor ? 0.78 : 0.2)) continue;
-      const brightness = 0.36 + random() * 0.64;
-      const color = light.map((channel) => Math.round(channel * brightness));
-      glow.fillStyle = `rgb(${color.join(',')})`;
-      const paneCount = random() > 0.28 ? 2 : 1;
-      const sill = random() > 0.7 ? 17 : 20;
-      for (let paneIndex = 0; paneIndex < paneCount; paneIndex++) {
-        glow.fillRect(start + paneIndex * (wide / 2 + 1), y + 5, wide / 2 - 1, sill);
-      }
-      glow.fillStyle = 'rgba(15,20,31,.28)';
-      glow.fillRect(start, y + 17, wide, 2);
-      if (random() > 0.57) {
-        glow.fillStyle = 'rgba(67,49,39,.36)';
-        glow.fillRect(start, y + 8, wide, 6);
-      }
-    }
-  }
-  return [surface, emission].map((canvas) => {
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.anisotropy = 4;
-    return texture;
-  });
-}
-
-export function addCitySkyline(THREE, city) {
+export function addCitySkyline(THREE, city, loader) {
   const drawGroup = new THREE.Group();
   drawGroup.name = 'SAEICitySkyline';
   drawGroup.userData.dynamicScene = true;
   city.add(drawGroup);
   const blocks = skylineBlocks();
   const textures = [];
-  const makeBatch = () => ({ positions: [], uvs: [], indices: [] });
-  let facadeBatch;
-  let roofBatch;
-  const markerPositions = [];
-  const dayRoof = new THREE.Color('#425367');
-  const nightRoof = new THREE.Color('#253651');
-
+  const ridgeReady = loader.loadAsync(new URL('./assets/3d/coastal-ridge.glb', import.meta.url).href)
+    .then(({ scene }) => {
+      const ridge = scene.getObjectByName('DistantCoastalRidge');
+      const imported = ridge.material;
+      textures.push(imported.map);
+      ridge.material = new THREE.MeshLambertMaterial({ map: imported.map, color: '#b5bab6' });
+      imported.dispose();
+      // Haze grows with distance. Keep enough contrast to read the gullies from above.
+      ridge.material.onBeforeCompile = shader => {
+        shader.vertexShader = 'varying float ridgeHeight;\n' + shader.vertexShader.replace(
+          '#include <begin_vertex>', '#include <begin_vertex>\n ridgeHeight = position.y;');
+        shader.fragmentShader = 'varying float ridgeHeight;\n' + shader.fragmentShader.replace('#include <fog_fragment>',
+          '#ifdef USE_FOG\nfloat haze = smoothstep(fogNear, fogFar * 1.35, vFogDepth);\n' +
+          'float foot = (1.0-smoothstep(0.0,24.0,ridgeHeight))*smoothstep(fogNear,fogFar,vFogDepth);\n' +
+          'gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, mix(haze * 0.48, 1.0, foot));\n#endif');
+      };
+      drawGroup.add(ridge);
+    }).catch(error => console.warn('SAEI: coastal ridge unavailable.', error));
   function quad(batch, vertices, width = 1, height = 1, u = 0, v = 0) {
     const first = batch.positions.length / 3;
     batch.positions.push(...vertices.flat());
     batch.uvs.push(u, v, u + width, v, u + width, v + height, u, v + height);
     batch.indices.push(first, first + 1, first + 2, first, first + 2, first + 3);
   }
-
-  function volumeSides(
-    batch,
-    a,
-    b,
-    c,
-    d,
-    bottom,
-    top,
-    wide = 1,
-    deep = 1,
-    levels = 1,
-    u = 0,
-    v = 0
-  ) {
-    quad(
-      batch,
-      [
-        [a, bottom, d],
-        [b, bottom, d],
-        [b, top, d],
-        [a, top, d]
-      ],
-      wide,
-      levels,
-      u,
-      v
-    );
-    quad(
-      batch,
-      [
-        [b, bottom, d],
-        [b, bottom, c],
-        [b, top, c],
-        [b, top, d]
-      ],
-      deep,
-      levels,
-      u + 0.25,
-      v
-    );
-    quad(
-      batch,
-      [
-        [b, bottom, c],
-        [a, bottom, c],
-        [a, top, c],
-        [b, top, c]
-      ],
-      wide,
-      levels,
-      u + 0.5,
-      v
-    );
-    quad(
-      batch,
-      [
-        [a, bottom, c],
-        [a, bottom, d],
-        [a, top, d],
-        [a, top, c]
-      ],
-      deep,
-      levels,
-      u + 0.75,
-      v
-    );
-  }
-
-  function roofVolume(x, z, width, depth, bottom, height) {
-    const a = x - width / 2,
-      b = x + width / 2;
-    const c = z - depth / 2,
-      d = z + depth / 2;
-    const top = bottom + height;
-    volumeSides(roofBatch, a, b, c, d, bottom, top);
-    quad(roofBatch, [
-      [a, top, d],
-      [b, top, d],
-      [b, top, c],
-      [a, top, c]
-    ]);
-  }
-
-  function storeys(block, bottom, height, width, depth, variation) {
-    const a = block.x - width / 2,
-      b = block.x + width / 2;
-    const c = block.z - depth / 2,
-      d = block.z + depth / 2;
-    const top = bottom + height;
-    const u = variation / 12;
-    const v = Math.floor((variation * 7) % 12) / 12;
-    const levels = Math.max(1, Math.round(height / 3.25)) / 12;
-    const wide = Math.max(1, Math.floor(width / 2.15)) / 12;
-    const deep = Math.max(1, Math.floor(depth / 2.15)) / 12;
-    volumeSides(facadeBatch, a, b, c, d, bottom, top, wide, deep, levels, u, v);
-    roofVolume(block.x, block.z, width + 0.12, depth + 0.12, top - 0.13, 0.26);
-  }
-
-  const detailedBlocks = blocks.map((block, index) => {
-    facadeBatch = makeBatch();
-    roofBatch = makeBatch();
-    const podium = block.finish === 2 ? 4.0 : 3.6;
-    const shoulder = block.setback ? block.height * (index % 2 ? 0.64 : 0.76) : block.height;
-    const upperWidth = block.setback ? block.width * (index % 3 ? 0.76 : 0.62) : block.width * 0.93;
-    const upperDepth = block.depth * (block.setback ? 0.83 : 0.94);
-    const upper = { ...block, x: block.x + (index % 2 ? 0.28 : -0.28), z: block.z - 0.3 };
-    storeys(block, 0, podium, block.width, block.depth, (index + 7) % 12);
-    storeys(upper, podium, shoulder - podium, block.width * 0.93, block.depth * 0.94, index % 12);
-    if (block.setback)
-      storeys(upper, shoulder, block.height - shoulder, upperWidth, upperDepth, (index + 5) % 12);
-    if (block.height > 25) {
-      const x = upper.x - upperWidth * 0.12,
-        z = upper.z - upperDepth * 0.12;
-      roofVolume(x, z, upperWidth * 0.37, upperDepth * 0.32, block.height, 1.36);
-      roofVolume(
-        upper.x + upperWidth * 0.23,
-        upper.z + upperDepth * 0.17,
-        1.5,
-        1.8,
-        block.height,
-        0.54
-      );
-      if (block.height > 31) markerPositions.push([x, block.height + 1.42, z]);
-    }
-    return { facadeBatch, roofBatch };
-  });
 
   function meshFrom(batch, material) {
     const geometry = new THREE.BufferGeometry();
@@ -281,70 +94,6 @@ export function addCitySkyline(THREE, city) {
     const mesh = new THREE.Mesh(geometry, material);
     drawGroup.add(mesh);
     return mesh;
-  }
-
-  const windows = finishes.map((finish, index) => {
-    const [map, emissiveMap] = facadeTextures(THREE, finish, index);
-    textures.push(map, emissiveMap);
-    const material = new THREE.MeshStandardMaterial({
-      map,
-      emissiveMap,
-      emissive: '#fff3df',
-      emissiveIntensity: 0,
-      roughness: 0.82,
-      metalness: 0.05
-    });
-    return material;
-  });
-  const roof = new THREE.MeshStandardMaterial({ color: dayRoof, roughness: 0.9 });
-  const billboardGeometry = new THREE.PlaneGeometry(1, 1);
-  const billboards = windows.map((material, finish) => {
-    const count = blocks.filter((block) => block.finish === finish).length;
-    const batch = new THREE.InstancedMesh(billboardGeometry, material, count);
-    batch.name = 'DistantCityFacade';
-    batch.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    batch.frustumCulled = false;
-    batch.count = 0;
-    drawGroup.add(batch);
-    return batch;
-  });
-  const buildingModels = detailedBlocks.map(({ facadeBatch, roofBatch }, index) => {
-    const facade = meshFrom(facadeBatch, windows[blocks[index].finish]);
-    const top = meshFrom(roofBatch, roof);
-    facade.visible = top.visible = false;
-    return { facade, top };
-  });
-  const billboardPose = new THREE.Object3D();
-  const lastPosition = new THREE.Vector3(Infinity, Infinity, Infinity);
-  let priorCount = -1;
-
-  function updateBuildings(camera) {
-    if (lastPosition.distanceToSquared(camera.position) < 0.4) return;
-    lastPosition.copy(camera.position);
-    billboards.forEach((batch) => (batch.count = 0));
-    let distant = 0;
-    blocks.forEach((block, index) => {
-      const { facade, top } = buildingModels[index];
-      const dx = camera.position.x - block.x;
-      const dy = camera.position.y - block.height / 2;
-      const dz = camera.position.z - block.z;
-      const distanceSquared = dx * dx + dy * dy + dz * dz;
-      facade.visible = top.visible = showsExteriorDetail(distanceSquared, facade.visible, 105);
-      if (facade.visible) return;
-      const batch = billboards[block.finish];
-      const heading = Math.atan2(dx, dz);
-      const width =
-        Math.abs(Math.cos(heading)) * block.width + Math.abs(Math.sin(heading)) * block.depth;
-      billboardPose.position.set(block.x, block.height / 2, block.z);
-      billboardPose.rotation.y = heading;
-      billboardPose.scale.set(width, block.height, 1);
-      billboardPose.updateMatrix();
-      batch.setMatrixAt(batch.count++, billboardPose.matrix);
-      distant++;
-    });
-    billboards.forEach((batch) => (batch.instanceMatrix.needsUpdate = true));
-    if (priorCount !== distant) document.documentElement.dataset.cityBillboards = String(distant);
-    priorCount = distant;
   }
 
   const groundBatch = { positions: [], uvs: [], indices: [] };
@@ -359,13 +108,39 @@ export function addCitySkyline(THREE, city) {
   }
   groundQuad(groundBatch, 39, 360, -377, 70, -0.195);
   groundQuad(groundBatch, -61, 39, -377, -108, -0.195);
-  const ground = new THREE.MeshStandardMaterial({ color: '#667b73', roughness: 0.98 });
+  const ground = new THREE.MeshStandardMaterial({ color: '#788472', roughness: 0.98 });
   meshFrom(groundBatch, ground).receiveShadow = true;
   const road = new THREE.MeshStandardMaterial({ color: '#333b49', roughness: 0.94 });
-  for (const x of eastAvenues) groundQuad(streetBatch, x - 3.5, x + 3.5, -270, 43, 0.042);
-  for (const x of rearAvenues) groundQuad(streetBatch, x - 3.5, x + 3.5, -270, -180, 0.042);
+  const roadNight = { value: 0 };
+  // The same road surface carries its verge lights when seen from the air.
+  road.onBeforeCompile = shader => {
+    shader.uniforms.roadNight = roadNight;
+    shader.vertexShader = 'varying vec2 streetUv;\n' + shader.vertexShader.replace(
+      '#include <begin_vertex>', '#include <begin_vertex>\n streetUv = uv;');
+    shader.fragmentShader = 'uniform float roadNight; varying vec2 streetUv;\n' +
+      shader.fragmentShader.replace('#include <emissivemap_fragment>', `
+        #include <emissivemap_fragment>
+        if (roadNight > 0.001) {
+          float across = streetUv.x;
+          float along = streetUv.y;
+          float edge = abs(min(across, 1.0-across) - 0.09);
+          float footprint = clamp(fwidth(across), 0.012, 0.22);
+          float strip = (1.0 - smoothstep(0.014, 0.014 + footprint, edge))
+            * min(1.0, 0.06 / footprint);
+          float pool = 0.46 + 0.54 * pow(abs(cos(along * 0.25)), 4.0);
+          totalEmissiveRadiance += roadNight * strip * pool * vec3(1.0, 0.43, 0.10);
+        }`);
+  };
+  function avenue(x, start, end) {
+    quad(streetBatch, [[x-3.5, 0.042, end], [x+3.5, 0.042, end],
+      [x+3.5, 0.042, start], [x-3.5, 0.042, start]], 1, end-start);
+  }
+  for (const x of eastAvenues) avenue(x, -270, 43);
+  for (const x of rearAvenues) avenue(x, -270, -180);
   for (const [row, z] of crossStreets.entries()) {
-    groundQuad(streetBatch, row < 3 ? 36 : -43, 205, z - 3.2, z + 3.2, 0.041);
+    const start = row < 3 ? 36 : -43;
+    quad(streetBatch, [[start, 0.041, z-3.2], [start, 0.041, z+3.2],
+      [205, 0.041, z+3.2], [205, 0.041, z-3.2]], 1, 205-start);
   }
   meshFrom(streetBatch, road).receiveShadow = true;
 
@@ -382,6 +157,25 @@ export function addCitySkyline(THREE, city) {
   const poolMap = new THREE.CanvasTexture(pool);
   poolMap.colorSpace = THREE.SRGBColorSpace;
   textures.push(poolMap);
+  // Ground the towers with pavement and a soft contact shadow in two instanced draws.
+  const lotGeometry = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+  const pavingMaterial = new THREE.MeshStandardMaterial({ color: '#92958b', roughness: 0.96 });
+  const plazas = new THREE.InstancedMesh(lotGeometry, pavingMaterial, blocks.length);
+  const contact = new THREE.InstancedMesh(lotGeometry.clone(), new THREE.MeshBasicMaterial({
+    map: poolMap, color: '#141c1a', transparent: true, opacity: 0.58, depthWrite: false
+  }), blocks.length);
+  const lotTransform = new THREE.Object3D();
+  blocks.forEach((block, index) => {
+    lotTransform.position.set(block.x, 0.029, block.z);
+    lotTransform.scale.set(block.width + 3, 1, block.depth + 3);
+    lotTransform.updateMatrix();
+    plazas.setMatrixAt(index, lotTransform.matrix);
+    lotTransform.position.y = 0.034;
+    lotTransform.scale.set(block.width + 5, 1, block.depth + 5);
+    lotTransform.updateMatrix();
+    contact.setMatrixAt(index, lotTransform.matrix);
+  });
+  drawGroup.add(plazas, contact);
   const poolMaterial = new THREE.MeshBasicMaterial({
     map: poolMap,
     depthWrite: false,
@@ -426,22 +220,17 @@ export function addCitySkyline(THREE, city) {
   });
   drawGroup.add(pools, lamps, poles);
 
-  const markerGeometry = new THREE.BufferGeometry();
-  markerGeometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(markerPositions.flat(), 3)
-  );
-  const markerMaterial = new THREE.PointsMaterial({
-    color: '#ff7158',
-    size: 0.39,
-    map: poolMap,
-    transparent: true,
-    depthWrite: false,
-    opacity: 0,
-    toneMapped: false
-  });
-  const markers = new THREE.Points(markerGeometry, markerMaterial);
-  drawGroup.add(markers);
+  const beaconGeometry = new THREE.BufferGeometry();
+  const beaconPositions = blocks.filter(block => block.height > 31)
+    .flatMap(block => [block.x, block.height + 0.15, block.z]);
+  beaconGeometry.setAttribute('position', new THREE.Float32BufferAttribute(beaconPositions, 3));
+  const beacons = new THREE.Points(beaconGeometry, new THREE.PointsMaterial({
+    map: poolMap, color: '#ff7158', size: 0.39, transparent: true, depthWrite: false,
+    opacity: 0, toneMapped: false
+  }));
+  beacons.name = 'CityRoofBeacons';
+  beacons.visible = false;
+  drawGroup.add(beacons);
 
   // A gradient behind the moon and clouds adds an amber haze near the built
   // horizon, with no bloom pass and no additional scene lights.
@@ -455,9 +244,9 @@ export function addCitySkyline(THREE, city) {
     uniforms: {
       amount: { value: 0 },
       day: { value: new THREE.Color('#87ceeb') },
-      zenith: { value: new THREE.Color('#0a1630') },
-      horizon: { value: new THREE.Color('#26384f') },
-      glow: { value: new THREE.Color('#4a414c') },
+      zenith: { value: new THREE.Color('#080d2c') },
+      horizon: { value: new THREE.Color('#3f376a') },
+      glow: { value: new THREE.Color('#a16b65') },
       distanceTint: { value: new THREE.Color('#080f20') }
     },
     vertexShader: `
@@ -472,10 +261,11 @@ export function addCitySkyline(THREE, city) {
       uniform vec3 day, zenith, horizon, glow, distanceTint;
       void main() {
         vec3 direction = normalize(skyDirection);
-        float band = exp(-abs(direction.y - 0.04) * 3.4);
+        float band = exp(-abs(direction.y - 0.015) * 5.6);
         float cityward = smoothstep(-0.28, 0.95, dot(direction.xz, normalize(vec2(0.44, -1.0))));
-        vec3 night = mix(zenith, mix(horizon, glow, cityward * 0.46), band);
-        night = mix(distanceTint, night, smoothstep(-0.24, 0.03, direction.y));
+        vec3 night = mix(zenith, horizon, band);
+        night = mix(night, glow, cityward * 0.54 * band * band * band);
+        night = mix(distanceTint, night, smoothstep(-0.25, -0.025, direction.y));
         gl_FragColor = vec4(mix(day, night, amount), 1.0);
         #include <colorspace_fragment>
       }`
@@ -485,27 +275,70 @@ export function addCitySkyline(THREE, city) {
   sky.frustumCulled = false;
   drawGroup.add(sky);
 
+  const towers = addCityTowers(THREE, drawGroup, blocks, loader);
+  const districtMaterials = new Set();
+  let districtNight = 0;
+  let disposed = false;
+  const districtsReady = loader.loadAsync(
+    new URL('./assets/3d/environment/night-city-districts.glb', import.meta.url).href
+  ).then(({ scene }) => {
+    scene.traverse(mesh => {
+      if (!mesh.isMesh) return;
+      if (disposed) {
+        mesh.geometry.dispose();
+        mesh.material.map?.dispose();
+        mesh.material.emissiveMap?.dispose();
+        mesh.material.dispose();
+        return;
+      }
+      if (districtMaterials.has(mesh.material)) return;
+      districtMaterials.add(mesh.material);
+      for (const texture of [mesh.material.map, mesh.material.emissiveMap]) {
+        if (texture && !textures.includes(texture)) textures.push(texture);
+      }
+      mesh.material.emissiveIntensity = districtNight;
+    });
+    if (disposed) return;
+    towers.replaceLots(scene.userData.lots);
+    scene.name = 'SketchfabCityDistricts';
+    drawGroup.add(scene);
+  }).catch(error => console.warn('SAEI: Sketchfab city districts unavailable.', error));
+  const neighborhood = createCityNeighborhood(THREE, blocks, seededRandom(8412));
+  drawGroup.add(neighborhood.mesh);
+  textures.push(neighborhood.windows);
+  const dayGround = ground.color.clone(), nightGround = new THREE.Color('#222633');
+  const dayRoad = road.color.clone(), nightRoad = new THREE.Color('#1c2230');
+  const dayPaving = pavingMaterial.color.clone(), nightPaving = new THREE.Color('#30353b');
+
   return {
+    ready: Promise.all([towers.ready, ridgeReady, districtsReady]),
     count: blocks.length,
     rearCount: blocks.filter((block) => block.z < -110).length,
     updateCamera(camera) {
       sky.position.copy(camera.position);
-      updateBuildings(camera);
+      towers.updateCamera(camera);
     },
     setNight(amount) {
+      towers.setNight(amount);
+      neighborhood.setNight(amount);
+      ground.color.copy(dayGround).lerp(nightGround, amount);
+      road.color.copy(dayRoad).lerp(nightRoad, amount);
+      pavingMaterial.color.copy(dayPaving).lerp(nightPaving, amount);
       const lights = THREE.MathUtils.smoothstep(amount, 0.16, 0.86);
-      windows.forEach((material, i) => {
-        material.emissiveIntensity = lights * (i === 1 ? 1.55 : 1.95);
-      });
-      roof.color.copy(dayRoof).lerp(nightRoof, amount);
+      districtNight = lights * 1.3;
+      for (const material of districtMaterials) material.emissiveIntensity = districtNight;
+      roadNight.value = lights;
       poolMaterial.opacity = lights * 0.87;
       lampMaterial.opacity = lights;
-      markerMaterial.opacity = lights * 0.87;
-      pools.visible = lamps.visible = markers.visible = lights > 0.001;
+      pools.visible = lamps.visible = lights > 0.001;
+      beacons.visible = lights > 0.001;
+      beacons.material.opacity = lights * 0.87;
       skyMaterial.uniforms.amount.value = amount;
       sky.visible = amount > 0.002;
     },
     destroy() {
+      disposed = true;
+      towers.destroy();
       drawGroup.removeFromParent();
       drawGroup.traverse((mesh) => {
         mesh.geometry?.dispose();

@@ -247,6 +247,7 @@
       window.OfoqFrontend.log?.('profile', 'تحديث المعلومات الشخصية');
       showProfile();
       closeEditor();
+      window.dispatchEvent(new Event('saei:profile-updated'));
       status.textContent = 'تم تحديث ملفك خلال هذه الزيارة.';
     });
     profileForm.addEventListener('input', (event) => {

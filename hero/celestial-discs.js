@@ -45,6 +45,9 @@ export function createCelestialDiscs(THREE, sky) {
   sky.add(sun);
 
   const moon = new THREE.Group();
+  // Three.js starts a new transparent sort group at every Group, including this
+  // one. Keep the lunar disc and halo in the sky pass, behind the cloud banks.
+  moon.renderOrder = sky.renderOrder;
   sky.add(moon);
   const coronaMap = radialTexture(THREE, [
     [0, 'rgba(255,190,150,.21)'],
@@ -90,6 +93,13 @@ export function createCelestialDiscs(THREE, sky) {
   lunarMap.offset.set(0.027, 0.027);
   const lunarFace = new THREE.Mesh(new THREE.CircleGeometry(9.4, 64), lunarMaterial);
   moon.add(lunarFace);
+  // Keep the orbital projection and sea clipping while testing against all city geometry.
+  for (const material of [sun.material, corona.material, lunarMaterial]) {
+    material.onBeforeCompile = shader => {
+      shader.vertexShader = shader.vertexShader.replace('#include <clipping_planes_vertex>',
+        '#include <clipping_planes_vertex>\n gl_Position.z = gl_Position.w * 0.999999;');
+    };
+  }
   const front = new THREE.Vector3(0, 0, 1);
   const facing = new THREE.Vector3();
 

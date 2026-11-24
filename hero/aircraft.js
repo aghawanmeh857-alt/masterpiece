@@ -7,7 +7,7 @@ export function sampleAircraftFlight(phase) {
   const speedZ = 126 * Math.PI * Math.cos(arc);
   return {
     x: -410 + speedX * progress,
-    y: 67 + 7 * Math.sin(arc),
+    y: 168 + 7 * Math.sin(arc),
     z: -79 + 126 * Math.sin(arc),
     yaw: Math.atan2(speedX, speedZ),
     pitch: -Math.atan2(speedY, Math.hypot(speedX, speedZ)),

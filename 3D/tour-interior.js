@@ -118,11 +118,12 @@ export function createTourInterior(THREE, scene, { box, cylinder, people, props 
     group.add(shadow);
   }
 
-  function sit(group, { x = 0, z = 0, height = 0.46, rotation = Math.PI, pose = 1 } = {}) {
+  function sit(group, { x = 0, z = 0, height = 0.46, rotation = Math.PI, pose = 1, role = 'listener' } = {}) {
     group.updateMatrixWorld(true);
     const at = group.localToWorld(new THREE.Vector3(x, height, z));
     return people(at.x, at.z, {
       rotation: group.rotation.y + rotation,
+      role,
       seat: { height: at.y, pose }
     });
   }
@@ -196,6 +197,7 @@ export function createTourInterior(THREE, scene, { box, cylinder, people, props 
       box(3.48, 0.08, 0.96, 0, 0.045, 0, frame, group);
       laptop(group, -0.76, 1.03, -0.07);
       notebook(group, 0.92, 1.03, 0.12, 0);
+      return group;
     },
     sofa(x, z, rotation, occupied) {
       const group = groupAt(x, z, rotation);
@@ -216,18 +218,18 @@ export function createTourInterior(THREE, scene, { box, cylinder, people, props 
     classroom(x, z, variant) {
       const group = groupAt(x, z);
       table(group, 1.59, 0.69, 0.755);
-      if (variant % 2 === 0) laptop(group, -0.18, 0.755, -0.05);
+      if (variant % 2 === 0) laptop(group, 0, 0.755, 0.19);
       notebook(group, 0.48, 0.755, 0.12, 2);
-      chair(group, 'classroom', 0.93);
-      sit(group, { z: 1, pose: (variant % 2) + 1 });
+      chair(group, 'classroom', 0.72);
+      sit(group, { z: 0.79, pose: (variant % 2) + 1, role: variant % 2 === 0 ? 'typist' : 'listener' });
     },
     mentorTable(x, z) {
       const group = groupAt(x, z);
       table(group, 2.13, 0.92, 0.755);
       notebook(group, -0.59, 0.755, 0.14, 3);
-      laptop(group, 0.43, 0.755, -0.12);
-      chair(group, 'interview', 1.03);
-      sit(group, { z: 1.09, pose: 2 });
+      laptop(group, 0, 0.755, 0.25);
+      chair(group, 'interview', 0.78);
+      sit(group, { z: 0.84, pose: 2, role: 'typist' });
     },
     interview(x, z) {
       const group = groupAt(x, z);
@@ -240,7 +242,7 @@ export function createTourInterior(THREE, scene, { box, cylinder, people, props 
       }
       const host = groupAt(group.position.x, group.position.z - 1.18, Math.PI);
       chair(host, 'interview');
-      sit(host, { z: 0.045, pose: 1 });
+      sit(host, { z: 0.045, pose: 1, role: 'interviewer' });
     },
     theatreSeat(x, z, occupied, pose) {
       const group = groupAt(x, z);

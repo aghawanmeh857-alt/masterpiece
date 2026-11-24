@@ -29,15 +29,17 @@
       info.append(group);
     }
   }
-  info.after(document.getElementById('profilePublicDocuments'));
+  const fields = document.createElement('div');
+  fields.className = 'profile-fields';
+  info.before(fields);
+  fields.append(info, document.getElementById('profilePublicDocuments'));
   personalInfo();
   document.getElementById('profileForm').addEventListener('submit', personalInfo);
   const edit = document.getElementById('editProfile');
-  personal.querySelector('h2').after(edit);
   const personalHeader = document.createElement('div');
   personalHeader.className = 'profile-panel-heading';
   personal.prepend(personalHeader);
-  personalHeader.append(document.getElementById('aboutTitle'), edit);
+  personalHeader.append(document.getElementById('aboutTitle'));
   for (const [id, title] of [
     ['profileBio', 'نبذة عني'],
     ['profileSkills', 'مهاراتي']
@@ -65,7 +67,7 @@
   nav.className = 'profile-section-nav';
   nav.setAttribute('role', 'tablist');
   nav.setAttribute('aria-label', 'أقسام حسابي');
-  nav.setAttribute('aria-orientation', 'vertical');
+  nav.setAttribute('aria-orientation', 'horizontal');
   const buttons = [];
   for (const [id, label] of definitions) {
     const panel = stack.querySelector(`[data-profile-section="${id}"]`);
@@ -93,7 +95,7 @@
     buttons.push(button);
     nav.append(button);
   }
-  identity.append(nav);
+  identity.after(nav);
   const paths = {
     personal: 'M4 21v-2a8 8 0 0 1 16 0v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
     courses: 'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3zM12 6v16',
@@ -115,9 +117,14 @@
     button.prepend(icon);
   }
   const hero = main.querySelector('.account-heading');
-  hero.querySelector('h1').textContent = 'ملفي الشخصي';
-  hero.querySelector('h1').nextElementSibling.textContent =
-    'اعرض معلوماتك الشخصية وتابع دوراتك وطلباتك وملفاتك.';
+  const breadcrumb = hero.querySelector('h1');
+  breadcrumb.textContent = 'حسابي / الملف الشخصي';
+  hero.replaceChildren(breadcrumb);
+  const identityText = document.createElement('div');
+  identityText.className = 'identity-text';
+  identity.querySelector('#profileAvatar').after(identityText);
+  identityText.append(...['profileName', 'profileRole', 'profileLocation'].map(id => document.getElementById(id)));
+  identity.append(edit);
   const overview = document.createElement('div');
   overview.className = 'profile-overview';
   for (const [label, count] of [
@@ -133,16 +140,12 @@
     item.append(value, text);
     overview.append(item);
   }
-  identity.insertBefore(overview, nav);
-  const dashboardLink = hero.querySelector('a');
-  dashboardLink.classList.add('profile-reference-dashboard');
-  nav.prepend(dashboardLink);
-  const accountType = document.createElement('span');
-  accountType.className = 'profile-account-type';
-  accountType.textContent = 'حساب شخصي';
-  hero.append(accountType);
+  personal.append(overview);
+  main.append(main.querySelector('.preview-note'));
+  const preview = document.getElementById('activityPreview');
   function select(id, update = true) {
     if (!buttons.some((button) => button.dataset.profileTab === id)) id = 'personal';
+    preview.hidden = id !== 'personal';
     for (const panel of stack.querySelectorAll('[data-profile-section]'))
       panel.hidden = panel.dataset.profileSection !== id;
     for (const button of buttons) {
@@ -171,8 +174,8 @@
     const index = buttons.indexOf(event.target);
     if (index < 0) return;
     let next;
-    if (['ArrowDown', 'ArrowRight'].includes(event.key)) next = (index + 1) % buttons.length;
-    else if (['ArrowUp', 'ArrowLeft'].includes(event.key))
+    if (['ArrowDown', 'ArrowLeft'].includes(event.key)) next = (index + 1) % buttons.length;
+    else if (['ArrowUp', 'ArrowRight'].includes(event.key))
       next = (index - 1 + buttons.length) % buttons.length;
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = buttons.length - 1;
@@ -181,7 +184,7 @@
     buttons[next].focus();
     select(buttons[next].dataset.profileTab);
   });
-  edit.addEventListener('click', () => select('personal'));
+  edit.addEventListener('click', () => select('personal'), true);
   addEventListener('hashchange', fromHash);
   addEventListener('ofoq:profile-activity', () => {
     for (const button of buttons) {

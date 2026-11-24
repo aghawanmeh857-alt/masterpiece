@@ -11,6 +11,7 @@
       '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
     messages:
       '<path d="M21 11a8 8 0 0 1-8 8H6l-4 3V11a8 8 0 0 1 8-8h3a8 8 0 0 1 8 8Z"/><path d="M7 9h9M7 13h6"/>',
+    favorites: '<path d="M20.8 4.8a5.5 5.5 0 0 0-7.8 0L12 6l-1.1-1.2a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.4a5.5 5.5 0 0 0 0-7.8Z"/>',
     settings:
       '<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/>',
     login: '<path d="M14 3h6v18h-6M3 12h12m-4-4 4 4-4 4"/>',
@@ -64,4 +65,32 @@
       : `<div class="container-xl header-inner">${brand}${navigation}${actions}</div>`;
   }
   script.replaceWith(header);
+  if (script.dataset.workspace !== undefined) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const main = document.getElementById('mainContent');
+      if (!main || (main.querySelector('#profileName') && new URLSearchParams(location.search).has('user'))) return;
+      const shell = document.createElement('div');
+      shell.className = 'member-workspace';
+      const nav = document.createElement('nav');
+      nav.className = 'workspace-rail';
+      nav.setAttribute('aria-label', 'مساحة الحساب');
+      const title = document.createElement('strong');
+      title.textContent = 'مساحة الحساب';
+      nav.append(title);
+      for (const [folder, label, icon] of [
+        ['Profile', 'الملف الشخصي', 'profile'], ['Dashboard', 'لوحة المتابعة', 'dashboard'],
+        ['Favorites', 'المفضلة', 'favorites'], ['Messages', 'الرسائل', 'messages'],
+        ['Settings', 'الإعدادات', 'settings']
+      ]) {
+        const link = document.createElement('a');
+        link.href = url('Account/' + folder + '/' + folder.toLowerCase() + '.html');
+        if (link.pathname === location.pathname) link.setAttribute('aria-current', 'page');
+        link.innerHTML = accountIcon(icon);
+        link.append(label);
+        nav.append(link);
+      }
+      main.before(shell);
+      shell.append(nav, main);
+    }, { once: true });
+  }
 })();

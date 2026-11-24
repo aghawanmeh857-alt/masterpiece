@@ -53,8 +53,7 @@ a {
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 16px;
-  background: radial-gradient(ellipse at 50% 36%, #203951, #0c1727 69%);
+  background: radial-gradient(ellipse at 50% 46%, #1c334b, #101d2d 68%);
   color: #ecf2f7;
   font-size: 0.9rem;
   overscroll-behavior: contain;
@@ -65,42 +64,37 @@ a {
 }
 
 .scene-loader-mark {
-  position: relative;
-  width: 138px;
-  height: 78px;
-  overflow: hidden;
-  border-radius: 15px;
+  display: grid;
+  width: clamp(125px, 18vw, 176px);
+  padding: 14px 17px;
+  border-radius: 14px;
   background: #fffdf9;
+  box-shadow: 0 12px 36px #070d1660;
 }
 
 .scene-loader-mark img {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 148px;
-  height: 148px;
-  max-width: none;
-  transform: translate(-50%, -50%);
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-.scene-loader-spinner {
-  width: 28px;
-  height: 28px;
-  border: 2px solid #ffd7bc45;
-  border-top-color: #ff8f56;
-  border-radius: 50%;
-  animation: scene-loading-spin 0.85s linear infinite;
-}
+@media (prefers-reduced-motion: no-preference) {
+  .scene-loader-mark img:first-child { opacity: 0.25; }
 
-@keyframes scene-loading-spin {
-  to {
-    transform: rotate(1turn);
+  .scene-loader-reveal {
+    animation: scene-logo-fill 1.85s ease-in-out infinite;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scene-loader-spinner {
-    animation: none;
-  }
+  .scene-loader-mark .scene-loader-reveal { display: none; }
+}
+
+@keyframes scene-logo-fill {
+  0% { clip-path: inset(0 0 0 100%); }
+  68%, 84% { clip-path: inset(0); opacity: 1; }
+  100% { clip-path: inset(0); opacity: 0; }
 }
 
 .scene-vignette {

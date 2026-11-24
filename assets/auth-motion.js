@@ -1,104 +1,71 @@
 (() => {
-  const form = document.getElementById('authForm');
-  if (!form) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const timers = new WeakMap();
-  const animations = new WeakMap();
-  const lastPulse = new WeakMap();
-  const dot = document.querySelector('.auth-dot');
-  let angle = -110;
-  let speed = 0;
-  let orbitFrame = 0;
-  let previousTime = 0;
-  let typingUntil = 0;
-  function orbit(time) {
-    orbitFrame = 0;
-    if (reduced.matches || document.hidden || !dot) {
-      speed = 0;
-      return;
+  const transitionKey = 'authTransition';
+  const contextKeys = ['next', 'account', 'service', 'theme'];
+  const initialUrl = new URL(location.href);
+  const arriving = initialUrl.searchParams.get(transitionKey) === '1';
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (arriving && !reducedMotion.matches) document.documentElement.dataset.authArrival = '';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const shell = document.querySelector('.auth-shell');
+    if (!shell) return;
+
+    if (arriving) {
+      const cleanUrl = new URL(location.href);
+      cleanUrl.searchParams.delete(transitionKey);
+      history.replaceState(history.state, '', cleanUrl);
     }
-    const dt = Math.min((time - previousTime) / 1000, 0.05);
-    previousTime = time;
-    const targetSpeed = time < typingUntil ? 85 : 0;
-    speed += (targetSpeed - speed) * (1 - Math.exp(-dt * 5));
-    angle = (angle + speed * dt) % 360;
-    dot.style.setProperty('--orbit-angle', `${angle}deg`);
-    if (targetSpeed || speed > 0.15) orbitFrame = requestAnimationFrame(orbit);
-    else speed = 0;
-  }
-  function moveOrbit() {
-    if (!dot || reduced.matches || !dot.getClientRects().length) return;
-    typingUntil = performance.now() + 650;
-    if (!orbitFrame) {
-      previousTime = performance.now();
-      orbitFrame = requestAnimationFrame(orbit);
+
+    for (const link of shell.querySelectorAll('[data-auth-switch]')) {
+      const target = new URL(link.href);
+      for (const key of contextKeys) {
+        const value = initialUrl.searchParams.get(key);
+        if (value && !target.searchParams.has(key)) target.searchParams.set(key, value);
+      }
+      link.href = target;
     }
-  }
-  function stopOrbit() {
-    cancelAnimationFrame(orbitFrame);
-    orbitFrame = 0;
-    speed = 0;
-  }
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopOrbit();
-  });
-  reduced.addEventListener('change', () => {
-    if (reduced.matches) stopOrbit();
-  });
-  window.addEventListener('pagehide', stopOrbit);
-  form.addEventListener('input', (event) => {
-    const field = event.target.closest('.field');
-    if (!field) return;
-    moveOrbit();
-    field.classList.add('is-typing');
-    clearTimeout(timers.get(field));
-    timers.set(
-      field,
-      setTimeout(() => field.classList.remove('is-typing'), 650)
-    );
-    const now = performance.now();
-    if (reduced.matches || now - (lastPulse.get(field) ?? -Infinity) < 240) return;
-    lastPulse.set(field, now);
-    animations.get(field)?.cancel();
-    animations.set(
-      field,
-      field.animate(
-        [
-          { transform: 'translateY(0)' },
-          { transform: 'translateY(-2px)', offset: 0.4 },
-          { transform: 'translateY(0)' }
-        ],
-        { duration: 260, easing: 'ease-out' }
-      )
-    );
-  });
-  form.addEventListener('focusout', (event) => {
-    const field = event.target.closest('.field');
-    if (field) {
-      clearTimeout(timers.get(field));
-      field.classList.remove('is-typing');
+
+    let switching = false;
+    function reset() {
+      switching = false;
+      shell.inert = false;
+      shell.classList.remove('is-auth-switching');
     }
+
+    addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        delete document.documentElement.dataset.authArrival;
+        reset();
+      }
+    });
+
+    shell.addEventListener('click', (event) => {
+      const link = event.target.closest('[data-auth-switch]');
+      if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey ||
+          event.ctrlKey || event.shiftKey || event.altKey || reducedMotion.matches) return;
+
+      event.preventDefault();
+      if (switching) return;
+      switching = true;
+      const target = new URL(window.siteThemeUrl ? window.siteThemeUrl(link.href) : link.href);
+      target.searchParams.set(transitionKey, '1');
+      shell.classList.add('is-auth-switching');
+      shell.inert = true;
+
+      // Keep the existing application routing and use a timeout if the animation is interrupted.
+      let fallback;
+      function navigate() {
+        clearTimeout(fallback);
+        shell.removeEventListener('animationend', finish);
+        if (window.OfoqFrontend?.navigate) window.OfoqFrontend.navigate(target.href);
+        else location.assign(target.href);
+      }
+      function finish(event) {
+        if (event.animationName === 'auth-panel-cover') navigate();
+      }
+      shell.addEventListener('animationend', finish);
+      fallback = setTimeout(navigate, 420);
+    });
   });
-  form.addEventListener(
-    'invalid',
-    (event) => {
-      const field = event.target.closest('.field');
-      if (!field || reduced.matches) return;
-      animations.get(field)?.cancel();
-      animations.set(
-        field,
-        field.animate(
-          [
-            { transform: 'translateX(0)' },
-            { transform: 'translateX(5px)' },
-            { transform: 'translateX(-5px)' },
-            { transform: 'translateX(3px)' },
-            { transform: 'translateX(0)' }
-          ],
-          { duration: 320, easing: 'ease-out' }
-        )
-      );
-    },
-    true
-  );
 })();

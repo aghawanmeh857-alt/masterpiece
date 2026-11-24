@@ -1,5 +1,6 @@
 import { addCityTowers } from './city-towers.js';
 import { createCityNeighborhood } from './night-neighborhood.js';
+import { addSelectedCity, officeHeightsByLot } from '../3D/city/selected-city.js';
 
 const eastAvenues = [71, 105, 139, 173];
 const crossStreets = [-31, -65, -99, -133, -167, -201, -235];
@@ -50,6 +51,7 @@ export function skylineBlocks() {
     { x: 20, z: -117, width: 12.6, depth: 16, height: 34, finish: 0, setback: true },
     { x: -33, z: -108, width: 14, depth: 16, height: 28, finish: 2, setback: false }
   );
+  for (const [index, height] of Object.entries(officeHeightsByLot)) blocks[index].height = height;
   return blocks;
 }
 
@@ -276,6 +278,7 @@ export function addCitySkyline(THREE, city, loader) {
   drawGroup.add(sky);
 
   const towers = addCityTowers(THREE, drawGroup, blocks, loader);
+  const selectedCity = addSelectedCity(THREE, drawGroup, loader, towers.replaceLots, textures);
   const districtMaterials = new Set();
   let districtNight = 0;
   let disposed = false;
@@ -311,15 +314,17 @@ export function addCitySkyline(THREE, city, loader) {
   const dayPaving = pavingMaterial.color.clone(), nightPaving = new THREE.Color('#30353b');
 
   return {
-    ready: Promise.all([towers.ready, ridgeReady, districtsReady]),
+    ready: Promise.all([towers.ready, ridgeReady, districtsReady, selectedCity.ready]),
     count: blocks.length,
     rearCount: blocks.filter((block) => block.z < -110).length,
     updateCamera(camera) {
       sky.position.copy(camera.position);
       towers.updateCamera(camera);
+      selectedCity.updateCamera(camera);
     },
     setNight(amount) {
       towers.setNight(amount);
+      selectedCity.setNight(amount);
       neighborhood.setNight(amount);
       ground.color.copy(dayGround).lerp(nightGround, amount);
       road.color.copy(dayRoad).lerp(nightRoad, amount);
@@ -338,6 +343,7 @@ export function addCitySkyline(THREE, city, loader) {
     },
     destroy() {
       disposed = true;
+      selectedCity.destroy();
       towers.destroy();
       drawGroup.removeFromParent();
       drawGroup.traverse((mesh) => {

@@ -236,9 +236,6 @@ body[data-section='freelance'] .project-offer .details-link {
   font-size: 12px;
   margin: 0;
 }
-body[data-section='freelance'] .community-banner {
-  margin-top: 48px;
-}
 @media (min-width: 1500px) {
   body[data-section='freelance'] .workspace {
     grid-template-columns: 290px minmax(0, 1fr);
